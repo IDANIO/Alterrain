@@ -2,6 +2,23 @@
 
 UCSC CMPM 120 Phaser Multiplayer Game
 
+## Team
+
+* **Ivan Xu** (yxu83) - [RaiderSoap](https://github.com/RaiderSoap)
+* **Julio Choy** - [svntax](https://github.com/svntax)
+* **David Kirkpatrick**
+
+### Links
+
+* **[Production Plan](https://docs.google.com/spreadsheets/d/1j9RkvIJDULHMqaTGhHoymikjDXNxcCUxKwtvIhiS2I4/edit?usp=drive_web&ouid=101774301194820727572)**
+* **[Team Drive](https://drive.google.com/drive/u/1/folders/0AAoaaZ8jLRMSUk9PVA)**
+
+### Sever
+
+Ubuntu NodeJS 10.0 on 16.04
+
+1 GB Memory / 25 GB Disk / SFO2
+
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
@@ -57,7 +74,7 @@ cd /home/game/project
 git pull
 ```
 
-Then start the game application:
+Then start the game application (only if the game is not work as expected):
 
 ```
 pm2 start game      // game is an task I already defined
@@ -86,13 +103,6 @@ pm2 monit
 
 * [Socket.io](http://socket.io) - Realtime application framework (Node.JS server)
 * [Express](https://expressjs.com/) - Fast, unopinionated, minimalist web framework for node.
-
-
-## People
-
-* **Ivan Xu** - [RaiderSoap](https://github.com/RaiderSoap)
-* **Julio Choy** - [svntax](https://github.com/svntax)
-* **David Kirkpatrick**
 
 ## License
 
