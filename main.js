@@ -1,22 +1,24 @@
-let express = require('express');
-let app = express();
-let path = require('path');
+const path = require('path');
+const express = require('express');
+const compression = require('compression');
+const app = express();
 
-let server = require('http').createServer(app);
-let io = require('socket.io')(server);
-let port = process.env.PORT || 3000;
+const server = require('http').createServer(app);
+const io = require('socket.io')(server);
+const port = process.env.PORT || 8080;
 
 server.listen(port, () => {
   console.log('Server listening at port %d', port);
 });
 
+app.use(compression());
+
 // Routing
 app.use(express.static(path.join(__dirname, 'public')));
-
 
 io.on('connection', (socket) => {
   console.log('A client connected..');
   socket.on('disconnect', () => {
-    console.log('A client Disconnected..')
-  })
+    console.log('A client Disconnected..');
+  });
 });
