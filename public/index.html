@@ -1,13 +1,32 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-	<meta charset="UTF-8" />
-	<title>Phaser Bootstrap</title>
-	<script type="text/javascript" src="./framework/phaser.min.js"></script>
-	<script type="text/javascript" src="./myGame/js/main.js"></script>
-	<link rel="stylesheet" type="text/css" href="./myGame/css/styles.css">
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Phaser - ES6 - Webpack</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta http-equiv="cleartype" content="on">
+    <meta name="format-detection" content="telephone=no">
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
 </head>
+
 <body>
-	<h1>My Game</h1>
-</body>
+
+    <div id="content"></div>
+    <div> Control: </div>
+    <div>Use Arrow Key to move Marisa. Hold 'Z' to cast spells. Hold 'Shift'
+        to focus
+    </div>
+    <!-- uncomment the line bellow for cordova feature -->
+    <!-- <script type="text/javascript" src="cordova.js"></script> -->
+<script type="text/javascript" src="./dist/vendor.bundle.js"></script><script type="text/javascript" src="./dist/bundle.js"></script></body>
+
 </html>
