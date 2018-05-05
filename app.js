@@ -5,6 +5,7 @@
  */
 const express = require('express');
 const compression = require('compression');
+const bodyParser = require('body-parser');
 const path = require('path');
 const dotenv = require('dotenv');
 const favicon = require('serve-favicon');
@@ -13,8 +14,7 @@ const logger = require('morgan');
 const errorHandler = require('errorhandler');
 
 /**
- * Load environment variables from .env file, where API keys and passwords
- * are configured.
+ * Load environment variables from .env file.
  */
 dotenv.load({path: '.env'});
 
@@ -32,6 +32,7 @@ const port = process.env.PORT || 8080;
 app.use(compression());
 app.use(logger('dev'));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(bodyParser.json);
 
 /**
  * Socket
@@ -55,7 +56,6 @@ io.on('connection', (socket) => {
  * Basic Routing.
  */
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
-
 
 /**
  * Error Handler.
