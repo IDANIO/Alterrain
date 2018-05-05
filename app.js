@@ -60,7 +60,6 @@ app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
 /**
  * Error Handler.
  */
-console.log(process.env.NODE_ENV);
 if (process.env.NODE_ENV === 'development') {
   // only use in development
   app.use(errorHandler());
