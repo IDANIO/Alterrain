@@ -19,13 +19,23 @@
   },
   "homepage": "https://github.com/RaiderSoap/cmpm120-project#readme",
   "dependencies": {
+    "body-parser": "^1.18.2",
+    "chalk": "^2.4.1",
     "compression": "^1.7.2",
+    "dotenv": "^5.0.1",
     "express": "^4.16.3",
-    "socket.io": "^2.1.0",
-    "winston": "^3.0.0-rc5"
+    "morgan": "^1.9.0",
+    "serve-favicon": "^2.5.0",
+    "socket.io": "^2.1.0"
   },
   "devDependencies": {
+    "errorhandler": "^1.5.0",
     "eslint": "^4.19.1",
-    "eslint-config-google": "^0.9.1"
+    "eslint-config-google": "^0.9.1",
+    "mocha": "^5.1.1"
+  },
+  "engines": {
+    "node": ">=8.11.1",
+    "npm": ">=5.6.0"
   }
 }
