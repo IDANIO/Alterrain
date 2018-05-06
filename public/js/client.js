@@ -71,6 +71,8 @@ var Client = {};
     for (var i = 0; i < players.length; i++) {
       gameplayState.addNewPlayer(players[i].id, players[i].x, players[i].y)
     }
+
+    gameplayState.generateTiles(data.tiles);
   });
 
   /**
