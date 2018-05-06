@@ -14,6 +14,11 @@ const logger = require('morgan');
 const errorHandler = require('errorhandler');
 
 /**
+ * import Server Game
+ */
+const Game = require('./app/server.js');
+
+/**
  * Load environment variables from .env file.
  */
 dotenv.load({path: '.env'});
@@ -44,13 +49,16 @@ server.listen(port, () => {
   `);
 });
 
-io.on('connection', (socket) => {
-  logger.info('A client connected..');
+const game = new Game(io);
+game.startGameClock();
 
-  socket.on('disconnect', () => {
-    logger.info('A client Disconnected..');
-  });
-});
+// io.on('connection', (socket) => {
+//   logger.info('A client connected..');
+//
+//   socket.on('disconnect', () => {
+//     logger.info('A client Disconnected..');
+//   });
+// });
 
 /**
  * Basic Routing.
