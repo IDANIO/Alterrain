@@ -14,6 +14,8 @@ GameplayState.prototype = {
 
     create: function(){
         game.stage.backgroundColor = "#222";
+        
+        this.tileGroup = game.add.group();
 
         Client.askNewPlayer();
 
@@ -55,6 +57,26 @@ GameplayState.prototype = {
     movePlayer: function(id, x, y){
         this.playerMap[id].x = x;
         this.playerMap[id].y = y;
+    },
+    
+    //Generates tile objects based on a given 2D tilemap
+    //0 == grass
+    //1 == sand
+    generateTiles: function(tileMap){
+        for(let i = 0; i < tileMap.length; i++){
+            for(let j = 0; j < tileMap[i].length; j++){
+                if(tileMap[i][j] === 0){ //grass
+                    let tile = this.tileGroup.create(i * 32, j * 32, "grassTile");
+                    tile.scale.x = 2;
+                    tile.scale.y = 2;
+                }
+                else if(tileMap[i][j] === 1){ //sand
+                    let tile = this.tileGroup.create(i * 32, j * 32, "sandTile");
+                    tile.scale.x = 2;
+                    tile.scale.y = 2;
+                }
+            }
+        }
     }
 }
 

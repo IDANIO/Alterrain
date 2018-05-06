@@ -30,6 +30,11 @@ Client.socket.on("remove", function(id){
     gameplayState.removePlayer(id);
 });
 
+//Callback function when the tileMap 2D array is received
+Client.socket.on("tilemap", function(tilemap){
+    gameplayState.generateTiles(tilemap);
+});
+
 //Callback function whenever a "moveplayer" signal is received
 Client.socket.on("moveplayer", function(data){
     gameplayState.movePlayer(data.id, data.x, data.y);
