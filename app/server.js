@@ -1,10 +1,30 @@
-// const Tiles = require('./game/tiles');
-const MAP_WIDTH = 16;
-const MAP_HEIGHT = 16;
+'use strict';
 
+const EventEmitter = require('events');
+const World = require('./game/world.js');
+
+/**
+ * Server is the main server-side singleton code.
+ * This class should not be used to contain the actual game logic.
+ * Only logging gameplay statistics and registering user activity and user data.
+ */
 class Server {
   constructor(io) {
+    /**
+     * @type {Map<String, Object>} HashTable that contains the currently
+     * connected players.
+     */
+    this.connectedPlayers = new Map();
+
+    this.intervalFrameRate = 60;
     this.lastPlayerID = 0;
+
+    /**
+     * @type {World} The actual game world
+     */
+    this.world = null;
+
+    this.setupEventEmitter();
     this.setupSocketIO(io);
     //The game world represented in a 2D array
     //0 = grass
@@ -22,119 +42,202 @@ class Server {
     generateTileMap(this.tileMap, this.heightmap);
   }
 
+  /**
+   * Register handlers for an event
+   * @private
+   */
+  setupEventEmitter() {
+    let emitter = new EventEmitter();
+
+    this.on = emitter.on;
+    this.once = emitter.once;
+    this.removeListener = emitter.removeListener;
+
+    this.emit = emitter.emit;
+  }
+
+  /**
+   * @param io {Socket}
+   */
   setupSocketIO(io) {
     this.io = io;
-    io.on('connection', (socket) => {
-      socket.on('newplayer', () => {
-        socket.player = {
-          id: this.lastPlayerID++,
-          x: randomInt(100, 400),
-          y: randomInt(100, 400),
-        };
+    io.on('connection', this.onPlayerConnected.bind(this));
+  }
 
-        socket.emit('allplayers', this.getAllPlayers());
-        
-        //Send the tilemap data to the new player
-        socket.emit("tilemap", this.tileMap);
+  /**
+   * @param worldSettings {Object=}
+   */
+  initWorld(worldSettings) {
+    this.world = new World();
 
-        socket.broadcast.emit('newplayer', socket.player);
-
-        socket.on('moveplayer', (data) => {
-          socket.player.x += data.dx;
-          socket.player.y += data.dy;
-          io.emit('moveplayer', socket.player);
-        });
-
-        socket.on('disconnect', () => {
-          io.emit('remove', socket.player.id);
-        });
-      });
-    });
+    /**
+     * The worldSettings defines the game world constants, such
+     * as width, height, depth, etc. such that all other classes
+     * can reference these values.
+     * @member {Object} worldSettings
+     * @memberof Server
+     */
+    this.worldSettings = Object.assign({}, worldSettings);
   }
 
   /**
    * Start game logic and the clock
    */
-  startGameClock() {
-    this.intervalGameTick = setInterval(() => {
+  start() {
+    this.initWorld();
+
+    const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
+    this.intervalGameTick = setInterval(this.step.bind(this), intervalDelta);
+  }
+
+  /**
+   * Single game step.
+   *
+   * @param {Number=} dt - elapsed time since last step was called.
+   */
+  step(dt) {
+    this.serverTime = (new Date().getTime());
+
+    // let step = ++this.world.stepCount;
+
+    // this.emit('preStep', {step, dt});
+
+    // Main Game Update Goes Here
+    this.world.step(dt);
+
+    // for (const player of this.connectedPlayers) {
+    //   if (player.state === 'new') {
+    //     player.state = 'synced';
+    //   }
+    //   player.socket.emit('worldUpdate', {});
+    // }
+
+    // this.emit('postStep', {step});
+  }
+
+  /**
+   * Called when the Client first opens up the browser.
+   * However the players is no yet joined to the world.
+   * @param socket {Socket}
+   */
+  onPlayerConnected(socket) {
+    let onlineCount = this.connectedPlayers.size + 1;
+    console.log(`[${onlineCount}] A Client connected`, socket.id);
+
+    // get next available id
+    let playerId = ++this.lastPlayerID;
+
+    // save player
+    this.connectedPlayers.set(socket.id, {
+      socket: socket,
+      state: 'new',
+      playerId: playerId,
+    });
+
+    // create a new Event (indicating connection)
+    let playerEvent = {
+      id: socket.id,
+      playerId: playerId,
+      joinTime: 0,
+      disconnectTime: 0,
+    };
+
+    // TODO: change name
+    socket.on('newplayer', () => {
+      playerEvent.joinTime = (new Date()).getTime();
+      this.onPlayerJoinWorld(socket, playerEvent);
+
+      console.log(`[${playerEvent.id}] Has joined the world
+      playerId        ${playerEvent.playerId}
+      joinTime        ${playerEvent.joinTime}
+      disconnectTime  ${playerEvent.disconnectTime}`);
+    });
+
+    socket.on('disconnect', () => {
+      playerEvent.disconnectTime = (new Date()).getTime();
+      socket.broadcast.emit('playerEvent', playerEvent);
+
+      this.onPlayerDisconnected(socket.id);
+      // this.gameEngine.emit('server__playerDisconnected', playerEvent);
+      // this.gameEngine.emit('playerDisconnected', playerEvent);
+
+      console.log(`[playerEvent] disconnect
+      playerId        ${playerEvent.playerId}
+      joinTime        ${playerEvent.joinTime}
+      disconnectTime  ${playerEvent.disconnectTime}`);
     });
   }
 
   /**
-   * tick based on the frame interval
-   * in this game it is 1000/60
-   * handle all the game module's update
-   * @private
+   * handle player when join the world
+   * @param socket {Socket}
+   * @param playerEvent {Object}
    */
-  tick() {
+  onPlayerJoinWorld(socket, playerEvent) {
+    // This send the data of all players to the new-joined client.
+    playerEvent.x = 50;
+    playerEvent.y = 50;
 
-  }
+    this.world.addObject(playerEvent.playerId);
 
-  getAllPlayers() {
-    let players = [];
-    Object.keys(this.io.sockets.connected).forEach((socketID) => {
-      let player = this.io.sockets.connected[socketID].player;
-      if (player) {
-        players.push(player);
-      }
+    let objects = [];
+    this.world.objects.forEach((value) => {
+      objects.push(value);
     });
-    return players;
+
+    socket.emit('initWorld', {
+      players: objects,
+      tiles: this.world.getTileMap(),
+    });
+
+    // This send out the new-joined client's data to all other clients
+    socket.broadcast.emit('playerEvent', playerEvent);
+
+    /**
+     * Receive Input from Client
+     * TODO: Rename messages name to something else
+     */
+    socket.on('moveplayer', (data) => {
+      this.onReceivedInput(data, socket, playerEvent.playerId);
+    });
   }
-}
 
-/**
- * Returns the type of terrain that corresponds to the
- * given parameters
- * @param elevation The 2D array that represents the elevation
- * @param moisture The 2D array that represents the moisture
- * @returns {number} an integer that corresponds to a specific tile type
- */
-function getBiomeType(elevation, moisture){
-    //TODO properly check the terrain type
-    if(elevation < 0.5){
-        return 0;
-    }
-    else{
-        return 1;
-    }
-}
+  /**
+   * handle player dis-connection
+   * @param socketId {String}
+   */
+  onPlayerDisconnected(socketId) {
+    this.connectedPlayers.delete(socketId);
 
-/**
- * Returns the type of terrain that corresponds to the
- * given parameters
- * @param arr The 2D array to fill
- * @param width The width of the 2D array
- * @param height The height of the 2D array
- */
-function generateNoise(arr, width, height){
-    for(let i = 0; i < width; i++){
-        for(let j = 0; j < height; j++){
-            //TODO use an actual noise function
-            arr[i][j] = Math.random() * 2 - 1;
-        }
-    }
-}
+    let onlineCount = this.connectedPlayers.size;
+    console.log(`[${onlineCount}] A Client disconnected`, socketId);
+  }
 
-/**
- * Creates the tilemap of the game world based on different
- * layers of noise
- * @param tilemap The 2D array to generate tiles in
- * @param heightmap A 2D array of noise representing elevation
- */
-function generateTileMap(tilemap, heightmap){
-    //TODO properly generate the tilemap based on the heightmap
-    //layer and other layers
-    for(let i = 0; i < tilemap.length; i++){
-        for(let j = 0; j < tilemap.length; j++){
-            let e = heightmap[i][j];
-            let tileType = getBiomeType(e, 0);
-            tilemap[i][j] = tileType;
-        }
-    }
-}
+  /**
+   *
+   * @param data {{dx,dy}} Temp
+   * @param socket {Socket}
+   * @param playerId {Number}
+   */
+  onReceivedInput(data, socket, playerId) {
+    let player = this.world.objects.get(playerId);
+    if (player) {
+      player.x += data.dx || 0;
+      player.y += data.dy || 0;
 
-function randomInt(low, high) {
-  return Math.floor(Math.random() * (high - low) + low);
+      console.log(`Player [${playerId}] moved to (${player.x},${player.y})`);
+    }
+
+    this.io.emit('playerMovement', {
+      id: playerId,
+      x: player.x,
+      y: player.y,
+    });
+  }
+
+  getPlayerCount() {
+    return this.connectedPlayers.size;
+  }
 }
 
 module.exports = Server;
