@@ -171,10 +171,9 @@ class Server {
       objects.push(value);
     });
 
-    console.log(objects);
     socket.emit('initWorld', {
       players: objects,
-      tiles: [[]],
+      tiles: this.world.getTileMap(),
     });
 
     // This send out the new-joined client's data to all other clients

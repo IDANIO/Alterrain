@@ -66,6 +66,7 @@ var Client = {};
    * @param data.tiles {Array} An 2D array of the world data.
    */
   Client.socket.on("initWorld", function (data) {
+    console.log(data);
     var players = data.players;
     for (var i = 0; i < players.length; i++) {
       gameplayState.addNewPlayer(players[i].id, players[i].x, players[i].y)
