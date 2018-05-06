@@ -53,10 +53,7 @@ const game = new Game(io);
 game.startGameClock();
 
 // io.on('connection', (socket) => {
-//   logger.info('A client connected..');
-//
 //   socket.on('disconnect', () => {
-//     logger.info('A client Disconnected..');
 //   });
 // });
 
