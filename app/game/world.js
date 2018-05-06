@@ -29,14 +29,23 @@ class World {
   }
 
   /**
-   * @param playerId
+   * @param playerId {Number}
+   * @return {Map<Number, Object>}
    */
   addObject(playerId) {
-    this.objects.set(playerId, {
+    return this.objects.set(playerId, {
       id: playerId,
       x: 50,
       y: 50,
     });
+  }
+
+  /**
+   * @param playerId {Number}
+   * @return {boolean}
+   */
+  removeObject(playerId) {
+    return this.objects.delete(playerId);
   }
 
   getObjects() {

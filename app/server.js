@@ -143,7 +143,7 @@ class Server {
       playerEvent.disconnectTime = (new Date()).getTime();
       socket.broadcast.emit('playerEvent', playerEvent);
 
-      this.onPlayerDisconnected(socket.id);
+      this.onPlayerDisconnected(socket);
       // this.gameEngine.emit('server__playerDisconnected', playerEvent);
       // this.gameEngine.emit('playerDisconnected', playerEvent);
 
@@ -190,13 +190,22 @@ class Server {
 
   /**
    * handle player dis-connection
-   * @param socketId {String}
+   * @param socket {Socket}
    */
-  onPlayerDisconnected(socketId) {
-    this.connectedPlayers.delete(socketId);
+  onPlayerDisconnected(socket) {
+    // Remove from Game World
+    let player = this.connectedPlayers.get(socket.id);
+    if (player) {
+      this.world.removeObject(player.playerId);
+    } else {
+      console.warn('should not happen');
+    }
+
+    // Remove from server
+    this.connectedPlayers.delete(socket.id);
 
     let onlineCount = this.connectedPlayers.size;
-    console.log(`[${onlineCount}] A Client disconnected`, socketId);
+    console.log(`[${onlineCount}] A Client disconnected`, socket.id);
   }
 
   /**
