@@ -39,12 +39,19 @@ var Client = {};
 
       gameplayState.generateTiles(data.tiles);
     });
-  }
+  };
+
+  /**
+   *
+   */
+  Client.disconnectFromServer = function(){
+    Client.socket.disconnect();
+  };
 
   Client.askNewPlayer = function () {
     Client.socket.emit('newplayer');
     console.log('newPlayer')
-  }
+  };
 
   /**
    * @deprecated

@@ -8,6 +8,12 @@ var GameplayState = function(game){
 var playerSpeed = 32;
 
 GameplayState.prototype = {
+    init: function(){
+      // --------------------------------------
+      Client.connectToServer();
+      // --------------------------------------
+    },
+
     preload: function(){
         //empty
     },
@@ -17,11 +23,16 @@ GameplayState.prototype = {
 
         this.tileGroup = game.add.group();
 
-        Client.connectToServer();
-        // Client.askNewPlayer();
 
         //Handle input
         game.input.keyboard.onDownCallback = this.handleKeys;
+    },
+
+    shutdown: function(){
+        // --------------------------------------
+        Client.disconnectFromServer();
+        // --------------------------------------
+
     },
 
     update: function(){
