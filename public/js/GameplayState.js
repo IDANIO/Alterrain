@@ -63,6 +63,11 @@ GameplayState.prototype = {
         if(e.keyCode == Phaser.Keyboard.RIGHT){
             Client.sendMove(playerSpeed, 0);
         }
+        //Quit key - go back to the main menu
+        if(e.keyCode == Phaser.Keyboard.ESC){
+            console.log("ESC pressed");
+            game.state.start("MainMenuState");
+        }
     },
 
     //Moves the player to the given position
