@@ -1,13 +1,19 @@
 var GAME_WIDTH = 640;
 var GAME_HEIGHT = 480;
 
-var game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO);
+var game;
+var mainMenuState;
+var gameplayState;
 
-var mainMenuState = new MainMenuState(game);
-var gameplayState = new GameplayState(game);
+window.onload = function(){
+    game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO);
 
-//Add the states to the state manager
-game.state.add("MainMenuState", mainMenuState);
-game.state.add("GameplayState", gameplayState);
+    mainMenuState = new MainMenuState(game);
+    gameplayState = new GameplayState(game);
 
-game.state.start("MainMenuState");
+    //Add the states to the state manager
+    game.state.add("MainMenuState", mainMenuState);
+    game.state.add("GameplayState", gameplayState);
+
+    game.state.start("MainMenuState");
+};
