@@ -44,7 +44,7 @@ npm install
 To start testing locally, simply use node
 
 ```
-node main.js
+node app.js
 ```
 
 And you you can go to http://localhost:8080
