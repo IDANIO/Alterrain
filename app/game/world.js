@@ -5,12 +5,26 @@
  */
 class World {
   constructor() {
-    this.objects = [];
+    /**
+     * @type {Map<Number, Object>}
+     */
+    this.objects = new Map();
     this.stepCount = 0;
   }
 
-  addObject(object) {
+  /**
+   * @param playerId
+   */
+  addObject(playerId) {
+    this.objects.set(playerId, {
+      id: playerId,
+      x: 50,
+      y: 50,
+    });
+  }
 
+  getObjects() {
+    return this.objects.values();
   }
 
   step(dt) {

@@ -102,78 +102,48 @@ class Server {
   }
 
   /**
+   * Called when the Client first opens up the browser.
+   * However the players is no yet joined to the world.
    * @param socket {Socket}
    */
   onPlayerConnected(socket) {
     let onlineCount = this.connectedPlayers.size + 1;
     console.log(`[${onlineCount}] A Client connected`, socket.id);
 
+    // get next available id
+    let playerId = ++this.lastPlayerID;
+
     // save player
     this.connectedPlayers.set(socket.id, {
       socket: socket,
       state: 'new',
+      playerId: playerId,
     });
 
-    let playerId = socket.playerId = ++this.lastPlayerID;
-    socket.joinTime = (new Date()).getTime();
-
+    // create a new Event (indicating connection)
     let playerEvent = {
       id: socket.id,
-      playerId,
-      joinTime: socket.joinTime,
+      playerId: playerId,
+      joinTime: 0,
       disconnectTime: 0,
     };
 
+    // TODO: change name
     socket.on('newplayer', () => {
-        // TODO: Remove this
-        socket.player = {
-          id: playerId,
-          x: 50,
-          y: 50,
-        };
+      playerEvent.joinTime = (new Date()).getTime();
+      this.onPlayerJoinWorld(socket, playerEvent);
 
-        console.log(`[playerEvent] connected
-        playerId        ${playerEvent.playerId}
-        joinTime        ${playerEvent.joinTime}
-        disconnectTime  ${playerEvent.disconnectTime}`);
+      console.log(`[${playerEvent.id}] Has joined the world
+      playerId        ${playerEvent.playerId}
+      joinTime        ${playerEvent.joinTime}
+      disconnectTime  ${playerEvent.disconnectTime}`);
+    });
 
-        // This send the data of all player to the new-joined client.
-        let players = [];
-        this.connectedPlayers.forEach((value, key) => {
-          let player = value.socket.player;
-          if (player && value.state !== 'new') {
-            players.push(player);
-          }
-        });
-
-        // TODO: Rename
-        socket.emit('allplayers', players);
-        // socket.emit('playerJoined', playerEvent);
-
-        // This send out the new-joined client data to all other clients
-        // TODO: Rename
-        socket.broadcast.emit(`newplayer`, socket.player);
-
-        // this.resetIdleTimeout(socket);
-
-        /**
-         * Receive Input from Client
-         * TODO: Rename messages name to something else
-         */
-        socket.on('moveplayer', (data) => {
-          this.onReceivedInput(data, socket);
-
-          // console.log(`[onReceivedInput]
-          // id:${socket.player.id}
-          // x: ${socket.player.x}
-          // y: ${socket.player.y}
-          // `);
-        });
-      }
-    );
     socket.on('disconnect', () => {
       playerEvent.disconnectTime = (new Date()).getTime();
-      this.onPlayerDisconnected(socket.id, playerId);
+      socket.broadcast.emit('playerEvent', playerEvent);
+
+      this.onPlayerDisconnected(socket.id);
       // this.gameEngine.emit('server__playerDisconnected', playerEvent);
       // this.gameEngine.emit('playerDisconnected', playerEvent);
 
@@ -184,53 +154,76 @@ class Server {
     });
   }
 
-  // /**
-  //  * handle player timeout
-  //  * @param socket {Socket}
-  //  */
-  // onPlayerTimeout(socket) {
-  //   // console.log(`Client timed out after ${this.options.timeoutInterval}
-  //   // seconds`, socket.id);
-  //   console.log(`Client timed out after seconds`, socket.id);
-  //   socket.disconnect();
-  // }
+  /**
+   * handle player when join the world
+   * @param socket {Socket}
+   * @param playerEvent {Object}
+   */
+  onPlayerJoinWorld(socket, playerEvent) {
+    // This send the data of all players to the new-joined client.
+    playerEvent.x = 50;
+    playerEvent.y = 50;
+
+    this.world.addObject(playerEvent.playerId);
+
+    let objects = [];
+    this.world.objects.forEach((value) => {
+      objects.push(value);
+    });
+
+    console.log(objects);
+    socket.emit('initWorld', {
+      players: objects,
+      tiles: [[]],
+    });
+
+    // This send out the new-joined client's data to all other clients
+    socket.broadcast.emit('playerEvent', playerEvent);
+
+    /**
+     * Receive Input from Client
+     * TODO: Rename messages name to something else
+     */
+    socket.on('moveplayer', (data) => {
+      this.onReceivedInput(data, socket, playerEvent.playerId);
+    });
+  }
 
   /**
    * handle player dis-connection
    * @param socketId {String}
-   * @param playerId {Number}
    */
-  onPlayerDisconnected(socketId, playerId) {
+  onPlayerDisconnected(socketId) {
     this.connectedPlayers.delete(socketId);
 
     let onlineCount = this.connectedPlayers.size;
     console.log(`[${onlineCount}] A Client disconnected`, socketId);
   }
 
-  // /**
-  //  * handle player timeout
-  //  * @param socket {Socket}
-  //  */
-  // resetIdleTimeout(socket) {
-  //   // if (socket.idleTimeout) {
-  //   //   clearTimeout(socket.idleTimeout);
-  //   // }
-  //   // socket.idleTimeout = setTimeout(() => {
-  //   //   this.onPlayerTimeout(socket);
-  //   // }, 60 * 1000);
-  // }
-
   /**
    *
-   * @param data {{x,y}} Temp
+   * @param data {{dx,dy}} Temp
    * @param socket {Socket}
+   * @param playerId {Number}
    */
-  onReceivedInput(data, socket) {
-    // this.resetIdleTimeout(socket);
-    socket.player.x += data.dx;
-    socket.player.y += data.dy;
+  onReceivedInput(data, socket, playerId) {
+    let player = this.world.objects.get(playerId);
+    if (player) {
+      player.x += data.dx || 0;
+      player.y += data.dy || 0;
 
-    this.io.emit('moveplayer', socket.player);
+      console.log(`Player [${playerId}] moved to (${player.x},${player.y})`);
+    }
+
+    this.io.emit('playerMovement', {
+      id: playerId,
+      x: player.x,
+      y: player.y,
+    });
+  }
+
+  getPlayerCount() {
+    return this.connectedPlayers.size;
   }
 }
 
