@@ -42,18 +42,28 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
  */
 server.listen(port, () => {
   console.log(`
+  ___ ____    _    _   _ ___ ___  
+ |_ _|  _ \\  / \\  | \\ | |_ _/ _ \\ 
+  | || | | |/ _ \\ |  \\| || | | | |
+  | || |_| / ___ \\| |\\  || | |_| |
+ |___|____/_/   \\_\\_| \\_|___\\___/ 
+                                  
   Port: ${chalk.blue(port)}
   http://localhost:${port}
   `);
 });
 
-const game = new Game(io);
-game.startGameClock();
-
 /**
  * Basic Routing.
  */
 app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
+
+/**
+ * Constructing a Server Game instance, and start server game clock.
+ * @type {Server}
+ */
+const game = new Game(io);
+game.start();
 
 /**
  * Error Handler.
