@@ -26,20 +26,6 @@ class Server {
 
     this.setupEventEmitter();
     this.setupSocketIO(io);
-    //The game world represented in a 2D array
-    //0 = grass
-    //1 = sand
-    this.tileMap = [];
-    //The heightmap, used to procedurally generate
-    //the tilemap
-    this.heightmap = [];
-    for(let i = 0; i < MAP_HEIGHT; i++){
-      this.tileMap[i] = [];
-      this.heightmap[i] = [];
-    }
-    
-    generateNoise(this.heightmap, MAP_WIDTH, MAP_HEIGHT);
-    generateTileMap(this.tileMap, this.heightmap);
   }
 
   /**
