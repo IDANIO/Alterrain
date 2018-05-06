@@ -65,7 +65,6 @@ GameplayState.prototype = {
         }
         //Quit key - go back to the main menu
         if(e.keyCode == Phaser.Keyboard.ESC){
-            console.log("ESC pressed");
             game.state.start("MainMenuState");
         }
     },

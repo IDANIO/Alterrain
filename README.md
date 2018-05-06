@@ -47,7 +47,7 @@ To start testing locally, simply use node
 node app.js
 ```
 
-And you you can go to http://localhost:8080
+And you can go to http://localhost:8080
 
 ## Code Style
 
