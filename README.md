@@ -1,5 +1,5 @@
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/RaiderSoap/cmpm120-project.png?columns=all)](https://waffle.io/RaiderSoap/cmpm120-project?utm_source=badge)
-# CMPM 120 Project
+# CMPM 120 Project - Development
 
 UCSC CMPM 120 Phaser Multiplayer Game
 

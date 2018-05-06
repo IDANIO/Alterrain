@@ -1,6 +1,7 @@
-export default class Tiles {
+class Tiles {
   constructor() {
 
   }
 }
 
+module.exports = Tiles;
