@@ -14,7 +14,7 @@ UCSC CMPM 120 Phaser Multiplayer Game
 * **[Production Plan](https://docs.google.com/spreadsheets/d/1j9RkvIJDULHMqaTGhHoymikjDXNxcCUxKwtvIhiS2I4/edit?usp=drive_web&ouid=101774301194820727572)**
 * **[Team Drive](https://drive.google.com/drive/u/1/folders/0AAoaaZ8jLRMSUk9PVA)**
 
-### Sever
+### Server
 
 Ubuntu NodeJS 10.0 on 16.04
 
@@ -26,9 +26,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
-
-Say what the step will be
+A step by step series of examples that tell you how to get a development env running
 
 ```
 git clone https://github.com/RaiderSoap/cmpm120-project.git myProject
@@ -43,7 +41,7 @@ npm install
 
 ## Start the server
 
-To start the testing locally, simply use node
+To start testing locally, simply use node
 
 ```
 node main.js
@@ -63,12 +61,12 @@ npm run test
 
 ## Deployment
 
-Once you have commited and pushed to this repository
+Once you have committed and pushed to this repository
 
 Login into our server, as user *game*
 
 
-first we need to pull from GitHub,
+First we need to pull from GitHub,
 
 ```
 cd /home/game/project
@@ -78,7 +76,7 @@ git pull
 Then start the game application (only if the game is not work as expected):
 
 ```
-pm2 start game      // game is an task I already defined
+pm2 start game      // game is a task I already defined
 ```
 
 To list all running processes:
