@@ -14,10 +14,11 @@ GameplayState.prototype = {
 
     create: function(){
         game.stage.backgroundColor = "#222";
-        
+
         this.tileGroup = game.add.group();
 
-        Client.askNewPlayer();
+        Client.connectToServer();
+        // Client.askNewPlayer();
 
         //Handle input
         game.input.keyboard.onDownCallback = this.handleKeys;
@@ -58,7 +59,7 @@ GameplayState.prototype = {
         this.playerMap[id].x = x;
         this.playerMap[id].y = y;
     },
-    
+
     //Generates tile objects based on a given 2D tilemap
     //0 == grass
     //1 == sand

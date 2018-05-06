@@ -124,28 +124,23 @@ class Server {
     let playerEvent = {
       id: socket.id,
       playerId: playerId,
-      joinTime: 0,
+      joinTime: (new Date()).getTime(),
       disconnectTime: 0,
     };
 
-    // TODO: change name
-    socket.on('newplayer', () => {
-      playerEvent.joinTime = (new Date()).getTime();
-      this.onPlayerJoinWorld(socket, playerEvent);
-
-      console.log(`[${playerEvent.id}] Has joined the world
+    console.log(`[${playerEvent.id}] Has joined the world
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
-    });
+
+
+    this.onPlayerJoinWorld(socket, playerEvent);
 
     socket.on('disconnect', () => {
       playerEvent.disconnectTime = (new Date()).getTime();
       socket.broadcast.emit('playerEvent', playerEvent);
 
       this.onPlayerDisconnected(socket);
-      // this.gameEngine.emit('server__playerDisconnected', playerEvent);
-      // this.gameEngine.emit('playerDisconnected', playerEvent);
 
       console.log(`[playerEvent] disconnect
       playerId        ${playerEvent.playerId}
