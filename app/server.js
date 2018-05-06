@@ -1,70 +1,233 @@
-// const Tiles = require('./game/tiles');
+'use strict';
 
+const EventEmitter = require('events');
+const World = require('./game/world.js');
+
+/**
+ * Server is the main server-side singleton code.
+ * This class should not be used to contain the actual game logic.
+ * Only logging gameplay statistics and registering user activity and user data.
+ */
 class Server {
   constructor(io) {
+    /**
+     * @type {Map<String, Object>} HashTable that contains the currently
+     * connected players.
+     */
+    this.connectedPlayers = new Map();
+
+    this.intervalFrameRate = 60;
     this.lastPlayerID = 0;
+
+    /**
+     * @type {World} The actual game world
+     */
+    this.world = null;
+
+    this.setupEventEmitter();
     this.setupSocketIO(io);
   }
 
+  /**
+   * Register handlers for an event
+   * @private
+   */
+  setupEventEmitter() {
+    let emitter = new EventEmitter();
+
+    this.on = emitter.on;
+    this.once = emitter.once;
+    this.removeListener = emitter.removeListener;
+
+    this.emit = emitter.emit;
+  }
+
+  /**
+   * @param io {Socket}
+   */
   setupSocketIO(io) {
     this.io = io;
-    io.on('connection', (socket) => {
-      socket.on('newplayer', () => {
-        socket.player = {
-          id: this.lastPlayerID++,
-          x: randomInt(100, 400),
-          y: randomInt(100, 400),
-        };
+    io.on('connection', this.onPlayerConnected.bind(this));
+  }
 
-        socket.emit('allplayers', this.getAllPlayers());
+  /**
+   * @param worldSettings {Object=}
+   */
+  initWorld(worldSettings) {
+    this.world = new World();
 
-        socket.broadcast.emit('newplayer', socket.player);
-
-        socket.on('moveplayer', (data) => {
-          socket.player.x += data.dx;
-          socket.player.y += data.dy;
-          io.emit('moveplayer', socket.player);
-        });
-
-        socket.on('disconnect', () => {
-          io.emit('remove', socket.player.id);
-        });
-      });
-    });
+    /**
+     * The worldSettings defines the game world constants, such
+     * as width, height, depth, etc. such that all other classes
+     * can reference these values.
+     * @member {Object} worldSettings
+     * @memberof Server
+     */
+    this.worldSettings = Object.assign({}, worldSettings);
   }
 
   /**
    * Start game logic and the clock
    */
-  startGameClock() {
-    this.intervalGameTick = setInterval(() => {
+  start() {
+    this.initWorld();
+
+    const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
+    this.intervalGameTick = setInterval(this.step.bind(this), intervalDelta);
+  }
+
+  /**
+   * Single game step.
+   *
+   * @param {Number=} dt - elapsed time since last step was called.
+   */
+  step(dt) {
+    this.serverTime = (new Date().getTime());
+
+    // let step = ++this.world.stepCount;
+
+    // this.emit('preStep', {step, dt});
+
+    // Main Game Update Goes Here
+    this.world.step(dt);
+
+    // for (const player of this.connectedPlayers) {
+    //   if (player.state === 'new') {
+    //     player.state = 'synced';
+    //   }
+    //   player.socket.emit('worldUpdate', {});
+    // }
+
+    // this.emit('postStep', {step});
+  }
+
+  /**
+   * Called when the Client first opens up the browser.
+   * However the players is no yet joined to the world.
+   * @param socket {Socket}
+   */
+  onPlayerConnected(socket) {
+    let onlineCount = this.connectedPlayers.size + 1;
+    console.log(`[${onlineCount}] A Client connected`, socket.id);
+
+    // get next available id
+    let playerId = ++this.lastPlayerID;
+
+    // save player
+    this.connectedPlayers.set(socket.id, {
+      socket: socket,
+      state: 'new',
+      playerId: playerId,
+    });
+
+    // create a new Event (indicating connection)
+    let playerEvent = {
+      id: socket.id,
+      playerId: playerId,
+      joinTime: (new Date()).getTime(),
+      disconnectTime: 0,
+    };
+
+    console.log(`[${playerEvent.id}] Has joined the world
+      playerId        ${playerEvent.playerId}
+      joinTime        ${playerEvent.joinTime}
+      disconnectTime  ${playerEvent.disconnectTime}`);
+
+
+    this.onPlayerJoinWorld(socket, playerEvent);
+
+    socket.on('disconnect', () => {
+      playerEvent.disconnectTime = (new Date()).getTime();
+      socket.broadcast.emit('playerEvent', playerEvent);
+
+      this.onPlayerDisconnected(socket);
+
+      console.log(`[playerEvent] disconnect
+      playerId        ${playerEvent.playerId}
+      joinTime        ${playerEvent.joinTime}
+      disconnectTime  ${playerEvent.disconnectTime}`);
     });
   }
 
   /**
-   * tick based on the frame interval
-   * in this game it is 1000/60
-   * handle all the game module's update
-   * @private
+   * handle player when join the world
+   * @param socket {Socket}
+   * @param playerEvent {Object}
    */
-  tick() {
+  onPlayerJoinWorld(socket, playerEvent) {
+    // This send the data of all players to the new-joined client.
+    playerEvent.x = 50;
+    playerEvent.y = 50;
 
-  }
+    this.world.addObject(playerEvent.playerId);
 
-  getAllPlayers() {
-    let players = [];
-    Object.keys(this.io.sockets.connected).forEach((socketID) => {
-      let player = this.io.sockets.connected[socketID].player;
-      if (player) {
-        players.push(player);
-      }
+    let objects = [];
+    this.world.objects.forEach((value) => {
+      objects.push(value);
     });
-    return players;
-  }
-}
 
-function randomInt(low, high) {
-  return Math.floor(Math.random() * (high - low) + low);
+    socket.emit('initWorld', {
+      players: objects,
+      tiles: this.world.getTileMap(),
+    });
+
+    // This send out the new-joined client's data to all other clients
+    socket.broadcast.emit('playerEvent', playerEvent);
+
+    /**
+     * Receive Input from Client
+     * TODO: Rename messages name to something else
+     */
+    socket.on('moveplayer', (data) => {
+      this.onReceivedInput(data, socket, playerEvent.playerId);
+    });
+  }
+
+  /**
+   * handle player dis-connection
+   * @param socket {Socket}
+   */
+  onPlayerDisconnected(socket) {
+    // Remove from Game World
+    let player = this.connectedPlayers.get(socket.id);
+    if (player) {
+      this.world.removeObject(player.playerId);
+    } else {
+      console.warn('should not happen');
+    }
+
+    // Remove from server
+    this.connectedPlayers.delete(socket.id);
+
+    let onlineCount = this.connectedPlayers.size;
+    console.log(`[${onlineCount}] A Client disconnected`, socket.id);
+  }
+
+  /**
+   *
+   * @param data {{dx,dy}} Temp
+   * @param socket {Socket}
+   * @param playerId {Number}
+   */
+  onReceivedInput(data, socket, playerId) {
+    let player = this.world.objects.get(playerId);
+    if (player) {
+      player.x += data.dx || 0;
+      player.y += data.dy || 0;
+
+      console.log(`Player [${playerId}] moved to (${player.x},${player.y})`);
+    }
+
+    this.io.emit('playerMovement', {
+      id: playerId,
+      x: player.x,
+      y: player.y,
+    });
+  }
+
+  getPlayerCount() {
+    return this.connectedPlayers.size;
+  }
 }
 
 module.exports = Server;
