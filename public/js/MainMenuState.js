@@ -8,7 +8,7 @@ MainMenuState.prototype = {
     },
 
     preload: function(){
-        game.load.spritesheet("player", "assets/img/dude.png", 32, 48);
+        game.load.spritesheet("player", "./assets/img/dude.png", 32, 48);
     },
 
     create: function(){
