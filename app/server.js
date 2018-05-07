@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events');
 const World = require('./game/world.js');
+const logger = require('./logger.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -108,7 +109,7 @@ class Server {
    */
   onPlayerConnected(socket) {
     let onlineCount = this.connectedPlayers.size + 1;
-    console.log(`[${onlineCount}] A Client connected`, socket.id);
+    logger.info(`[${onlineCount}] A Client connected`, socket.id);
 
     // get next available id
     let playerId = ++this.lastPlayerID;
@@ -128,7 +129,7 @@ class Server {
       disconnectTime: 0,
     };
 
-    console.log(`[${playerEvent.id}] Has joined the world
+    logger.info(`[${playerEvent.id}] Has joined the world
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
@@ -142,7 +143,7 @@ class Server {
 
       this.onPlayerDisconnected(socket);
 
-      console.log(`[playerEvent] disconnect
+      logger.info(`[playerEvent] disconnect
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
@@ -193,14 +194,14 @@ class Server {
     if (player) {
       this.world.removeObject(player.playerId);
     } else {
-      console.warn('should not happen');
+      logger.error('should not happen');
     }
 
     // Remove from server
     this.connectedPlayers.delete(socket.id);
 
     let onlineCount = this.connectedPlayers.size;
-    console.log(`[${onlineCount}] A Client disconnected`, socket.id);
+    logger.info(`[${onlineCount}] A Client disconnected`, socket.id);
   }
 
   /**
@@ -215,7 +216,7 @@ class Server {
       player.x += data.dx || 0;
       player.y += data.dy || 0;
 
-      console.log(`Player [${playerId}] moved to (${player.x},${player.y})`);
+      // logger.info(`Player [${playerId}] moved to (${player.x},${player.y})`);
     }
 
     this.io.emit('playerMovement', {
