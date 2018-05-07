@@ -109,7 +109,7 @@ class Server {
    */
   onPlayerConnected(socket) {
     let onlineCount = this.connectedPlayers.size + 1;
-    logger.info(`[${onlineCount}] A Client connected`, socket.id);
+    logger.info(`[${onlineCount}] A Client connected`);
 
     // get next available id
     let playerId = ++this.lastPlayerID;
@@ -129,7 +129,7 @@ class Server {
       disconnectTime: 0,
     };
 
-    logger.info(`[${playerEvent.id}] Has joined the world
+    logger.data(`[${playerEvent.id}] Has joined the world
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
@@ -143,7 +143,7 @@ class Server {
 
       this.onPlayerDisconnected(socket);
 
-      logger.info(`[playerEvent] disconnect
+      logger.data(`[${playerEvent.id}][playerEvent] disconnect
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
@@ -201,7 +201,7 @@ class Server {
     this.connectedPlayers.delete(socket.id);
 
     let onlineCount = this.connectedPlayers.size;
-    logger.info(`[${onlineCount}] A Client disconnected`, socket.id);
+    logger.info(`[${onlineCount}] A Client disconnected`);
   }
 
   /**
@@ -216,7 +216,7 @@ class Server {
       player.x += data.dx || 0;
       player.y += data.dy || 0;
 
-      // logger.info(`Player [${playerId}] moved to (${player.x},${player.y})`);
+      logger.debug(`Player [${playerId}] moved to (${player.x},${player.y})`);
     }
 
     this.io.emit('playerMovement', {

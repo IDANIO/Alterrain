@@ -22,7 +22,7 @@ const config = {
 
 /**
  * @instance
- * @type {{log, info, warn, error}}
+ * @type {{log, info, warn, error, debug, data}}
  */
 const logger = createLogger({
   levels: config.levels,
