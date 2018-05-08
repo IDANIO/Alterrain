@@ -63,6 +63,11 @@ GameplayState.prototype = {
         if(e.keyCode == Phaser.Keyboard.RIGHT){
             Client.sendMove(playerSpeed, 0);
         }
+        //Change the tile the player is standing on
+        //TODO should have some limit later on
+        if(e.keyCode == Phaser.Keyboard.SPACEBAR){
+            Client.changeTile();
+        }
         //Quit key - go back to the main menu
         if(e.keyCode == Phaser.Keyboard.ESC){
             game.state.start("MainMenuState");
@@ -73,6 +78,19 @@ GameplayState.prototype = {
     movePlayer: function(id, x, y){
         this.playerMap[id].x = x;
         this.playerMap[id].y = y;
+    },
+    
+    //Change the given tile to another type
+    changeTileAt(tileX, tileY, tileType){
+        if(tileType === 0){ //grass
+            //TODO incomplete
+        }
+        else if(tileType === 1){ //sand
+            //TODO incomplete
+        }
+        else if(tileType === 2){ //stone
+            console.log("Tile at " + tileX + ", " + tileY + " should've changed");
+        }
     },
 
     //Generates tile objects based on a given 2D tilemap
