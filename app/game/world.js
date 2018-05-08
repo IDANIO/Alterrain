@@ -1,10 +1,19 @@
+'use strict';
+
+const logger = require('../logger.js');
+
 /**
  * This class represents an instance of the game world,
  * where all data pertaining to the current state of the
  * world is saved.
  */
 class World {
-  constructor() {
+  /**
+   * @param server{Server}
+   */
+  constructor(server) {
+    this.server = server;
+
     /**
      * @type {Map<Number, Object>}
      */
@@ -14,6 +23,7 @@ class World {
     // The game world represented in a 2D array
     // 0 = grass
     // 1 = sand
+    // 2 = stone - temp
     this.tileMap = [];
 
     // The heightmap, used to procedurally generate
@@ -38,6 +48,22 @@ class World {
       x: 50,
       y: 50,
     });
+  }
+
+  /**
+   * temp
+   * @deprecated
+   * TODO: Make it proper
+   */
+  changeTile(x, y) {
+    x = Math.floor(x/16);
+    y = Math.floor(y/16);
+    this.tileMap[x][y] = 2;
+    this.server.io.emit('worldUpdate', {
+      tiles: [x, y, 2],
+    });
+
+    logger.debug(`Tile changed at (${x},${y})`);
   }
 
   /**
@@ -94,6 +120,7 @@ class World {
       }
     }
   }
+
   /**
    * Creates the tilemap of the game world based on different
    * layers of noise
@@ -117,7 +144,7 @@ function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
 }
 
-World.MAP_WIDTH = 16;
-World.MAP_HEIGHT = 16;
+World.MAP_WIDTH = 64;
+World.MAP_HEIGHT = 64;
 
 module.exports = World;

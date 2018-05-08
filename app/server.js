@@ -2,6 +2,7 @@
 
 const EventEmitter = require('events');
 const World = require('./game/world.js');
+const logger = require('./logger.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -54,7 +55,7 @@ class Server {
    * @param worldSettings {Object=}
    */
   initWorld(worldSettings) {
-    this.world = new World();
+    this.world = new World(this);
 
     /**
      * The worldSettings defines the game world constants, such
@@ -65,6 +66,7 @@ class Server {
      */
     this.worldSettings = Object.assign({}, worldSettings);
   }
+
 
   /**
    * Start game logic and the clock
@@ -108,7 +110,7 @@ class Server {
    */
   onPlayerConnected(socket) {
     let onlineCount = this.connectedPlayers.size + 1;
-    console.log(`[${onlineCount}] A Client connected`, socket.id);
+    logger.info(`[${onlineCount}] A Client connected`);
 
     // get next available id
     let playerId = ++this.lastPlayerID;
@@ -128,7 +130,7 @@ class Server {
       disconnectTime: 0,
     };
 
-    console.log(`[${playerEvent.id}] Has joined the world
+    logger.data(`[${playerEvent.id}] Has joined the world
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
@@ -142,7 +144,7 @@ class Server {
 
       this.onPlayerDisconnected(socket);
 
-      console.log(`[playerEvent] disconnect
+      logger.data(`[${playerEvent.id}][playerEvent] disconnect
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
@@ -193,29 +195,33 @@ class Server {
     if (player) {
       this.world.removeObject(player.playerId);
     } else {
-      console.warn('should not happen');
+      logger.error('should not happen');
     }
 
     // Remove from server
     this.connectedPlayers.delete(socket.id);
 
     let onlineCount = this.connectedPlayers.size;
-    console.log(`[${onlineCount}] A Client disconnected`, socket.id);
+    logger.info(`[${onlineCount}] A Client disconnected`);
   }
 
   /**
    *
-   * @param data {{dx,dy}} Temp
+   * @param data {{dx,dy, tile}} Temp
    * @param socket {Socket}
    * @param playerId {Number}
    */
   onReceivedInput(data, socket, playerId) {
     let player = this.world.objects.get(playerId);
+
+    if (data.tile) {
+      this.world.changeTile(player.x, player.y);
+      return;
+    }
+
     if (player) {
       player.x += data.dx || 0;
       player.y += data.dy || 0;
-
-      console.log(`Player [${playerId}] moved to (${player.x},${player.y})`);
     }
 
     this.io.emit('playerMovement', {

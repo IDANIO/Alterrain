@@ -39,6 +39,14 @@ var Client = {};
 
       gameplayState.generateTiles(data.tiles);
     });
+    
+    /**
+     * @param data {Object}
+     * @param data.tiles {Array} An array that represents a tile's x,y position and type
+     */
+    Client.socket.on("worldUpdate", function (data){
+      gameplayState.changeTileAt(data.tiles[0], data.tiles[1], data.tiles[2]);
+    });
   };
 
   /**
@@ -60,6 +68,13 @@ var Client = {};
    */
   Client.sendMove = function (dx, dy) {
     Client.socket.emit("moveplayer", {dx: dx, dy: dy});
+  }
+
+  /**
+   * @deprecated
+   */
+  Client.changeTile = function () {
+    Client.socket.emit("moveplayer", {tile:true});
   }
 
 })();
