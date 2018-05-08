@@ -62,5 +62,12 @@ var Client = {};
     Client.socket.emit("moveplayer", {dx: dx, dy: dy});
   }
 
+  /**
+   * @deprecated
+   */
+  Client.changeTile = function () {
+    Client.socket.emit("moveplayer", {tile:true});
+  }
+
 })();
 

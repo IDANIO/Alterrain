@@ -55,7 +55,7 @@ class Server {
    * @param worldSettings {Object=}
    */
   initWorld(worldSettings) {
-    this.world = new World();
+    this.world = new World(this);
 
     /**
      * The worldSettings defines the game world constants, such
@@ -66,6 +66,7 @@ class Server {
      */
     this.worldSettings = Object.assign({}, worldSettings);
   }
+
 
   /**
    * Start game logic and the clock
@@ -206,17 +207,21 @@ class Server {
 
   /**
    *
-   * @param data {{dx,dy}} Temp
+   * @param data {{dx,dy, tile}} Temp
    * @param socket {Socket}
    * @param playerId {Number}
    */
   onReceivedInput(data, socket, playerId) {
     let player = this.world.objects.get(playerId);
+
+    if (data.tile) {
+      this.world.changeTile(player.x, player.y);
+      return;
+    }
+
     if (player) {
       player.x += data.dx || 0;
       player.y += data.dy || 0;
-
-      logger.debug(`Player [${playerId}] moved to (${player.x},${player.y})`);
     }
 
     this.io.emit('playerMovement', {
