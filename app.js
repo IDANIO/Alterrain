@@ -4,18 +4,18 @@
  * Module dependencies.
  */
 const express = require('express');
+const helmet = require('helmet');
 const compression = require('compression');
 const path = require('path');
 const dotenv = require('dotenv');
 const favicon = require('serve-favicon');
-const chalk = require('chalk');
-const logger = require('morgan');
 const errorHandler = require('errorhandler');
 
 /**
  * import Server Game
  */
 const Game = require('./app/server.js');
+const logger = require('./app/logger.js');
 
 /**
  * Load environment variables from .env file.
@@ -33,22 +33,22 @@ const port = process.env.PORT || 8080;
 /**
  * Express configuration.
  */
+app.use(helmet());
 app.use(compression());
-app.use(logger('dev'));
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 /**
  * Socket
  */
 server.listen(port, () => {
-  console.log(`
+  logger.log('info', `
   ___ ____    _    _   _ ___ ___  
  |_ _|  _ \\  / \\  | \\ | |_ _/ _ \\ 
   | || | | |/ _ \\ |  \\| || | | | |
   | || |_| / ___ \\| |\\  || | |_| |
  |___|____/_/   \\_\\_| \\_|___\\___/ 
                                   
-  Port: ${chalk.blue(port)}
+  Port: ${port}
   http://localhost:${port}
   `);
 });
