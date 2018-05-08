@@ -56,8 +56,8 @@ class World {
    * TODO: Make it proper
    */
   changeTile(x, y) {
-    x = Math.floor(x/32);
-    y = Math.floor(y/32);
+    x = Math.floor(x/16);
+    y = Math.floor(y/16);
     this.tileMap[x][y] = 2;
     this.server.io.emit('worldUpdate', {
       tiles: [x, y, 2],
@@ -144,7 +144,7 @@ function randomInt(low, high) {
   return Math.floor(Math.random() * (high - low) + low);
 }
 
-World.MAP_WIDTH = 16;
-World.MAP_HEIGHT = 16;
+World.MAP_WIDTH = 64;
+World.MAP_HEIGHT = 64;
 
 module.exports = World;

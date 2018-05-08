@@ -9,8 +9,9 @@ MainMenuState.prototype = {
 
     preload: function(){
         game.load.spritesheet("player", "./assets/img/dude.png", 32, 48);
-        game.load.image("grassTile", "./assets/img/grass_tile_16.png", 16, 16);
-        game.load.image("sandTile", "./assets/img/sand_tile_16.png", 16, 16);
+        //game.load.image("grassTile", "./assets/img/grass_tile_16.png", 16, 16);
+        //game.load.image("sandTile", "./assets/img/sand_tile_16.png", 16, 16);
+        game.load.image("gameTileset", "./assets/img/game_tileset.png", 16, 16);
     },
 
     create: function(){
