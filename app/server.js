@@ -158,8 +158,8 @@ class Server {
    */
   onPlayerJoinWorld(socket, playerEvent) {
     // This send the data of all players to the new-joined client.
-    playerEvent.x = 50;
-    playerEvent.y = 50;
+    playerEvent.x = 64;
+    playerEvent.y = 64;
 
     this.world.addObject(playerEvent.playerId);
 
@@ -171,6 +171,7 @@ class Server {
     socket.emit('initWorld', {
       players: objects,
       tiles: this.world.getTileMap(),
+      id: playerEvent.playerId
     });
 
     // This send out the new-joined client's data to all other clients

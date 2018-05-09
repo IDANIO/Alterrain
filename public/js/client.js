@@ -36,7 +36,9 @@ var Client = {};
       for (var i = 0; i < players.length; i++) {
         gameplayState.addNewPlayer(players[i].id, players[i].x, players[i].y)
       }
-
+      if(data.id){
+        gameplayState.setPlayerReference(data.id);
+      }
       gameplayState.generateTiles(data.tiles);
     });
     
