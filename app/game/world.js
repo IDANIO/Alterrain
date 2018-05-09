@@ -45,8 +45,8 @@ class World {
   addObject(playerId) {
     return this.objects.set(playerId, {
       id: playerId,
-      x: 50,
-      y: 50,
+      x: 64,
+      y: 64,
     });
   }
 

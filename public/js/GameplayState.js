@@ -2,6 +2,7 @@
 var GameplayState = function(game){
     //Create a playerMap property
     this.playerMap = {};
+    this.player = null;
 };
 
 //Tile-based movement
@@ -20,6 +21,8 @@ GameplayState.prototype = {
 
     create: function(){
         game.stage.backgroundColor = "#222";
+        //TODO use constants instead of hard-coded numbers
+        game.world.setBounds(0, 0, 64 * 16, 64 * 16);
 
         this.tileGroup = game.add.group();
         
@@ -27,9 +30,7 @@ GameplayState.prototype = {
         this.tileMap.setTileSize(16, 16);
         this.tileMap.addTilesetImage("gameTileset");
         //new Tilemap(layerName, widthInTiles, heightInTiles, tileWidth, tileHeight)
-        let mainLayer = this.tileMap.create("mainLayer", 64, 64, 16, 16);
-        mainLayer.scrollFactorX = 0.5;
-        mainLayer.scrollFactorY = 0.5;
+        this.mainLayer = this.tileMap.create("mainLayer", 64, 64, 16, 16);
 
         //Handle input
         game.input.keyboard.onDownCallback = this.handleKeys;
@@ -49,6 +50,12 @@ GameplayState.prototype = {
     //Adds a new player object to the world
     addNewPlayer: function(id, x, y){
         this.playerMap[id] = game.add.sprite(x, y, "player");
+    },
+
+    //Set the player reference to the correct player sprite object
+    setPlayerReference: function(id){
+        this.player = this.playerMap[id];
+        game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN);
     },
 
     //Removes a player object from the world with the given id
