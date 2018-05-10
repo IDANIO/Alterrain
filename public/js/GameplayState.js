@@ -8,6 +8,10 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 16;
 
+//How close the player needs to be, in pixels, to hear a sound play
+var MIN_HEARING_DISTANCE = 768;
+var TILE_SIZE = 16; //TODO change to 32 later
+
 GameplayState.prototype = {
     init: function(){
       // --------------------------------------
@@ -21,16 +25,19 @@ GameplayState.prototype = {
 
     create: function(){
         game.stage.backgroundColor = "#222";
+        //Create sound objects
+        this.placeTileSound = game.add.audio("placeTileSound");
+        
         //TODO use constants instead of hard-coded numbers
-        game.world.setBounds(0, 0, 64 * 16, 64 * 16);
+        game.world.setBounds(0, 0, 64 * TILE_SIZE, 64 * TILE_SIZE);
 
         this.tileGroup = game.add.group();
         
         this.tileMap = game.add.tilemap();
-        this.tileMap.setTileSize(16, 16);
+        this.tileMap.setTileSize(TILE_SIZE, TILE_SIZE);
         this.tileMap.addTilesetImage("gameTileset");
         //new Tilemap(layerName, widthInTiles, heightInTiles, tileWidth, tileHeight)
-        this.mainLayer = this.tileMap.create("mainLayer", 64, 64, 16, 16);
+        this.mainLayer = this.tileMap.create("mainLayer", 64, 64, TILE_SIZE, TILE_SIZE);
 
         //Handle input
         game.input.keyboard.onDownCallback = this.handleKeys;
@@ -77,11 +84,13 @@ GameplayState.prototype = {
         if(e.keyCode == Phaser.Keyboard.RIGHT){
             Client.sendMove(playerSpeed, 0);
         }
+        
         //Change the tile the player is standing on
         //TODO should have some limit later on
         if(e.keyCode == Phaser.Keyboard.SPACEBAR){
             Client.changeTile();
         }
+        
         //Quit key - go back to the main menu
         if(e.keyCode == Phaser.Keyboard.ESC){
             game.state.start("MainMenuState");
@@ -96,6 +105,13 @@ GameplayState.prototype = {
     
     //Change the given tile to another type
     changeTileAt(tileX, tileY, tileType){
+        if(tileX < 0 || tileX >= this.tileMap.width || tileY < 0 || tileY >= this.tileMap.height){
+            console.log("invalid tile position");
+            return;
+        }
+        let sourceX = tileX * TILE_SIZE;
+        let sourceY = tileY * TILE_SIZE;
+        this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
         if(tileType === 0){ //grass
             this.tileMap.putTile(0, tileX, tileY);
         }
@@ -134,6 +150,24 @@ GameplayState.prototype = {
                 }
             }
         }
+    },
+    
+    //Plays a given sound with volume inversely scaled to the distance from the source
+    playSoundFrom: function(sfx, x, y){
+        let dist = this.getDistance(x, y, this.player.x, this.player.y);
+        let factor = dist / MIN_HEARING_DISTANCE;
+        if(factor > 1){
+            factor = 1;
+        }
+        sfx.volume = 1 - factor;
+        if(sfx.volume > 0){
+            sfx.play();
+        }
+    },
+    
+    //Returns the distance between 2 points
+    getDistance: function(x1, y1, x2, y2){
+        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
     }
 }
 
