@@ -13,6 +13,7 @@ MainMenuState.prototype = {
         //game.load.image("sandTile", "./assets/img/sand_tile_16.png", 16, 16);
         game.load.image("gameTileset", "./assets/img/game_tileset.png", 16, 16);
         game.load.audio("placeTileSound", "assets/audio/place_tile.ogg");
+        game.load.audio("abstractChirpSound", "assets/audio/abstract_chirp01.ogg");
     },
 
     create: function(){

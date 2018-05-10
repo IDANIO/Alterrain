@@ -184,6 +184,14 @@ class Server {
     socket.on('moveplayer', (data) => {
       this.onReceivedInput(data, socket, playerEvent.playerId);
     });
+    
+    /**
+     * Receive Sound from Client
+     * TODO: restructure later
+     */
+    socket.on("playSound", (data) => {
+      this.onReceivedSound(data, socket, playerEvent.playerId);
+    });
   }
 
   /**
@@ -227,6 +235,19 @@ class Server {
 
     this.io.emit('playerMovement', {
       id: playerId,
+      x: player.x,
+      y: player.y,
+    });
+  }
+  
+  /**
+   *
+   * @param data {{x, y}} Temp
+   * @param socket {Socket}
+   */
+  onReceivedSound(data, socket, playerId){
+    let player = this.world.objects.get(playerId);
+    this.io.emit("playSound", {
       x: player.x,
       y: player.y,
     });

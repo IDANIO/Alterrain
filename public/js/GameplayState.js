@@ -9,7 +9,7 @@ var GameplayState = function(game){
 var playerSpeed = 16;
 
 //How close the player needs to be, in pixels, to hear a sound play
-var MIN_HEARING_DISTANCE = 768;
+var MIN_HEARING_DISTANCE = 600;
 var TILE_SIZE = 16; //TODO change to 32 later
 
 GameplayState.prototype = {
@@ -25,14 +25,13 @@ GameplayState.prototype = {
 
     create: function(){
         game.stage.backgroundColor = "#222";
-        //Create sound objects
-        this.placeTileSound = game.add.audio("placeTileSound");
         
+        this.createSoundObjects();
+        
+        //Set up and create the world tilemap
         //TODO use constants instead of hard-coded numbers
         game.world.setBounds(0, 0, 64 * TILE_SIZE, 64 * TILE_SIZE);
-
         this.tileGroup = game.add.group();
-        
         this.tileMap = game.add.tilemap();
         this.tileMap.setTileSize(TILE_SIZE, TILE_SIZE);
         this.tileMap.addTilesetImage("gameTileset");
@@ -52,6 +51,11 @@ GameplayState.prototype = {
 
     update: function(){
         //empty
+    },
+    
+    createSoundObjects: function(){
+        this.placeTileSound = game.add.audio("placeTileSound");
+        this.abstractChirpSound = game.add.audio("abstractChirpSound");
     },
 
     //Adds a new player object to the world
@@ -91,10 +95,20 @@ GameplayState.prototype = {
             Client.changeTile();
         }
         
+        //Play abstract sound
+        if(e.keyCode == Phaser.Keyboard.ONE){
+            //TODO limit this so that the player can't spam the sound
+            Client.playSound();
+        }
+        
         //Quit key - go back to the main menu
         if(e.keyCode == Phaser.Keyboard.ESC){
             game.state.start("MainMenuState");
         }
+    },
+    
+    playAbstractSoundAt: function(x, y){
+        this.playSoundFrom(this.abstractChirpSound, x, y);
     },
 
     //Moves the player to the given position

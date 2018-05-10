@@ -49,6 +49,13 @@ var Client = {};
     Client.socket.on("worldUpdate", function (data){
       gameplayState.changeTileAt(data.tiles[0], data.tiles[1], data.tiles[2]);
     });
+    
+    /**
+     * @param data {Object} An object with an x and y property that represents the sound's position
+     */
+    Client.socket.on("playSound", function (data){
+      gameplayState.playAbstractSoundAt(data.x, data.y);
+    });
   };
 
   /**
@@ -77,6 +84,15 @@ var Client = {};
    */
   Client.changeTile = function () {
     Client.socket.emit("moveplayer", {tile:true});
+  }
+  
+  /**
+   * @deprecated
+   * @param x The x position of the sound's source
+   * @param y The y position of the sound's source
+   */
+  Client.playSound = function(){
+      Client.socket.emit("playSound")
   }
 
 })();
