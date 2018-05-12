@@ -6,11 +6,11 @@ var GameplayState = function(game){
 };
 
 //Tile-based movement
-var playerSpeed = 16;
+var playerSpeed = 32;
 
 //How close the player needs to be, in pixels, to hear a sound play
 var MIN_HEARING_DISTANCE = 600;
-var TILE_SIZE = 16; //TODO change to 32 later
+var TILE_SIZE = 32;
 
 GameplayState.prototype = {
     init: function(){
@@ -145,21 +145,12 @@ GameplayState.prototype = {
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
                 if(tileMap[i][j] === 0){ //grass
-                    //let tile = this.tileGroup.create(i * 32, j * 32, "grassTile");
-                    //tile.scale.x = 2;
-                    //tile.scale.y = 2;
                     this.tileMap.putTile(0, i, j);
                 }
                 else if(tileMap[i][j] === 1){ //sand
-                    //let tile = this.tileGroup.create(i * 32, j * 32, "sandTile");
-                    //tile.scale.x = 2;
-                    //tile.scale.y = 2;
                     this.tileMap.putTile(1, i, j);
                 }
                 else if(tileMap[i][j] === 2){ //stone
-                    //let tile = this.tileGroup.create(i * 32, j * 32, "sandTile");
-                    //tile.scale.x = 2;
-                    //tile.scale.y = 2;
                     this.tileMap.putTile(2, i, j);
                 }
             }

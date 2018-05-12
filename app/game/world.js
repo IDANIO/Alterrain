@@ -56,8 +56,8 @@ class World {
    * TODO: Make it proper
    */
   changeTile(x, y) {
-    x = Math.floor(x/16);
-    y = Math.floor(y/16);
+    x = Math.floor(x/32);
+    y = Math.floor(y/32);
     //Check array index out of bounds
     if(x < 0 || x >= World.MAP_WIDTH || y < 0 || y >= World.MAP_HEIGHT){
       logger.debug("Invalid tile position at (${x},${y})");
@@ -66,8 +66,7 @@ class World {
       this.tileMap[x][y] = 2;
       this.server.io.emit('worldUpdate', {
         tiles: [x, y, 2],
-      });
-      logger.debug("Tile changed at (${x},${y})");    
+      });  
     }
   }
 
