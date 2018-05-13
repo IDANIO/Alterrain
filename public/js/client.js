@@ -57,7 +57,7 @@ var Client = {};
         var y = tile[1];
         var type = tile[2];
         gameplayState.changeTileAt(x, y, type);
-        gameplayState.playAbstractSoundAt(x, y);
+        //gameplayState.playAbstractSoundAt(x, y);
       }
     });
 

@@ -60,7 +60,7 @@ GameplayState.prototype = {
 
     //Adds a new player object to the world
     addNewPlayer: function(id, x, y){
-        this.playerMap[id] = new Player(game, x, y, "player");
+        this.playerMap[id] = new Player(game, x * TILE_SIZE, y * TILE_SIZE, "player");
         game.add.existing(this.playerMap[id]);
     },
 
