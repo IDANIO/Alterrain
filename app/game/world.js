@@ -1,8 +1,8 @@
 'use strict';
 
 const EventEmitter = require('events');
-const Noise = require('noisejs');
 const Player = require('./player.js');
+const noise = require('../lib/perlin.js');
 
 const {WorldConfig} = require('../../shared/constant.js');
 const logger = require('../logger.js');
@@ -168,6 +168,9 @@ class World {
    * @param height The height of the 2D array
    */
   generateNoise(arr, width, height) {
+    // let noise = new Noise();
+    noise.seed(Math.random());
+
     for (let i = 0; i < width; i++) {
       for (let j = 0; j < height; j++) {
         // TODO use an actual noise function
