@@ -1,5 +1,8 @@
 'use strict';
 
+const EventEmitter = require('events');
+const Character = require('./character');
+const {WorldConfig} = require('../../shared/constant.js');
 const logger = require('../logger.js');
 
 /**
@@ -15,7 +18,7 @@ class World {
     this.server = server;
 
     /**
-     * @type {Map<Number, Object>}
+     * @type {Map<Number, Character>}
      */
     this.objects = new Map();
     this.stepCount = 0;
@@ -24,6 +27,7 @@ class World {
     // 0 = grass
     // 1 = sand
     // 2 = stone - temp
+    // 3 = water - can not pass
     this.tileMap = [];
 
     // The heightmap, used to procedurally generate
@@ -36,18 +40,34 @@ class World {
 
     this.generateNoise(this.heightmap, World.MAP_WIDTH, World.MAP_HEIGHT);
     this.generateTileMap(this.tileMap, this.heightmap);
+
+    this.setupEventEmitter();
+    this.on('server__processInput', (input, playerId)=>{
+      this.processInput(input, playerId);
+    });
+  }
+
+  /**
+   * Register handlers for an event
+   * @private
+   */
+  setupEventEmitter() {
+    let emitter = new EventEmitter();
+
+    this.on = emitter.on;
+    this.once = emitter.once;
+    this.removeListener = emitter.removeListener;
+
+    this.emit = emitter.emit;
   }
 
   /**
    * @param playerId {Number}
-   * @return {Map<Number, Object>}
+   * @return {Map<Number, Character>}
    */
   addObject(playerId) {
-    return this.objects.set(playerId, {
-      id: playerId,
-      x: 64,
-      y: 64,
-    });
+    let character = new Character(5, 5);
+    return this.objects.set(playerId, character);
   }
 
   /**
@@ -55,18 +75,17 @@ class World {
    * @deprecated
    * TODO: Make it proper
    */
-  changeTile(x, y) {
+  changeTile(x, y, tileId = 2) {
     x = Math.floor(x/32);
     y = Math.floor(y/32);
-    //Check array index out of bounds
-    if(x < 0 || x >= World.MAP_WIDTH || y < 0 || y >= World.MAP_HEIGHT){
-      logger.debug("Invalid tile position at (${x},${y})");
-    }
-    else{
-      this.tileMap[x][y] = 2;
+    // Check array index out of bounds
+    if (x < 0 || x >= World.MAP_WIDTH || y < 0 || y >= World.MAP_HEIGHT) {
+      logger.debug(`Invalid tile position at (${x},${y})`);
+    } else {
+      this.tileMap[x][y] = tileId;
       this.server.io.emit('worldUpdate', {
-        tiles: [x, y, 2],
-      });  
+        tiles: [[x, y, 2]],
+      });
     }
   }
 
@@ -142,10 +161,16 @@ class World {
       }
     }
   }
-}
 
-function randomInt(low, high) {
-  return Math.floor(Math.random() * (high - low) + low);
+  /**
+   * @param inputMsg {Object}
+   * @param inputMsg.input {}
+   * @param playerId {Number}
+   */
+  processInput(inputMsg, playerId) {
+    logger.debug(`game engine processing input \
+<${inputMsg.input}> from playerId ${playerId}`);
+  }
 }
 
 World.MAP_WIDTH = 64;

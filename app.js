@@ -42,14 +42,13 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
  */
 server.listen(port, () => {
   logger.log('info', `
-  ___ ____    _    _   _ ___ ___  
- |_ _|  _ \\  / \\  | \\ | |_ _/ _ \\ 
-  | || | | |/ _ \\ |  \\| || | | | |
-  | || |_| / ___ \\| |\\  || | |_| |
- |___|____/_/   \\_\\_| \\_|___\\___/ 
+    ___ ____    _    _   _ ___ ___  
+   |_ _|  _ \\  / \\  | \\ | |_ _/ _ \\ 
+    | || | | |/ _ \\ |  \\| || | | | |
+    | || |_| / ___ \\| |\\  || | |_| |
+   |___|____/_/   \\_\\_| \\_|___\\___/ 
                                   
-  Port: ${port}
-  http://localhost:${port}
+✓ App is running at http://localhost:${port} in ${app.get('env')} mode
   `);
 });
 
