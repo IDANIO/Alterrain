@@ -117,7 +117,7 @@ GameplayState.prototype = {
         //this.playerMap[id].x = x;
         //this.playerMap[id].y = y;
         if(this.playerMap[id].ableToMove()){
-            this.playerMap[id].moveTo(x, y);
+            this.playerMap[id].moveTo(x * TILE_SIZE, y * TILE_SIZE);
         }
     },
     
