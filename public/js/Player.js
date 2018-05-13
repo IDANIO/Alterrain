@@ -3,7 +3,7 @@ function Player(game, x, y, key, frame){
     //Call to Phaser.Sprite(game, x, y, key, frame)
     Phaser.Sprite.call(this, game, x, y, key, frame);
     
-    this.canMove = true;    
+    this.canMove = true;
     this.moveDuration = 100; //In milliseconds
     this.nextPos = {x: 0, y: 0};
     this.moveTimer = game.time.create(false);

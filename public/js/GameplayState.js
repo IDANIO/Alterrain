@@ -28,9 +28,7 @@ GameplayState.prototype = {
         //empty
     },
 
-    create: function(){
-        game.stage.backgroundColor = "#222";
-        
+    create: function(){        
         this.createSoundObjects();
         
         //Set up and create the world tilemap
