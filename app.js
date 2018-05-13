@@ -5,6 +5,7 @@
  */
 const express = require('express');
 const helmet = require('helmet');
+const nocache = require('nocache');
 const compression = require('compression');
 const path = require('path');
 const dotenv = require('dotenv');
@@ -36,6 +37,9 @@ const port = process.env.PORT || 8080;
 app.use(helmet());
 app.use(compression());
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+if (process.env.NODE_ENV === 'development') {
+  app.use(nocache()); // only use in development
+}
 
 /**
  * Socket

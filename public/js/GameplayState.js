@@ -150,7 +150,7 @@ GameplayState.prototype = {
     movePlayer: function(id, x, y, d){
         //this.playerMap[id].x = x;
         //this.playerMap[id].y = y;
-      console.log(`${x},${y},${d}`)
+      // console.log(`${x},${y},${d}`)
       this.playerMap[id].setDirection(d);
         if(this.playerMap[id].ableToMove()){
             this.playerMap[id].moveTo(x * TILE_SIZE, y * TILE_SIZE);
