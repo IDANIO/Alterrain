@@ -1,8 +1,21 @@
-let assert = require('assert');
-describe('Array', function() {
-  describe('#indexOf()', function() {
-    it('should return -1 when the value is not present', function() {
-      assert.equal([1, 2, 3].indexOf(4), -1);
+const assert = require('assert');
+
+let Command = require('../app/game/command');
+let instance;
+
+describe('Command', function() {
+  describe('#constructor', function() {
+    it('should construct with callback.', function() {
+      instance = new Command(()=>{
+        return 'Hello';
+      });
+      assert.equal(typeof instance.executeFn, 'function');
+    });
+  });
+  describe('#execute', function() {
+    it('should execute with no argument.', function() {
+      let result = instance.execute();
+      assert.equal(result, 'Hello');
     });
   });
 });
