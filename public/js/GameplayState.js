@@ -3,10 +3,13 @@ var GameplayState = function(game){
     //Create a playerMap property
     this.playerMap = {};
     this.player = null;
+    this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
 //Tile-based movement
 var playerSpeed = 32;
+
+var tileName = ["Grass", "Sand", "Stone"];
 
 var FACING_LEFT = 0;
 var FACING_UP = 1;
@@ -40,6 +43,13 @@ GameplayState.prototype = {
         this.tileMap.addTilesetImage("gameTileset");
         //new Tilemap(layerName, widthInTiles, heightInTiles, tileWidth, tileHeight)
         this.mainLayer = this.tileMap.create("mainLayer", 64, 64, TILE_SIZE, TILE_SIZE);
+        
+        //TODO need to optimize later
+        this.tileChoice = 0;
+        
+        //Display tile choice
+        this.tileText = game.add.text(32, 32, tileName[this.tileChoice], this.textStyle);
+        this.tileText.fixedToCamera = true;
 
         //Handle input
         game.input.keyboard.onDownCallback = this.handleKeys;
@@ -93,14 +103,33 @@ GameplayState.prototype = {
             Client.sendMove(playerSpeed, 0);
         }
         
+        //Tile choosing controls
+        if(e.keyCode == Phaser.Keyboard.ONE){
+            this.tileChoice = 0;
+            //NOTE: Using the gameplayState variable feels like a bad idea
+            gameplayState.tileText.text = tileName[this.tileChoice];
+        }
+        //Tile choosing controls
+        if(e.keyCode == Phaser.Keyboard.TWO){
+            this.tileChoice = 1;
+            //NOTE: Using the gameplayState variable feels like a bad idea
+            gameplayState.tileText.text = tileName[this.tileChoice];
+        }
+        //Tile choosing controls
+        if(e.keyCode == Phaser.Keyboard.THREE){
+            this.tileChoice = 2;
+            //NOTE: Using the gameplayState variable feels like a bad idea
+            gameplayState.tileText.text = tileName[this.tileChoice];
+        }
+        
         //Change the tile the player is standing on
         //TODO should have some limit later on
         if(e.keyCode == Phaser.Keyboard.SPACEBAR){
-            Client.changeTile();
+            Client.changeTile(this.tileChoice, gameplayState.player.facing);
         }
         
         //Play abstract sound
-        if(e.keyCode == Phaser.Keyboard.ONE){
+        if(e.keyCode == Phaser.Keyboard.E){
             //TODO limit this so that the player can't spam the sound
             Client.playSound();
         }

@@ -94,7 +94,7 @@ class World {
    * @deprecated
    * TODO: Make it proper
    */
-  changeTile(x, y, tileId = 2) {
+  changeTile(x, y, tileId = 0) {
     if (!this.isValidTile(x, y)) {
       logger.error(`Invalid tile position at (${x},${y})`);
       return;

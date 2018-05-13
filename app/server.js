@@ -228,8 +228,26 @@ class Server {
 // eslint-disable-next-line no-case-declarations
       case Commands.ALTER_TILE:
         let tileId = cmd.params.tileId;
-
-        this.world.changeTile(player._x, player._y, tileId);
+        //left = 0
+        //up = 1
+        //down = 2
+        //right = 3
+        let facing = cmd.params.direction;
+        let offsetX = 0;
+        let offsetY = 0;
+        if(facing === 0){ //left
+            offsetX = -1;
+        }
+        else if(facing === 1){ //up
+            offsetY = -1;
+        }
+        else if(facing === 2){ //down
+            offsetY = 1;
+        }
+        else if(facing === 3){ //right
+            offsetX = 1;
+        }
+        this.world.changeTile(player._x + offsetX, player._y + offsetY, tileId);
 
         break;
       case Commands.COMMUNICATION:

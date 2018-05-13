@@ -47,7 +47,6 @@ Player.prototype.stepTo = function(){
 
 Player.prototype.moveTo = function(nx, ny){
     if(this.canMove){
-        console.log("Started timer");
         this.canMove = false;
         this.nextPos = {x: nx, y: ny};
         

@@ -121,7 +121,7 @@ var Client = {};
   /**
    * @deprecated
    */
-  Client.changeTile = function () {
+  Client.changeTile = function (tileChoice, dir) {
 
     // check '/shared/constant.js'
     //
@@ -131,7 +131,8 @@ var Client = {};
     Client.socket.emit('inputCommand', {
       type: 2,
       params: {
-        tileId: 2 // Rock
+        tileId: tileChoice,
+        direction: dir
       }
     });
 
