@@ -2,7 +2,7 @@
 function Player(game, x, y, key, frame){
     //Call to Phaser.Sprite(game, x, y, key, frame)
     Phaser.Sprite.call(this, game, x, y, key, frame);
-    
+
     this.canMove = true;
     this.moveDuration = 100; //In milliseconds
     this.nextPos = {x: 0, y: 0};
@@ -17,7 +17,7 @@ Player.prototype.constructor = Player;
 Player.prototype.update = function(){
     if(!this.canMove){
         this.stepTo();
-    }  
+    }
 };
 
 Player.prototype.ableToMove = function(){
@@ -28,16 +28,16 @@ Player.prototype.stepTo = function(){
     console.log("Stepped");
     //Movement is in progress
     if(this.x < this.nextPos.x){
-        this.x++;
+        this.x+=2;
     }
     else if(this.x > this.nextPos.x){
-        this.x--;
+        this.x-=2;
     }
     else if(this.y < this.nextPos.y){
-        this.y++;
+        this.y+=2;
     }
     else if(this.y > this.nextPos.y){
-        this.y--;
+        this.y-=2;
     }
     //Check if done moving
     if(this.nextPos.x === this.x && this.nextPos.y === this.y){

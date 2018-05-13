@@ -29,7 +29,7 @@ class Character {
      * @private
      */
     this._direction = 2;
-    this._moveSpeed = 4;
+    this._moveSpeed = 3;
   }
 
   /**
