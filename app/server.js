@@ -139,8 +139,8 @@ class Server {
    */
   onPlayerJoinWorld(socket, playerEvent) {
     // This send the data of all players to the new-joined client.
-    playerEvent.x = 64;
-    playerEvent.y = 64;
+    playerEvent.x = 5;
+    playerEvent.y = 5;
 
     this.world.addObject(playerEvent.playerId);
 
@@ -149,7 +149,7 @@ class Server {
       objects.push({
         x: player._x,
         y: player._y,
-        id: playerEvent.playerId,
+        id: player.id,
       });
     });
 
@@ -162,18 +162,9 @@ class Server {
     // This send out the new-joined client's data to all other clients
     socket.broadcast.emit('playerEvent', playerEvent);
 
-
     socket.on('inputCommand', (cmd) => {
       this.onReceivedInput(cmd, socket, playerEvent.playerId);
     });
-
-    // /**
-    //  * Receive Sound from Client
-    //  * TODO: restructure later
-    //  */
-    // socket.on('playSound', (data) => {
-    //   this.onReceivedSound(data, socket, playerEvent.playerId);
-    // });
   }
 
   /**
@@ -227,7 +218,7 @@ class Server {
       case Commands.ALTER_TILE:
         let tileId = cmd.params.tileId;
 
-        this.world.changeTile(player.x, player.y, tileId);
+        this.world.changeTile(player._x, player._y, tileId);
 
         break;
       case Commands.COMMUNICATION:

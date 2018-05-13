@@ -48,14 +48,23 @@ var Client = {};
      * @param data {Object}
      * @param data.tiles {Array} An array that represents a tile's x,y position and type
      */
-    Client.socket.on("worldUpdate", function (data){
-      gameplayState.changeTileAt(data.tiles[0], data.tiles[1], data.tiles[2]);
+    Client.socket.on('worldUpdate', function (data){
+      // Server has returned an array of changed tiles.
+      //
+      for (var i = 0; i < data.tiles.length; i++) {
+        var tile = data.tiles[i];
+        var x = tile[0];
+        var y = tile[1];
+        var type = tile[2];
+        gameplayState.changeTileAt(x, y, type);
+        gameplayState.playAbstractSoundAt(x, y);
+      }
     });
 
     /**
      * @param data {Object} An object with an x and y property that represents the sound's position
      */
-    Client.socket.on("playSound", function (data){
+    Client.socket.on('playSound', function (data){
       gameplayState.playAbstractSoundAt(data.x, data.y);
     });
   };
@@ -119,7 +128,7 @@ var Client = {};
     //   MOVEMENT: 1,
     //   ALTER_TILE: 2,
     //   COMMUNICATION: 3,
-    Client.socket.emit("inputCommand", {
+    Client.socket.emit('inputCommand', {
       type: 2,
       params: {
         tileId: 2 // Rock

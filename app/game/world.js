@@ -2,7 +2,7 @@
 
 const EventEmitter = require('events');
 const Noise = require('noisejs');
-const Character = require('./character');
+const Player = require('./player.js');
 
 const {WorldConfig} = require('../../shared/constant.js');
 const logger = require('../logger.js');
@@ -44,7 +44,7 @@ class World {
     this.generateTileMap(this.tileMap, this.heightmap);
 
     this.setupEventEmitter();
-    this.on('server__processInput', (input, playerId)=>{
+    this.on('server__processInput', (input, playerId) => {
       this.processInput(input, playerId);
     });
   }
@@ -68,8 +68,8 @@ class World {
    * @return {Map<Number, Character>}
    */
   addObject(playerId) {
-    let character = new Character(5, 5);
-    return this.objects.set(playerId, character);
+    let player = new Player(5, 5, playerId);
+    return this.objects.set(playerId, player);
   }
 
   /**
@@ -78,17 +78,27 @@ class World {
    * TODO: Make it proper
    */
   changeTile(x, y, tileId = 2) {
-    x = Math.floor(x/32);
-    y = Math.floor(y/32);
-    // Check array index out of bounds
-    if (x < 0 || x >= World.MAP_WIDTH || y < 0 || y >= World.MAP_HEIGHT) {
-      logger.debug(`Invalid tile position at (${x},${y})`);
-    } else {
-      this.tileMap[x][y] = tileId;
-      this.server.io.emit('worldUpdate', {
-        tiles: [[x, y, 2]],
-      });
+    if (!this.isValidTile(x, y)) {
+      logger.error(`Invalid tile position at (${x},${y})`);
+      return;
     }
+
+    logger.debug(`Tile at (${x}, ${y}) is changed to ${tileId}.`);
+
+    this.tileMap[x][y] = tileId;
+
+    this.server.io.emit('worldUpdate', {
+      tiles: [[x, y, 2]],
+    });
+  }
+
+  /**
+   * @param x {number}
+   * @param y {number}
+   * @return {boolean}
+   */
+  isValidTile(x, y) {
+    return x >= 0 && x < World.MAP_WIDTH && y >= 0 && y < World.MAP_HEIGHT;
   }
 
   /**
@@ -99,10 +109,6 @@ class World {
     return this.objects.delete(playerId);
   }
 
-  getObjects() {
-    return this.objects.values();
-  }
-
   /**
    * @return {Array}
    */
@@ -110,8 +116,22 @@ class World {
     return this.tileMap;
   }
 
+  /**
+   * Main Update function
+   * @param dt{Number}
+   */
   step(dt) {
 
+  }
+
+  /**
+   * @param inputMsg {Object}
+   * @param inputMsg.input {}
+   * @param playerId {Number}
+   */
+  processInput(inputMsg, playerId) {
+    logger.debug(`game engine processing input \
+<${inputMsg.input}> from playerId ${playerId}`);
   }
 
   /**
@@ -162,16 +182,6 @@ class World {
         tilemap[i][j] = tileType;
       }
     }
-  }
-
-  /**
-   * @param inputMsg {Object}
-   * @param inputMsg.input {}
-   * @param playerId {Number}
-   */
-  processInput(inputMsg, playerId) {
-    logger.debug(`game engine processing input \
-<${inputMsg.input}> from playerId ${playerId}`);
   }
 }
 

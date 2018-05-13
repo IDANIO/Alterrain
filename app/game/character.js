@@ -48,6 +48,13 @@ class Character {
   }
 
   /**
+   * @param d {Number}
+   */
+  setDirection(d) {
+    this._direction = d;
+  }
+
+  /**
    * @param x {Number}
    * @param y {Number}
    */
