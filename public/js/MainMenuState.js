@@ -20,7 +20,7 @@ MainMenuState.prototype = {
 
     preload: function(){
         //game.load.spritesheet("player", "./assets/img/dude.png", 32, 48);
-        game.load.spritesheet("player", "./assets/img/person_spritesheet.png", 32, 32);
+        game.load.spritesheet("player", "./assets/img/person_spritesheet_large.png", 32, 32);
         game.load.image("gameTileset", "./assets/img/game_tileset.png", 32, 32);
         game.load.audio("placeTileSound", "assets/audio/place_tile.ogg");
         game.load.audio("abstractChirpSound", "assets/audio/abstract_chirp01.ogg");

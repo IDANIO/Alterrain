@@ -64,9 +64,6 @@ GameplayState.prototype = {
     //Adds a new player object to the world
     addNewPlayer: function(id, x, y){
         this.playerMap[id] = new Player(game, x * TILE_SIZE, y * TILE_SIZE, "player");
-        //TODO temporary, the player sprite should actually be 32x32
-        this.playerMap[id].scale.x = 2;
-        this.playerMap[id].scale.y = 2;
         game.add.existing(this.playerMap[id]);
     },
 
