@@ -143,7 +143,7 @@ GameplayState.prototype = {
     },
 
     playAbstractSoundAt: function(x, y){
-        this.playSoundFrom(this.abstractChirpSound, x, y);
+        this.playSoundFrom(this.abstractChirpSound, x * TILE_SIZE, y * TILE_SIZE);
     },
 
     //Moves the player to the given position
