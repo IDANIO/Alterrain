@@ -3,15 +3,20 @@ var GameplayState = function(game){
     //Create a playerMap property
     this.playerMap = {};
     this.player = null;
+    this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
 //Tile-based movement
 var playerSpeed = 32;
 
-var FACING_LEFT = 0;
-var FACING_UP = 1;
+var tileName = ["Grass", "Sand", "Stone"];
+
+// We are using num-pad representation (Ivan)
+//
+var FACING_LEFT = 4;
+var FACING_UP = 8;
 var FACING_DOWN = 2;
-var FACING_RIGHT = 3;
+var FACING_RIGHT = 6;
 
 //How close the player needs to be, in pixels, to hear a sound play
 var MIN_HEARING_DISTANCE = 600;
@@ -28,9 +33,9 @@ GameplayState.prototype = {
         //empty
     },
 
-    create: function(){        
+    create: function(){
         this.createSoundObjects();
-        
+
         //Set up and create the world tilemap
         //TODO use constants instead of hard-coded numbers
         game.world.setBounds(0, 0, 64 * TILE_SIZE, 64 * TILE_SIZE);
@@ -40,6 +45,13 @@ GameplayState.prototype = {
         this.tileMap.addTilesetImage("gameTileset");
         //new Tilemap(layerName, widthInTiles, heightInTiles, tileWidth, tileHeight)
         this.mainLayer = this.tileMap.create("mainLayer", 64, 64, TILE_SIZE, TILE_SIZE);
+
+        //TODO need to optimize later
+        this.tileChoice = 0;
+
+        //Display tile choice
+        this.tileText = game.add.text(32, 32, tileName[this.tileChoice], this.textStyle);
+        this.tileText.fixedToCamera = true;
 
         //Handle input
         game.input.keyboard.onDownCallback = this.handleKeys;
@@ -55,7 +67,7 @@ GameplayState.prototype = {
     update: function(){
         //empty
     },
-    
+
     createSoundObjects: function(){
         this.placeTileSound = game.add.audio("placeTileSound");
         this.abstractChirpSound = game.add.audio("abstractChirpSound");
@@ -81,49 +93,70 @@ GameplayState.prototype = {
 
     handleKeys: function(e){
         if(e.keyCode == Phaser.Keyboard.UP){
-            Client.sendMove(0, -playerSpeed);
+            Client.sendMove(8);
         }
         if(e.keyCode == Phaser.Keyboard.DOWN){
-            Client.sendMove(0, playerSpeed);
+            Client.sendMove(2);
         }
         if(e.keyCode == Phaser.Keyboard.LEFT){
-            Client.sendMove(-playerSpeed, 0);
+            Client.sendMove(4);
         }
         if(e.keyCode == Phaser.Keyboard.RIGHT){
-            Client.sendMove(playerSpeed, 0);
+            Client.sendMove(6);
         }
-        
+
+        //Tile choosing controls
+        if(e.keyCode == Phaser.Keyboard.ONE){
+            this.tileChoice = 0;
+            //NOTE: Using the gameplayState variable feels like a bad idea
+            gameplayState.tileText.text = tileName[this.tileChoice];
+        }
+        //Tile choosing controls
+        if(e.keyCode == Phaser.Keyboard.TWO){
+            this.tileChoice = 1;
+            //NOTE: Using the gameplayState variable feels like a bad idea
+            gameplayState.tileText.text = tileName[this.tileChoice];
+        }
+        //Tile choosing controls
+        if(e.keyCode == Phaser.Keyboard.THREE){
+            this.tileChoice = 2;
+            //NOTE: Using the gameplayState variable feels like a bad idea
+            gameplayState.tileText.text = tileName[this.tileChoice];
+        }
+
         //Change the tile the player is standing on
         //TODO should have some limit later on
         if(e.keyCode == Phaser.Keyboard.SPACEBAR){
-            Client.changeTile();
+            Client.changeTile(this.tileChoice, gameplayState.player.facing);
         }
-        
+
         //Play abstract sound
-        if(e.keyCode == Phaser.Keyboard.ONE){
+        if(e.keyCode == Phaser.Keyboard.E){
             //TODO limit this so that the player can't spam the sound
             Client.playSound();
         }
-        
+
         //Quit key - go back to the main menu
         if(e.keyCode == Phaser.Keyboard.ESC){
             game.state.start("MainMenuState");
         }
     },
-    
+
     playAbstractSoundAt: function(x, y){
         this.playSoundFrom(this.abstractChirpSound, x, y);
     },
 
     //Moves the player to the given position
-    movePlayer: function(id, x, y){
+    movePlayer: function(id, x, y, d){
         //this.playerMap[id].x = x;
         //this.playerMap[id].y = y;
+      // console.log(`${x},${y},${d}`)
+      this.playerMap[id].setDirection(d);
         if(this.playerMap[id].ableToMove()){
             this.playerMap[id].moveTo(x * TILE_SIZE, y * TILE_SIZE);
         }
     },
-    
+
     //Change the given tile to another type
     changeTileAt(tileX, tileY, tileType){
         if(tileX < 0 || tileX >= this.tileMap.width || tileY < 0 || tileY >= this.tileMap.height){
@@ -168,7 +201,7 @@ GameplayState.prototype = {
             }
         }
     },
-    
+
     //Plays a given sound with volume inversely scaled to the distance from the source
     playSoundFrom: function(sfx, x, y){
         let dist = this.getDistance(x, y, this.player.x, this.player.y);
@@ -181,7 +214,7 @@ GameplayState.prototype = {
             sfx.play();
         }
     },
-    
+
     //Returns the distance between 2 points
     getDistance: function(x1, y1, x2, y2){
         return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));

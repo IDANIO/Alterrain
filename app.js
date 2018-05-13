@@ -5,6 +5,7 @@
  */
 const express = require('express');
 const helmet = require('helmet');
+const nocache = require('nocache');
 const compression = require('compression');
 const path = require('path');
 const dotenv = require('dotenv');
@@ -36,6 +37,9 @@ const port = process.env.PORT || 8080;
 app.use(helmet());
 app.use(compression());
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+if (process.env.NODE_ENV === 'development') {
+  app.use(nocache()); // only use in development
+}
 
 /**
  * Socket
@@ -48,7 +52,8 @@ server.listen(port, () => {
     | || |_| / ___ \\| |\\  || | |_| |
    |___|____/_/   \\_\\_| \\_|___\\___/ 
                                   
-✓ App is running at http://localhost:${port} in ${app.get('env')} mode
+✓ App is running at http://localhost:${port} in ${app.get('env')} mode.
+  Command line arguments: ${process.argv.slice(2)}
   `);
 });
 
@@ -62,6 +67,7 @@ app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
  * @type {Server}
  */
 const game = new Game(io);
+game.setup(process.argv.slice(2));
 game.start();
 
 /**

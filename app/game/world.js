@@ -1,10 +1,14 @@
 'use strict';
 
+const path = require('path');
+const fs = require('fs');
+
 const EventEmitter = require('events');
+const Character = require('./character');
 const Player = require('./player.js');
 const noise = require('../lib/perlin.js');
 
-const {TileData, WorldConfig} = require('../../shared/constant.js');
+const {Tiles, TileData, WorldConfig} = require('../../shared/constant.js');
 const logger = require('../logger.js');
 
 /**
@@ -15,8 +19,9 @@ const logger = require('../logger.js');
 class World {
   /**
    * @param server{Server}
+   * @param filename {String=}
    */
-  constructor(server) {
+  constructor(server, filename) {
     this.server = server;
 
     /**
@@ -28,12 +33,90 @@ class World {
     this.width = WorldConfig.WIDTH;
     this.height = WorldConfig.HEIGHT;
 
-    this.initTilemap();
+
+    this.initWorldData(filename);
 
     this.setupEventEmitter();
-    this.on('server__processInput', (input, playerId) => {
-      this.processInput(input, playerId);
+  }
+
+  /**
+   * Initialized the game world either by existing data or generate new.
+   * @param filename {String=}
+   * @return {boolean}
+   */
+  initWorldData(filename = null) {
+    let success = false;
+    if (typeof filename === 'string') {
+      this.tileMap = this.loadFromDiskData(filename);
+      if (this.tileMap) {
+        logger.info(`Successfully loading world data from ${filename}`);
+        return success = true;
+      }
+    }
+
+    logger.info('Creating new Tilemap...');
+    this.initTilemap();
+    this.saveWorldDataToDisk();
+    return success;
+  }
+
+  /**
+   * Register handlers for an event
+   * @private
+   */
+  setupEventEmitter() {
+    let emitter = new EventEmitter();
+
+    this.on = emitter.on;
+    this.once = emitter.once;
+    this.removeListener = emitter.removeListener;
+
+    this.emit = emitter.emit;
+  }
+
+  /**
+   * Save a world snapshot to the local disk.
+   */
+  saveWorldDataToDisk() {
+    let d = new Date();
+    let filename = `world-${d.getDay()}-${d.getHours()}-${d.getSeconds()}.json`;
+    let resolvedPath = path.join(__dirname, '../../data', filename);
+    let data = JSON.stringify(this.tileMap);
+
+    fs.writeFile(resolvedPath, data, (err) => {
+      if (err) {
+        return logger.error(`Unable to Save world data: ${resolvedPath}`);
+      }
+      logger.info(`World snapshot saved: ${resolvedPath}`);
     });
+  }
+
+  /**
+   * @param filename {String}
+   * @return {Array.<Array.<Number>>}
+   */
+  loadFromDiskData(filename) {
+    let resolvedPath = path.join(__dirname, '../../data', filename);
+
+    let mapData = null;
+
+    // fs.readFile(resolvedPath, (err, data) => {
+    //     if (err) {
+    //       return logger.error(`Unable to Read world data: ${resolvedPath}`);
+    //     }
+    //
+    //     mapData = JSON.parse(data);
+    //   }
+    // );
+
+    try {
+      mapData = JSON.parse(fs.readFileSync(resolvedPath));
+    } catch (err) {
+      logger.error(`Unable to Read world data: ${resolvedPath}`);
+      logger.error(err);
+    }
+
+    return mapData;
   }
 
   /**
@@ -49,33 +132,19 @@ class World {
 
     // The heightmap, used to procedurally generate the tilemap
     this.heightmap = [];
-    
+
     // The moisture, used to procedurally generate the tilemap
     this.moisture = [];
-    
+
     for (let i = 0; i < this.height; i++) {
       this.tileMap[i] = [];
       this.heightmap[i] = [];
       this.moisture[i] = [];
-    }    
+    }
 
     this.generateNoise(this.heightmap, this.width, this.height);
     this.generateNoise(this.moisture, this.width, this.height);
     this.generateTileMap(this.tileMap, this.heightmap, this.moisture);
-  }
-
-  /**
-   * Register handlers for an event
-   * @private
-   */
-  setupEventEmitter() {
-    let emitter = new EventEmitter();
-
-    this.on = emitter.on;
-    this.once = emitter.once;
-    this.removeListener = emitter.removeListener;
-
-    this.emit = emitter.emit;
   }
 
   /**
@@ -94,7 +163,7 @@ class World {
    * @deprecated
    * TODO: Make it proper
    */
-  changeTile(x, y, tileId = 2) {
+  changeTile(x, y, tileId = Tiles.GRASS) {
     if (!this.isValidTile(x, y)) {
       logger.error(`Invalid tile position at (${x},${y})`);
       return;
@@ -166,15 +235,12 @@ class World {
   }
 
   /**
-   * @param inputMsg {Object}
-   * @param inputMsg.input {}
-   * @param playerId {Number}
+   * @param command {Function} Command Function
    */
-  processInput(inputMsg, playerId) {
-    logger.debug(`game engine processing input \
-<${inputMsg.input}> from playerId ${playerId}`);
+  processInput(command) {
+    command();
   }
-  
+
   /** OLD - uses elevation only and returns only 3 biomes
    * Returns the type of terrain that corresponds to the
    * given parameters
@@ -182,17 +248,17 @@ class World {
    * @param m The 2D array that represents the moisture
    * @returns {number} an integer that corresponds to a specific tile type
    */
-  getBiomeType(e, m){
-      if(e < 0.4){
-          return 3; //water
+  getBiomeType(e, m) {
+      if (e < 0.4) {
+          return 3; // water
       }
-      if(e < 0.55){
-          return 1; //sand
+      if (e < 0.55) {
+          return 1; // sand
       }
-      if(e < 0.7){
-          return 0; //grass
+      if (e < 0.7) {
+          return 0; // grass
       }
-      return 2; //stone
+      return 2; // stone
   }
 
   /** USE THIS FUNCTION WHEN WE HAVE MORE BIOMES
@@ -202,67 +268,67 @@ class World {
    * @param m The 2D array that represents the moisture
    * @returns {number} an integer that corresponds to a specific tile type
    */
-  getBiomeTypeBetter(e, m) { //0 = grass, 1 = sand, 2 = stone, 3 = water
-    if(e < 0.1){
-        //ocean
+  getBiomeTypeBetter(e, m) { // 0 = grass, 1 = sand, 2 = stone, 3 = water
+    if (e < 0.1) {
+        // ocean
         return 3;
     }
-    if(e < 0.12){
-        //beach
+    if (e < 0.12) {
+        // beach
         return 1;
     }
-    if(e > 0.8){
-        if(m < 0.1){
-            //scorched
+    if (e > 0.8) {
+        if (m < 0.1) {
+            // scorched
         }
-        if(m < 0.2){
-            //bare
+        if (m < 0.2) {
+            // bare
         }
-        if(m < 0.5){
-            //tundra
+        if (m < 0.5) {
+            // tundra
             return 2;
         }
-        //snow
+        // snow
         return 2;
     }
-    if(e > 0.6){
-        if(m < 0.33){
-            //temperate desert
+    if (e > 0.6) {
+        if (m < 0.33) {
+            // temperate desert
             return 1;
         }
-        if(m < 0.66){
-            //shrubland
+        if (m < 0.66) {
+            // shrubland
             return 0;
         }
-        //taiga
+        // taiga
         return 2;
     }
-    if(e > 0.3){
-        if(m < 0.16){
-            //temperate desert
+    if (e > 0.3) {
+        if (m < 0.16) {
+            // temperate desert
             return 1;
         }
-        if(m < 0.5){
-            //grassland
+        if (m < 0.5) {
+            // grassland
             return 0;
         }
-        if(m < 0.83){
-            //temperate deciduous forest
+        if (m < 0.83) {
+            // temperate deciduous forest
         }
-        //temperate rain forest
+        // temperate rain forest
     }
-    if(m < 0.16){
-        //subtropical desert
+    if (m < 0.16) {
+        // subtropical desert
         return 1;
     }
-    if(m < 0.33){
-        //grassland
+    if (m < 0.33) {
+        // grassland
         return 0;
     }
-    if(m < 0.66){
-        //tropical seasonal rainforest
+    if (m < 0.66) {
+        // tropical seasonal rainforest
     }
-    //tropical rainforest
+    // tropical rainforest
   }
 
   /**
@@ -275,7 +341,7 @@ class World {
   generateNoise(arr, width, height) {
     // let noise = new Noise();
     noise.seed(Math.random());
-    //let freq = 1.2; //Frequency, should be a constant
+    // let freq = 1.2; //Frequency, should be a constant
     let freq = 2.2;
 
     for (let i = 0; i < width; i++) {

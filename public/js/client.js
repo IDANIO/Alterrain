@@ -7,9 +7,15 @@ var Client = {};
   Client.connectToServer = function() {
     Client.socket = io.connect();
 
+    /**
+     * @param data {Object}
+     * @param data.id {Number} Player Id
+     * @param data.x {Number} The new x position
+     * @param data.y {Number} The new y position
+     * @param data.d {Number} The new direction
+     */
     Client.socket.on('playerUpdate', function (data) {
-      console.log(data);
-      gameplayState.movePlayer(data.id, data.x, data.y);
+      gameplayState.movePlayer(data.id, data.x, data.y, data.d);
     });
 
     /**
@@ -82,28 +88,11 @@ var Client = {};
   };
 
   /**
-   * @deprecated
-   * @param dx
-   * @param dy
+   * @param dir
    */
-  Client.sendMove = function (dx, dy) {
+  Client.sendMove = function (dir) {
     // TODO: Julio, make it only sent the direction for player to move
     // 2 = Down, 4 = Left, 6 = Right, 8 = Up
-
-    var dir = 2;
-    if (dx > 0) {
-      if (dy === 0) {
-        dir = 6;
-      }
-    } else if (dx < 0) {
-      if (dy === 0) {
-        dir = 4;
-      }
-    } else {
-      if (dy < 0) {
-        dir = 8;
-      }
-    }
 
     // check '/shared/constant.js'
     //
@@ -116,12 +105,9 @@ var Client = {};
     });
 
     // Client.socket.emit("moveplayer", {dx: dx, dy: dy});
-  }
+  };
 
-  /**
-   * @deprecated
-   */
-  Client.changeTile = function () {
+  Client.changeTile = function (tileChoice, dir) {
 
     // check '/shared/constant.js'
     //
@@ -131,18 +117,12 @@ var Client = {};
     Client.socket.emit('inputCommand', {
       type: 2,
       params: {
-        tileId: 2 // Rock
+        tileId: tileChoice,
+        // direction: dir
       }
     });
+  };
 
-    // Client.socket.emit("moveplayer", {tile:true});
-  }
-
-  /**
-   * @deprecated
-   * @param x The x position of the sound's source
-   * @param y The y position of the sound's source
-   */
   Client.playSound = function(){
 
     // check '/shared/constant.js'
@@ -152,10 +132,7 @@ var Client = {};
     //   COMMUNICATION: 3,
     Client.socket.emit("inputCommand", {
       type: 3,
-      params: null
     });
-
-    //   Client.socket.emit("playSound")
   }
 
 })();

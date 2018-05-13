@@ -3,6 +3,7 @@
 const World = require('./game/world.js');
 const logger = require('./logger.js');
 const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
+const CommandFactory = require('./game/command');
 
 /**
  * Server is the main server-side singleton code.
@@ -12,11 +13,16 @@ const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
 class Server {
   constructor(io) {
     /**
-     * @type {Map<String, Object>} HashTable that contains the currently
+     * Key: Socket.id
+     * @type {Map<String, Object>} HashTable that contains the currently.
      * connected players.
      */
     this.connectedPlayers = new Map();
-    this.playerInputQueues = {};
+
+    /**
+     * @type {Map<Number, Array.<Function>>}
+     */
+    this.playerInputQueues = new Map();
 
     this.intervalFrameRate = ServerConfig.STEP_RATE || 60;
     this.maximumPlayer = ServerConfig.MAX_PLAYERS || 50;
@@ -42,9 +48,10 @@ class Server {
 
   /**
    * @param worldSettings {Object=}
+   * @param worldSettings.filename {String}
    */
-  initWorld(worldSettings) {
-    this.world = new World(this);
+  initWorld(worldSettings = {filename: null}) {
+    this.world = new World(this, worldSettings.filename);
 
     /**
      * The worldSettings defines the game world constants, such
@@ -57,11 +64,16 @@ class Server {
   }
 
   /**
+   * Setup very thing needed before the first game tick.
+   */
+  setup(args) {
+    this.initWorld({filename: args[0]});
+  }
+
+  /**
    * Start game logic and the clock
    */
   start() {
-    this.initWorld();
-
     const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
     this.intervalGameTick = setInterval(this.step.bind(this), intervalDelta);
   }
@@ -99,6 +111,7 @@ class Server {
     let playerId = ++this.lastPlayerID;
 
     // save player
+    this.playerInputQueues.set(playerId, []);
     this.connectedPlayers.set(socket.id, {
       socket: socket,
       state: 'new',
@@ -148,7 +161,7 @@ class Server {
     do {
       newX = Math.floor(Math.random() * WorldConfig.WIDTH);
       newY = Math.floor(Math.random() * WorldConfig.HEIGHT);
-    } while (!this.world.isValidTile(newX, newY));
+    } while (!this.world.isPassable(newX, newY, 2));
 
     playerEvent.x = newX;
     playerEvent.y = newY;
@@ -206,64 +219,42 @@ class Server {
    * @param playerId {Number}
    */
   onReceivedInput(cmd, socket, playerId) {
-    let player = this.world.objects.get(playerId);
+    // this.queueInputForPlayer(cmd, playerId);
+    const player = this.world.objects.get(playerId);
 
-    // TODO: refactor/decoupling this
+    let command;
+
     switch (cmd.type) {
-      // eslint-disable-next-line no-case-declarations
       case Commands.MOVEMENT:
-        let dir = cmd.params;
-
-        // check if can pass?
-        if (!player.isMoving()) {
-          player.moveStraight(dir);
-          this.io.emit('playerUpdate', {
-            id: playerId,
-            x: player._x,
-            y: player._y,
-          });
-        }
-
+        command = CommandFactory.makeMoveCommand(player, cmd.params);
         break;
-// eslint-disable-next-line no-case-declarations
       case Commands.ALTER_TILE:
-        let tileId = cmd.params.tileId;
-
-        this.world.changeTile(player._x, player._y, tileId);
-
+        command = CommandFactory.makeChangeTileCommand(player, cmd.params);
         break;
       case Commands.COMMUNICATION:
-
-        this.io.emit('playSound', {
-          x: player._x,
-          y: player._y,
-        });
+        command = CommandFactory.makeCommunicateCommand(player, cmd.params);
         break;
       default:
         logger.error(`Invalid Command ${cmd.type}`);
+        return;
     }
+
+    logger.debug(`Processing input <${cmd.type}> from playerId ${playerId}`);
+    this.world.processInput(command);
   }
 
   /**
    * Add an input to the input-queue for the specific player, each queue is
    * key'd by step, because there may be multiple inputs per step.
-   * @param data
+   * @param cmd
    * @param playerId
    */
-  queueInputForPlayer(data, playerId) {
-    // create an input queue for this player, if one doesn't already exist
-    if (!this.playerInputQueues.hasOwnProperty(playerId)) {
-      this.playerInputQueues[playerId] = {};
-    }
-    let queue = this.playerInputQueues[playerId];
+  queueInputForPlayer(cmd, playerId) {
+    let queue = this.playerInputQueues.get(playerId);
 
-    logger.debug(queue);
+    queue.push();
 
-    // create an array of inputs for this step, if one doesn't already exist
-    if (!queue[data.step]) queue[data.step] = [];
-
-    // add the input to the player's queue
-    queue[data.step].push(data);
+    logger.data(queue);
   }
 }
 

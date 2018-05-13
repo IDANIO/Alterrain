@@ -153,25 +153,24 @@ class Character {
     let x2 = Character.roundXWithDirection(x, d);
     let y2 = Character.roundYWithDirection(y, d);
     let d2 = this.reverseDir(d);
-    logger.warn(`Checking on (${x}, ${y}) and (${x2}, ${y2})`);
     return this.world.isValidTile(x2, y2) &&
             this.world.isPassable(x, y, d) &&
             this.world.isPassable(x2, y2, d2);
   }
 
   /**
-   * @param direction {Number}
+   * @param d {Number}
    */
-  moveStraight(direction) {
-    this.setDirection(direction);
+  moveStraight(d) {
+    this.setDirection(d);
 
     // Check can pass this terrain?
     if (this.isMapPassable(this._x, this._y, this._direction)) {
-      this._x = Character.roundXWithDirection(this._x, direction);
-      this._y = Character.roundYWithDirection(this._y, direction);
-
-      logger.debug(`Player moved to (${this._x}, ${this._y})`);
+      this._x = Character.roundXWithDirection(this._x, d);
+      this._y = Character.roundYWithDirection(this._y, d);
     }
+
+    logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
   }
 
   /**
@@ -189,7 +188,6 @@ class Character {
   }
 
   /**
-   * @private
    * @param x
    * @param d
    * @return {*}
@@ -199,7 +197,6 @@ class Character {
   }
 
   /**
-   * @private
    * @param y
    * @param d
    * @return {*}

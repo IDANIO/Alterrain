@@ -45,12 +45,35 @@ Player.prototype.stepTo = function(){
     }
 };
 
+/**
+ * @param d {FACING_RIGHT || FACING_LEFT || FACING_DOWN || FACING_UP}
+ */
+Player.prototype.setDirection = function(d) {
+  this.facing = d;
+
+  // TMP
+  switch (d){
+    case FACING_DOWN:
+      this.frame = 0;
+      break;
+    case FACING_LEFT:
+      this.frame = 3;
+      break;
+    case FACING_RIGHT:
+      this.frame = 1;
+      break;
+    case FACING_UP:
+      this.frame = 2;
+      break;
+  }
+
+};
+
 Player.prototype.moveTo = function(nx, ny){
     if(this.canMove){
-        console.log("Started timer");
         this.canMove = false;
         this.nextPos = {x: nx, y: ny};
-        
+
         if(this.x < this.nextPos.x){
             this.facing = FACING_RIGHT;
             this.frame = 1;
@@ -67,7 +90,7 @@ Player.prototype.moveTo = function(nx, ny){
             this.facing = FACING_UP;
             this.frame = 2;
         }
-        
+
         /////DEBUG - remove later/////
         this.x = nx;
         this.y = ny;
