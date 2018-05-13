@@ -6,17 +6,18 @@ const {combine, colorize, simple} = format;
 const config = {
   levels: {
     error: 0,
-    debug: 1,
-    warn: 2,
-    data: 3,
-    info: 4,
+    warn: 1,
+    info: 3,
+    data: 4,
+    debug: 5,
+
   },
   colors: {
     error: 'red',
-    debug: 'blue',
     warn: 'yellow',
-    data: 'grey',
     info: 'green',
+    data: 'grey',
+    debug: 'blue',
   },
 };
 
@@ -31,7 +32,14 @@ const logger = createLogger({
     simple()
   ),
   transports: [
-    new transports.Console(),
+    new transports.Console({
+      level: (process.env.NODE_ENV === 'development') ? 'debug' : 'data',
+    }),
+    new transports.File({
+      filename: 'debugger.log',
+      maxsize: 5242880,
+      level: (process.env.NODE_ENV === 'development') ? 'debug' : 'info',
+    }),
   ],
 });
 
