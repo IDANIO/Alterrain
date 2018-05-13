@@ -1,7 +1,9 @@
 'use strict';
 
 const EventEmitter = require('events');
+const Noise = require('noisejs');
 const Character = require('./character');
+
 const {WorldConfig} = require('../../shared/constant.js');
 const logger = require('../logger.js');
 
