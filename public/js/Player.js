@@ -8,7 +8,7 @@ function Player(game, x, y, key, frame){
     this.nextPos = {x: 0, y: 0};
     this.moveTimer = game.time.create(false);
     this.moveTimer.loop(this.moveDuration, this.stepTo, this);
-    console.log(this.stepTo);
+    this.facing = FACING_DOWN;
 }
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -50,5 +50,28 @@ Player.prototype.moveTo = function(nx, ny){
         console.log("Started timer");
         this.canMove = false;
         this.nextPos = {x: nx, y: ny};
+        
+        if(this.x < this.nextPos.x){
+            this.facing = FACING_RIGHT;
+            this.frame = 1;
+        }
+        else if(this.x > this.nextPos.x){
+            this.facing = FACING_LEFT;
+            this.frame = 3;
+        }
+        else if(this.y < this.nextPos.y){
+            this.facing = FACING_DOWN;
+            this.frame = 0;
+        }
+        else if(this.y > this.nextPos.y){
+            this.facing = FACING_UP;
+            this.frame = 2;
+        }
+        
+        /////DEBUG - remove later/////
+        this.x = nx;
+        this.y = ny;
+        this.canMove = true
+        /////DEBUG - remove later/////
     }
 };

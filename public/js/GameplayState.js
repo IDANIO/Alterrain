@@ -8,6 +8,11 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 32;
 
+var FACING_LEFT = 0;
+var FACING_UP = 1;
+var FACING_DOWN = 2;
+var FACING_RIGHT = 3;
+
 //How close the player needs to be, in pixels, to hear a sound play
 var MIN_HEARING_DISTANCE = 600;
 var TILE_SIZE = 32;
@@ -23,9 +28,7 @@ GameplayState.prototype = {
         //empty
     },
 
-    create: function(){
-        game.stage.backgroundColor = "#222";
-        
+    create: function(){        
         this.createSoundObjects();
         
         //Set up and create the world tilemap
@@ -61,6 +64,9 @@ GameplayState.prototype = {
     //Adds a new player object to the world
     addNewPlayer: function(id, x, y){
         this.playerMap[id] = new Player(game, x * TILE_SIZE, y * TILE_SIZE, "player");
+        //TODO temporary, the player sprite should actually be 32x32
+        this.playerMap[id].scale.x = 2;
+        this.playerMap[id].scale.y = 2;
         game.add.existing(this.playerMap[id]);
     },
 
@@ -130,7 +136,7 @@ GameplayState.prototype = {
         let sourceX = tileX * TILE_SIZE;
         let sourceY = tileY * TILE_SIZE;
         this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
-        if(tileType === 0){ //grass
+        /*if(tileType === 0){ //grass
             this.tileMap.putTile(0, tileX, tileY);
         }
         else if(tileType === 1){ //sand
@@ -139,6 +145,10 @@ GameplayState.prototype = {
         else if(tileType === 2){ //stone
             this.tileMap.putTile(2, tileX, tileY);
         }
+        else if(tileType === 3){ //water
+            this.tileMap.putTile(3, tileX, tileY);
+        }*/
+        this.tileMap.putTile(tileType, tileX, tileY);
     },
 
     //Generates tile objects based on a given 2D tilemap
@@ -148,7 +158,7 @@ GameplayState.prototype = {
     generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
-                if(tileMap[i][j] === 0){ //grass
+                /*if(tileMap[i][j] === 0){ //grass
                     this.tileMap.putTile(0, i, j);
                 }
                 else if(tileMap[i][j] === 1){ //sand
@@ -156,7 +166,8 @@ GameplayState.prototype = {
                 }
                 else if(tileMap[i][j] === 2){ //stone
                     this.tileMap.putTile(2, i, j);
-                }
+                }*/
+                this.tileMap.putTile(tileMap[i][j], i, j);
             }
         }
     },

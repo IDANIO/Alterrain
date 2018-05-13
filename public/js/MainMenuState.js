@@ -8,6 +8,9 @@ MainMenuState.prototype = {
         //Make sure the game continues running when out of focus
         game.stage.disableVisibilityChange = true;
         
+        //To make sure any pixel art that's scaled doesn't become blurry
+        game.stage.smoothed = false
+        
         this.titleText = game.add.text(GAME_WIDTH / 2, 180, "Alterrain", this.textStyle);
         this.titleText.anchor.setTo(0.5);
         
@@ -16,7 +19,8 @@ MainMenuState.prototype = {
     },
 
     preload: function(){
-        game.load.spritesheet("player", "./assets/img/dude.png", 32, 48);
+        //game.load.spritesheet("player", "./assets/img/dude.png", 32, 48);
+        game.load.spritesheet("player", "./assets/img/person_spritesheet.png", 32, 32);
         game.load.image("gameTileset", "./assets/img/game_tileset.png", 32, 32);
         game.load.audio("placeTileSound", "assets/audio/place_tile.ogg");
         game.load.audio("abstractChirpSound", "assets/audio/abstract_chirp01.ogg");
