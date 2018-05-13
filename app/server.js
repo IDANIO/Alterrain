@@ -148,7 +148,7 @@ class Server {
     do {
       newX = Math.floor(Math.random() * WorldConfig.WIDTH);
       newY = Math.floor(Math.random() * WorldConfig.HEIGHT);
-    } while (!this.world.isValidTile(newX, newY));
+    } while (!this.world.isPassable(newX, newY, 2));
 
     playerEvent.x = newX;
     playerEvent.y = newY;
@@ -206,60 +206,7 @@ class Server {
    * @param playerId {Number}
    */
   onReceivedInput(cmd, socket, playerId) {
-    let player = this.world.objects.get(playerId);
-
-    // TODO: refactor/decoupling this
-    switch (cmd.type) {
-      // eslint-disable-next-line no-case-declarations
-      case Commands.MOVEMENT:
-        let dir = cmd.params;
-
-        // check if can pass?
-        if (!player.isMoving()) {
-          player.moveStraight(dir);
-          this.io.emit('playerUpdate', {
-            id: playerId,
-            x: player._x,
-            y: player._y,
-          });
-        }
-
-        break;
-// eslint-disable-next-line no-case-declarations
-      case Commands.ALTER_TILE:
-        let tileId = cmd.params.tileId;
-        //left = 0
-        //up = 1
-        //down = 2
-        //right = 3
-        let facing = cmd.params.direction;
-        let offsetX = 0;
-        let offsetY = 0;
-        if(facing === 0){ //left
-            offsetX = -1;
-        }
-        else if(facing === 1){ //up
-            offsetY = -1;
-        }
-        else if(facing === 2){ //down
-            offsetY = 1;
-        }
-        else if(facing === 3){ //right
-            offsetX = 1;
-        }
-        this.world.changeTile(player._x + offsetX, player._y + offsetY, tileId);
-
-        break;
-      case Commands.COMMUNICATION:
-
-        this.io.emit('playSound', {
-          x: player._x,
-          y: player._y,
-        });
-        break;
-      default:
-        logger.error(`Invalid Command ${cmd.type}`);
-    }
+    this.world.processInput(cmd, playerId);
   }
 
   /**

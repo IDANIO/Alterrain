@@ -160,18 +160,18 @@ class Character {
   }
 
   /**
-   * @param direction {Number}
+   * @param d {Number}
    */
-  moveStraight(direction) {
-    this.setDirection(direction);
+  moveStraight(d) {
+    this.setDirection(d);
 
     // Check can pass this terrain?
     if (this.isMapPassable(this._x, this._y, this._direction)) {
-      this._x = Character.roundXWithDirection(this._x, direction);
-      this._y = Character.roundYWithDirection(this._y, direction);
-
-      logger.debug(`Player moved to (${this._x}, ${this._y})`);
+      this._x = Character.roundXWithDirection(this._x, d);
+      this._y = Character.roundYWithDirection(this._y, d);
     }
+
+    logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
   }
 
   /**
@@ -189,7 +189,6 @@ class Character {
   }
 
   /**
-   * @private
    * @param x
    * @param d
    * @return {*}
@@ -199,7 +198,6 @@ class Character {
   }
 
   /**
-   * @private
    * @param y
    * @param d
    * @return {*}

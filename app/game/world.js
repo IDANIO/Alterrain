@@ -1,10 +1,12 @@
 'use strict';
 
 const EventEmitter = require('events');
+const Character = require('./character');
 const Player = require('./player.js');
 const noise = require('../lib/perlin.js');
 
-const {TileData, WorldConfig} = require('../../shared/constant.js');
+const {Commands, Tiles,
+  TileData, WorldConfig} = require('../../shared/constant.js');
 const logger = require('../logger.js');
 
 /**
@@ -49,15 +51,15 @@ class World {
 
     // The heightmap, used to procedurally generate the tilemap
     this.heightmap = [];
-    
+
     // The moisture, used to procedurally generate the tilemap
     this.moisture = [];
-    
+
     for (let i = 0; i < this.height; i++) {
       this.tileMap[i] = [];
       this.heightmap[i] = [];
       this.moisture[i] = [];
-    }    
+    }
 
     this.generateNoise(this.heightmap, this.width, this.height);
     this.generateNoise(this.moisture, this.width, this.height);
@@ -94,7 +96,7 @@ class World {
    * @deprecated
    * TODO: Make it proper
    */
-  changeTile(x, y, tileId = 0) {
+  changeTile(x, y, tileId = Tiles.GRASS) {
     if (!this.isValidTile(x, y)) {
       logger.error(`Invalid tile position at (${x},${y})`);
       return;
@@ -166,15 +168,50 @@ class World {
   }
 
   /**
-   * @param inputMsg {Object}
-   * @param inputMsg.input {}
+   * @param cmd {Object}
+   * @param cmd.params {Object}
+   * @param cmd.type {Number}
    * @param playerId {Number}
    */
-  processInput(inputMsg, playerId) {
-    logger.debug(`game engine processing input \
-<${inputMsg.input}> from playerId ${playerId}`);
+  processInput(cmd, playerId) {
+    logger.debug(`Processing input <${cmd.type}> from playerId ${playerId}`);
+    let player = this.objects.get(playerId);
+
+    switch (cmd.type) {
+// eslint-disable-next-line no-case-declarations
+      case Commands.MOVEMENT:
+        let dir = cmd.params;
+
+        // check if can pass?
+        if (!player.isMoving()) {
+          player.moveStraight(dir);
+          this.server.io.emit('playerUpdate', {
+            id: playerId,
+            x: player._x,
+            y: player._y,
+            d: player._direction,
+          });
+        }
+
+        break;
+// eslint-disable-next-line no-case-declarations
+      case Commands.ALTER_TILE:
+        let tileId = cmd.params.tileId;
+        let x2 = Character.roundXWithDirection(player._x, player._direction);
+        let y2 = Character.roundYWithDirection(player._y, player._direction);
+        this.changeTile(x2, y2, tileId);
+        break;
+      case Commands.COMMUNICATION:
+        this.server.io.emit('playSound', {
+          x: player._x,
+          y: player._y,
+        });
+        break;
+      default:
+        logger.error(`Invalid Command ${cmd.type}`);
+    }
   }
-  
+
   /** OLD - uses elevation only and returns only 3 biomes
    * Returns the type of terrain that corresponds to the
    * given parameters
@@ -182,17 +219,17 @@ class World {
    * @param m The 2D array that represents the moisture
    * @returns {number} an integer that corresponds to a specific tile type
    */
-  getBiomeType(e, m){
-      if(e < 0.4){
-          return 3; //water
+  getBiomeType(e, m) {
+      if (e < 0.4) {
+          return 3; // water
       }
-      if(e < 0.55){
-          return 1; //sand
+      if (e < 0.55) {
+          return 1; // sand
       }
-      if(e < 0.7){
-          return 0; //grass
+      if (e < 0.7) {
+          return 0; // grass
       }
-      return 2; //stone
+      return 2; // stone
   }
 
   /** USE THIS FUNCTION WHEN WE HAVE MORE BIOMES
@@ -202,67 +239,67 @@ class World {
    * @param m The 2D array that represents the moisture
    * @returns {number} an integer that corresponds to a specific tile type
    */
-  getBiomeTypeBetter(e, m) { //0 = grass, 1 = sand, 2 = stone, 3 = water
-    if(e < 0.1){
-        //ocean
+  getBiomeTypeBetter(e, m) { // 0 = grass, 1 = sand, 2 = stone, 3 = water
+    if (e < 0.1) {
+        // ocean
         return 3;
     }
-    if(e < 0.12){
-        //beach
+    if (e < 0.12) {
+        // beach
         return 1;
     }
-    if(e > 0.8){
-        if(m < 0.1){
-            //scorched
+    if (e > 0.8) {
+        if (m < 0.1) {
+            // scorched
         }
-        if(m < 0.2){
-            //bare
+        if (m < 0.2) {
+            // bare
         }
-        if(m < 0.5){
-            //tundra
+        if (m < 0.5) {
+            // tundra
             return 2;
         }
-        //snow
+        // snow
         return 2;
     }
-    if(e > 0.6){
-        if(m < 0.33){
-            //temperate desert
+    if (e > 0.6) {
+        if (m < 0.33) {
+            // temperate desert
             return 1;
         }
-        if(m < 0.66){
-            //shrubland
+        if (m < 0.66) {
+            // shrubland
             return 0;
         }
-        //taiga
+        // taiga
         return 2;
     }
-    if(e > 0.3){
-        if(m < 0.16){
-            //temperate desert
+    if (e > 0.3) {
+        if (m < 0.16) {
+            // temperate desert
             return 1;
         }
-        if(m < 0.5){
-            //grassland
+        if (m < 0.5) {
+            // grassland
             return 0;
         }
-        if(m < 0.83){
-            //temperate deciduous forest
+        if (m < 0.83) {
+            // temperate deciduous forest
         }
-        //temperate rain forest
+        // temperate rain forest
     }
-    if(m < 0.16){
-        //subtropical desert
+    if (m < 0.16) {
+        // subtropical desert
         return 1;
     }
-    if(m < 0.33){
-        //grassland
+    if (m < 0.33) {
+        // grassland
         return 0;
     }
-    if(m < 0.66){
-        //tropical seasonal rainforest
+    if (m < 0.66) {
+        // tropical seasonal rainforest
     }
-    //tropical rainforest
+    // tropical rainforest
   }
 
   /**
@@ -275,7 +312,7 @@ class World {
   generateNoise(arr, width, height) {
     // let noise = new Noise();
     noise.seed(Math.random());
-    //let freq = 1.2; //Frequency, should be a constant
+    // let freq = 1.2; //Frequency, should be a constant
     let freq = 2.2;
 
     for (let i = 0; i < width; i++) {
