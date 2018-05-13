@@ -47,16 +47,21 @@ class World {
     // 3 = water - can not pass
     this.tileMap = [];
 
-    // The heightmap, used to procedurally generate
-    // the tilemap
+    // The heightmap, used to procedurally generate the tilemap
     this.heightmap = [];
+    
+    // The moisture, used to procedurally generate the tilemap
+    this.moisture = [];
+    
     for (let i = 0; i < this.height; i++) {
       this.tileMap[i] = [];
       this.heightmap[i] = [];
-    }
+      this.moisture[i] = [];
+    }    
 
     this.generateNoise(this.heightmap, this.width, this.height);
-    this.generateTileMap(this.tileMap, this.heightmap);
+    this.generateNoise(this.moisture, this.width, this.height);
+    this.generateTileMap(this.tileMap, this.heightmap, this.moisture);
   }
 
   /**
@@ -143,21 +148,95 @@ class World {
     logger.debug(`game engine processing input \
 <${inputMsg.input}> from playerId ${playerId}`);
   }
-
-  /**
+  
+  /** OLD - uses elevation only and returns only 3 biomes
    * Returns the type of terrain that corresponds to the
    * given parameters
-   * @param elevation The 2D array that represents the elevation
-   * @param moisture The 2D array that represents the moisture
+   * @param e The 2D array that represents the elevation
+   * @param m The 2D array that represents the moisture
    * @returns {number} an integer that corresponds to a specific tile type
    */
-  getBiomeType(elevation, moisture) {
-    // TODO properly check the terrain type
-    if (elevation < 0.5) {
-      return 0;
-    } else {
-      return 1;
+  getBiomeType(e, m){
+      if(e < 0.4){
+          return 3; //water
+      }
+      if(e < 0.55){
+          return 1; //sand
+      }
+      if(e < 0.7){
+          return 0; //grass
+      }
+      return 2; //stone
+  }
+
+  /** USE THIS FUNCTION WHEN WE HAVE MORE BIOMES
+   * Returns the type of terrain that corresponds to the
+   * given parameters
+   * @param e The 2D array that represents the elevation
+   * @param m The 2D array that represents the moisture
+   * @returns {number} an integer that corresponds to a specific tile type
+   */
+  getBiomeTypeBetter(e, m) { //0 = grass, 1 = sand, 2 = stone, 3 = water
+    if(e < 0.1){
+        //ocean
+        return 3;
     }
+    if(e < 0.12){
+        //beach
+        return 1;
+    }
+    if(e > 0.8){
+        if(m < 0.1){
+            //scorched
+        }
+        if(m < 0.2){
+            //bare
+        }
+        if(m < 0.5){
+            //tundra
+            return 2;
+        }
+        //snow
+        return 2;
+    }
+    if(e > 0.6){
+        if(m < 0.33){
+            //temperate desert
+            return 1;
+        }
+        if(m < 0.66){
+            //shrubland
+            return 0;
+        }
+        //taiga
+        return 2;
+    }
+    if(e > 0.3){
+        if(m < 0.16){
+            //temperate desert
+            return 1;
+        }
+        if(m < 0.5){
+            //grassland
+            return 0;
+        }
+        if(m < 0.83){
+            //temperate deciduous forest
+        }
+        //temperate rain forest
+    }
+    if(m < 0.16){
+        //subtropical desert
+        return 1;
+    }
+    if(m < 0.33){
+        //grassland
+        return 0;
+    }
+    if(m < 0.66){
+        //tropical seasonal rainforest
+    }
+    //tropical rainforest
   }
 
   /**
@@ -170,11 +249,17 @@ class World {
   generateNoise(arr, width, height) {
     // let noise = new Noise();
     noise.seed(Math.random());
+    //let freq = 1.2; //Frequency, should be a constant
+    let freq = 2.2;
 
     for (let i = 0; i < width; i++) {
       for (let j = 0; j < height; j++) {
-        // TODO use an actual noise function
-        arr[i][j] = Math.random() * 2 - 1;
+        let nx = i / this.width - 0.5;
+        let ny = j / this.height - 0.5;
+        arr[i][j] = noise.perlin2(freq * nx, freq * ny)
+                    + freq/2 * noise.perlin2(freq*2 * nx, freq*2 * ny)
+                    + freq/4 * noise.perlin2(freq*4 + nx, freq*4 + ny);
+        arr[i][j] = (arr[i][j] + 1) / 2;
       }
     }
   }
@@ -185,13 +270,14 @@ class World {
    * @param tilemap The 2D array to generate tiles in
    * @param heightmap A 2D array of noise representing elevation
    */
-  generateTileMap(tilemap, heightmap) {
+  generateTileMap(tilemap, heightmap, moisture) {
     // TODO properly generate the tilemap based on the heightmap
     // layer and other layers
     for (let i = 0; i < tilemap.length; i++) {
       for (let j = 0; j < tilemap.length; j++) {
         let e = heightmap[i][j];
-        let tileType = this.getBiomeType(e, 0);
+        let m = moisture[i][j];
+        let tileType = this.getBiomeType(e, m);
         tilemap[i][j] = tileType;
       }
     }

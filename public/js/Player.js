@@ -50,5 +50,10 @@ Player.prototype.moveTo = function(nx, ny){
         console.log("Started timer");
         this.canMove = false;
         this.nextPos = {x: nx, y: ny};
+        /////DEBUG - remove later/////
+        this.x = nx;
+        this.y = ny;
+        this.canMove = true
+        /////DEBUG - remove later/////
     }
 };

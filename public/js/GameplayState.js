@@ -130,7 +130,7 @@ GameplayState.prototype = {
         let sourceX = tileX * TILE_SIZE;
         let sourceY = tileY * TILE_SIZE;
         this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
-        if(tileType === 0){ //grass
+        /*if(tileType === 0){ //grass
             this.tileMap.putTile(0, tileX, tileY);
         }
         else if(tileType === 1){ //sand
@@ -139,6 +139,10 @@ GameplayState.prototype = {
         else if(tileType === 2){ //stone
             this.tileMap.putTile(2, tileX, tileY);
         }
+        else if(tileType === 3){ //water
+            this.tileMap.putTile(3, tileX, tileY);
+        }*/
+        this.tileMap.putTile(tileType, tileX, tileY);
     },
 
     //Generates tile objects based on a given 2D tilemap
@@ -148,7 +152,7 @@ GameplayState.prototype = {
     generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
-                if(tileMap[i][j] === 0){ //grass
+                /*if(tileMap[i][j] === 0){ //grass
                     this.tileMap.putTile(0, i, j);
                 }
                 else if(tileMap[i][j] === 1){ //sand
@@ -156,7 +160,8 @@ GameplayState.prototype = {
                 }
                 else if(tileMap[i][j] === 2){ //stone
                     this.tileMap.putTile(2, i, j);
-                }
+                }*/
+                this.tileMap.putTile(tileMap[i][j], i, j);
             }
         }
     },
