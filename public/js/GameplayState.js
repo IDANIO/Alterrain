@@ -8,6 +8,11 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 32;
 
+var FACING_LEFT = 0;
+var FACING_UP = 1;
+var FACING_DOWN = 2;
+var FACING_RIGHT = 3;
+
 //How close the player needs to be, in pixels, to hear a sound play
 var MIN_HEARING_DISTANCE = 600;
 var TILE_SIZE = 32;
@@ -61,6 +66,9 @@ GameplayState.prototype = {
     //Adds a new player object to the world
     addNewPlayer: function(id, x, y){
         this.playerMap[id] = new Player(game, x * TILE_SIZE, y * TILE_SIZE, "player");
+        //TODO temporary, the player sprite should actually be 32x32
+        this.playerMap[id].scale.x = 2;
+        this.playerMap[id].scale.y = 2;
         game.add.existing(this.playerMap[id]);
     },
 
