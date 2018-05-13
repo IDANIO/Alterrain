@@ -7,23 +7,23 @@ var Client = {};
   Client.connectToServer = function() {
     Client.socket = io.connect();
 
-    // /**
-    //  * @param data {Object}
-    //  * @param data.id {Number} Player Id
-    //  * @param data.x {Number} The new x position
-    //  * @param data.y {Number} The new y position
-    //  * @param data.d {Number} The new direction
-    //  */
+    /**
+     * @param data {Object}
+     * @param data.id {Number} Player Id
+     * @param data.x {Number} The new x position
+     * @param data.y {Number} The new y position
+     * @param data.d {Number} The new direction
+     */
     Client.socket.on('playerUpdate', function (data) {
       gameplayState.movePlayer(data.id, data.x, data.y, data.d);
     });
 
-    // /**
-    //  * @param event {Object}
-    //  * @param event.playerId {Number} UUID assigned to player
-    //  * @param event.x {Number}
-    //  * @param event.y {Number}
-    //  */
+    /**
+     * @param event {Object}
+     * @param event.playerId {Number} UUID assigned to player
+     * @param event.x {Number}
+     * @param event.y {Number}
+     */
     Client.socket.on('playerEvent', function (event) {
       // if Some player left the game
       if (event.disconnectTime) {
@@ -33,11 +33,11 @@ var Client = {};
       }
     });
 
-    // /**
-    //  * @param data {Object}
-    //  * @param data.players {Array} An array containing all players' x,y coordinate
-    //  * @param data.tiles {Array} An 2D array of the world data.
-    //  */
+    /**
+     * @param data {Object}
+     * @param data.players {Array} An array containing all players' x,y coordinate
+     * @param data.tiles {Array} An 2D array of the world data.
+     */
     Client.socket.on('initWorld', function (data) {
       console.log(data);
       var players = data.players;
@@ -50,10 +50,10 @@ var Client = {};
       gameplayState.generateTiles(data.tiles);
     });
 
-    // /**
-    //  * @param data {Object}
-    //  * @param data.tiles {Array} An array that represents a tile's x,y position and type
-    //  */
+    /**
+     * @param data {Object}
+     * @param data.tiles {Array} An array that represents a tile's x,y position and type
+     */
     Client.socket.on('worldUpdate', function (data){
       // Server has returned an array of changed tiles.
       //
@@ -67,9 +67,9 @@ var Client = {};
       }
     });
 
-    // /**
-    //  * @param data {Object} An object with an x and y property that represents the sound's position
-    //  */
+    /**
+     * @param data {Object} An object with an x and y property that represents the sound's position
+     */
     Client.socket.on('playSound', function (data){
       gameplayState.playAbstractSoundAt(data.x, data.y);
     });
