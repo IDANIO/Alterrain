@@ -2,7 +2,7 @@
 
 const World = require('./game/world.js');
 const logger = require('./logger.js');
-const {Commands} = require('../shared/constant.js');
+const {ServerConfig, Commands} = require('../shared/constant.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -18,7 +18,9 @@ class Server {
     this.connectedPlayers = new Map();
     this.playerInputQueues = {};
 
-    this.intervalFrameRate = 60;
+    this.intervalFrameRate = ServerConfig.STEP_RATE || 60;
+    this.maximumPlayer = ServerConfig.MAX_PLAYERS || 50;
+
     this.lastPlayerID = 0;
 
     /**

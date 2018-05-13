@@ -3,7 +3,12 @@
 const logger = require('../logger.js');
 
 class Character {
-  constructor(x = 0, y = 0) {
+  constructor(world, x = 0, y = 0) {
+    /**
+     * @type {World}
+     */
+    this.world = world;
+
     /**
      * @type {number}
      * @private

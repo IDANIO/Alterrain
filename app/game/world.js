@@ -25,6 +25,21 @@ class World {
     this.objects = new Map();
     this.stepCount = 0;
 
+    this.width = WorldConfig.WIDTH;
+    this.height = WorldConfig.HEIGHT;
+
+    this.initTilemap();
+
+    this.setupEventEmitter();
+    this.on('server__processInput', (input, playerId) => {
+      this.processInput(input, playerId);
+    });
+  }
+
+  /**
+   * @private
+   */
+  initTilemap() {
     // The game world represented in a 2D array
     // 0 = grass
     // 1 = sand
@@ -35,18 +50,13 @@ class World {
     // The heightmap, used to procedurally generate
     // the tilemap
     this.heightmap = [];
-    for (let i = 0; i < World.MAP_HEIGHT; i++) {
+    for (let i = 0; i < this.height; i++) {
       this.tileMap[i] = [];
       this.heightmap[i] = [];
     }
 
-    this.generateNoise(this.heightmap, World.MAP_WIDTH, World.MAP_HEIGHT);
+    this.generateNoise(this.heightmap, this.width, this.height);
     this.generateTileMap(this.tileMap, this.heightmap);
-
-    this.setupEventEmitter();
-    this.on('server__processInput', (input, playerId) => {
-      this.processInput(input, playerId);
-    });
   }
 
   /**
@@ -68,7 +78,7 @@ class World {
    * @return {Map<Number, Character>}
    */
   addObject(playerId) {
-    let player = new Player(5, 5, playerId);
+    let player = new Player(this, 5, 5, playerId);
     return this.objects.set(playerId, player);
   }
 
@@ -98,7 +108,7 @@ class World {
    * @return {boolean}
    */
   isValidTile(x, y) {
-    return x >= 0 && x < World.MAP_WIDTH && y >= 0 && y < World.MAP_HEIGHT;
+    return x >= 0 && x < this.width && y >= 0 && y < this.height;
   }
 
   /**
@@ -184,8 +194,5 @@ class World {
     }
   }
 }
-
-World.MAP_WIDTH = 64;
-World.MAP_HEIGHT = 64;
 
 module.exports = World;

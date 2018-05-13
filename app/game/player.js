@@ -3,8 +3,8 @@
 const Character = require('./character.js');
 
 class Player extends Character {
-  constructor(x, y, id) {
-    super(x, y);
+  constructor(world, x, y, id) {
+    super(world, x, y);
     this.id = id;
   }
 }
