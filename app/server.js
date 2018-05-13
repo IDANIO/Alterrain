@@ -1,8 +1,8 @@
 'use strict';
 
-const EventEmitter = require('events');
 const World = require('./game/world.js');
 const logger = require('./logger.js');
+const {Commands} = require('../shared/constant.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -16,6 +16,7 @@ class Server {
      * connected players.
      */
     this.connectedPlayers = new Map();
+    this.playerInputQueues = {};
 
     this.intervalFrameRate = 60;
     this.lastPlayerID = 0;
@@ -25,23 +26,9 @@ class Server {
      */
     this.world = null;
 
-    this.setupEventEmitter();
     this.setupSocketIO(io);
   }
 
-  /**
-   * Register handlers for an event
-   * @private
-   */
-  setupEventEmitter() {
-    let emitter = new EventEmitter();
-
-    this.on = emitter.on;
-    this.once = emitter.once;
-    this.removeListener = emitter.removeListener;
-
-    this.emit = emitter.emit;
-  }
 
   /**
    * @param io {Socket}
@@ -67,7 +54,6 @@ class Server {
     this.worldSettings = Object.assign({}, worldSettings);
   }
 
-
   /**
    * Start game logic and the clock
    */
@@ -86,19 +72,14 @@ class Server {
   step(dt) {
     this.serverTime = (new Date().getTime());
 
-    // let step = ++this.world.stepCount;
+    let step = ++this.world.stepCount;
 
     // this.emit('preStep', {step, dt});
+
 
     // Main Game Update Goes Here
     this.world.step(dt);
 
-    // for (const player of this.connectedPlayers) {
-    //   if (player.state === 'new') {
-    //     player.state = 'synced';
-    //   }
-    //   player.socket.emit('worldUpdate', {});
-    // }
 
     // this.emit('postStep', {step});
   }
@@ -164,34 +145,35 @@ class Server {
     this.world.addObject(playerEvent.playerId);
 
     let objects = [];
-    this.world.objects.forEach((value) => {
-      objects.push(value);
+    this.world.objects.forEach((player) => {
+      objects.push({
+        x: player._x,
+        y: player._y,
+        id: playerEvent.playerId,
+      });
     });
 
     socket.emit('initWorld', {
       players: objects,
       tiles: this.world.getTileMap(),
-      id: playerEvent.playerId
+      id: playerEvent.playerId,
     });
 
     // This send out the new-joined client's data to all other clients
     socket.broadcast.emit('playerEvent', playerEvent);
 
-    /**
-     * Receive Input from Client
-     * TODO: Rename messages name to something else
-     */
-    socket.on('moveplayer', (data) => {
-      this.onReceivedInput(data, socket, playerEvent.playerId);
+
+    socket.on('inputCommand', (cmd) => {
+      this.onReceivedInput(cmd, socket, playerEvent.playerId);
     });
-    
-    /**
-     * Receive Sound from Client
-     * TODO: restructure later
-     */
-    socket.on("playSound", (data) => {
-      this.onReceivedSound(data, socket, playerEvent.playerId);
-    });
+
+    // /**
+    //  * Receive Sound from Client
+    //  * TODO: restructure later
+    //  */
+    // socket.on('playSound', (data) => {
+    //   this.onReceivedSound(data, socket, playerEvent.playerId);
+    // });
   }
 
   /**
@@ -215,47 +197,89 @@ class Server {
   }
 
   /**
-   *
-   * @param data {{dx,dy, tile}} Temp
+   * @param cmd {Object}
+   * @param cmd.type {Number} import from 'constant.js' Commands
+   * @param cmd.params {Object}
    * @param socket {Socket}
    * @param playerId {Number}
    */
-  onReceivedInput(data, socket, playerId) {
+  onReceivedInput(cmd, socket, playerId) {
     let player = this.world.objects.get(playerId);
 
-    if (data.tile) {
-      this.world.changeTile(player.x, player.y);
-      return;
-    }
+    // TODO: refactor/decoupling this
+    switch (cmd.type) {
+      // eslint-disable-next-line no-case-declarations
+      case Commands.MOVEMENT:
+        let dir = cmd.params;
 
-    if (player) {
-      player.x += data.dx || 0;
-      player.y += data.dy || 0;
-    }
+        // check if can pass?
+        player.moveStraight(dir);
 
-    this.io.emit('playerMovement', {
-      id: playerId,
-      x: player.x,
-      y: player.y,
-    });
+        // then
+        this.io.emit('playerUpdate', {
+          id: playerId,
+          x: player._x,
+          y: player._y,
+        });
+
+        break;
+// eslint-disable-next-line no-case-declarations
+      case Commands.ALTER_TILE:
+        let tileId = cmd.params.tileId;
+
+        this.world.changeTile(player.x, player.y, tileId);
+
+        break;
+      case Commands.COMMUNICATION:
+
+        this.io.emit('playSound', {
+          x: player._x,
+          y: player._y,
+        });
+        break;
+      default:
+        logger.error(`Invalid Command ${cmd.type}`);
+    }
   }
-  
+
   /**
-   *
-   * @param data {{x, y}} Temp
-   * @param socket {Socket}
+   * Add an input to the input-queue for the specific player, each queue is
+   * key'd by step, because there may be multiple inputs per step.
+   * @param data
+   * @param playerId
    */
-  onReceivedSound(data, socket, playerId){
-    let player = this.world.objects.get(playerId);
-    this.io.emit("playSound", {
-      x: player.x,
-      y: player.y,
-    });
+  queueInputForPlayer(data, playerId) {
+    // create an input queue for this player, if one doesn't already exist
+    if (!this.playerInputQueues.hasOwnProperty(playerId)) {
+      this.playerInputQueues[playerId] = {};
+    }
+    let queue = this.playerInputQueues[playerId];
+
+    logger.debug(queue);
+
+    // create an array of inputs for this step, if one doesn't already exist
+    if (!queue[data.step]) queue[data.step] = [];
+
+    // add the input to the player's queue
+    queue[data.step].push(data);
   }
 
-  getPlayerCount() {
-    return this.connectedPlayers.size;
-  }
+  // /**
+  //  *
+  //  * @param data {{x, y}} Temp
+  //  * @param socket {Socket}
+  //  */
+  // onReceivedSound(data, socket, playerId) {
+  //   let player = this.world.objects.get(playerId);
+  //   this.io.emit('playSound', {
+  //     x: player.x,
+  //     y: player.y,
+  //   });
+  // }
+  //
+  // getPlayerCount() {
+  //   return this.connectedPlayers.size;
+  // }
 }
 
 module.exports = Server;
