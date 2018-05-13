@@ -153,7 +153,6 @@ class Character {
     let x2 = Character.roundXWithDirection(x, d);
     let y2 = Character.roundYWithDirection(y, d);
     let d2 = this.reverseDir(d);
-    logger.warn(`Checking on (${x}, ${y}) and (${x2}, ${y2})`);
     return this.world.isValidTile(x2, y2) &&
             this.world.isPassable(x, y, d) &&
             this.world.isPassable(x2, y2, d2);

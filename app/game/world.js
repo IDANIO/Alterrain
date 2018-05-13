@@ -168,48 +168,44 @@ class World {
   }
 
   /**
-   * @param cmd {Object}
-   * @param cmd.params {Object}
-   * @param cmd.type {Number}
-   * @param playerId {Number}
+   * @param command {Function} Command Function
    */
-  processInput(cmd, playerId) {
-    logger.debug(`Processing input <${cmd.type}> from playerId ${playerId}`);
-    let player = this.objects.get(playerId);
+  processInput(command) {
+    command();
 
-    switch (cmd.type) {
-// eslint-disable-next-line no-case-declarations
-      case Commands.MOVEMENT:
-        let dir = cmd.params;
-
-        // check if can pass?
-        if (!player.isMoving()) {
-          player.moveStraight(dir);
-          this.server.io.emit('playerUpdate', {
-            id: playerId,
-            x: player._x,
-            y: player._y,
-            d: player._direction,
-          });
-        }
-
-        break;
-// eslint-disable-next-line no-case-declarations
-      case Commands.ALTER_TILE:
-        let tileId = cmd.params.tileId;
-        let x2 = Character.roundXWithDirection(player._x, player._direction);
-        let y2 = Character.roundYWithDirection(player._y, player._direction);
-        this.changeTile(x2, y2, tileId);
-        break;
-      case Commands.COMMUNICATION:
-        this.server.io.emit('playSound', {
-          x: player._x,
-          y: player._y,
-        });
-        break;
-      default:
-        logger.error(`Invalid Command ${cmd.type}`);
-    }
+//     switch (cmd.type) {
+// // eslint-disable-next-line no-case-declarations
+//       case Commands.MOVEMENT:
+//         let dir = cmd.params;
+//
+//         // check if can pass?
+//         if (!player.isMoving()) {
+//           player.moveStraight(dir);
+//           this.server.io.emit('playerUpdate', {
+//             id: playerId,
+//             x: player._x,
+//             y: player._y,
+//             d: player._direction,
+//           });
+//         }
+//
+//         break;
+// // eslint-disable-next-line no-case-declarations
+//       case Commands.ALTER_TILE:
+//         let tileId = cmd.params.tileId;
+//         let x2 = Character.roundXWithDirection(player._x, player._direction);
+//         let y2 = Character.roundYWithDirection(player._y, player._direction);
+//         this.changeTile(x2, y2, tileId);
+//         break;
+//       case Commands.COMMUNICATION:
+//         this.server.io.emit('playSound', {
+//           x: player._x,
+//           y: player._y,
+//         });
+//         break;
+//       default:
+//         logger.error(`Invalid Command ${cmd.type}`);
+//     }
   }
 
   /** OLD - uses elevation only and returns only 3 biomes
