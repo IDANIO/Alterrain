@@ -60,7 +60,8 @@ GameplayState.prototype = {
 
     //Adds a new player object to the world
     addNewPlayer: function(id, x, y){
-        this.playerMap[id] = game.add.sprite(x, y, "player");
+        this.playerMap[id] = new Player(game, x, y, "player");
+        game.add.existing(this.playerMap[id]);
     },
 
     //Set the player reference to the correct player sprite object
@@ -113,8 +114,11 @@ GameplayState.prototype = {
 
     //Moves the player to the given position
     movePlayer: function(id, x, y){
-        this.playerMap[id].x = x;
-        this.playerMap[id].y = y;
+        //this.playerMap[id].x = x;
+        //this.playerMap[id].y = y;
+        if(this.playerMap[id].ableToMove()){
+            this.playerMap[id].moveTo(x, y);
+        }
     },
     
     //Change the given tile to another type
