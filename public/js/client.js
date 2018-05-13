@@ -7,9 +7,17 @@ var Client = {};
   Client.connectToServer = function() {
     Client.socket = io.connect();
 
-    Client.socket.on("playerMovement", function (data) {
-      gameplayState.movePlayer(data.id, data.x, data.y);
+    /**
+     * @param data {Object}
+     * @param data.id {Number} Player Id
+     * @param data.x {Number} The new x position
+     * @param data.y {Number} The new y position
+     * @param data.d {Number} The new direction
+     */
+    Client.socket.on('playerUpdate', function (data) {
+      gameplayState.movePlayer(data.id, data.x, data.y, data.d);
     });
+
     /**
      * @param event {Object}
      * @param event.playerId {Number} UUID assigned to player
@@ -30,22 +38,40 @@ var Client = {};
      * @param data.players {Array} An array containing all players' x,y coordinate
      * @param data.tiles {Array} An 2D array of the world data.
      */
-    Client.socket.on("initWorld", function (data) {
+    Client.socket.on('initWorld', function (data) {
       console.log(data);
       var players = data.players;
       for (var i = 0; i < players.length; i++) {
         gameplayState.addNewPlayer(players[i].id, players[i].x, players[i].y)
       }
-
+      if(data.id){
+        gameplayState.setPlayerReference(data.id);
+      }
       gameplayState.generateTiles(data.tiles);
     });
-    
+
     /**
      * @param data {Object}
      * @param data.tiles {Array} An array that represents a tile's x,y position and type
      */
-    Client.socket.on("worldUpdate", function (data){
-      gameplayState.changeTileAt(data.tiles[0], data.tiles[1], data.tiles[2]);
+    Client.socket.on('worldUpdate', function (data){
+      // Server has returned an array of changed tiles.
+      //
+      for (var i = 0; i < data.tiles.length; i++) {
+        var tile = data.tiles[i];
+        var x = tile[0];
+        var y = tile[1];
+        var type = tile[2];
+        gameplayState.changeTileAt(x, y, type);
+        //gameplayState.playAbstractSoundAt(x, y);
+      }
+    });
+
+    /**
+     * @param data {Object} An object with an x and y property that represents the sound's position
+     */
+    Client.socket.on('playSound', function (data){
+      gameplayState.playAbstractSoundAt(data.x, data.y);
     });
   };
 
@@ -62,19 +88,51 @@ var Client = {};
   };
 
   /**
-   * @deprecated
-   * @param dx
-   * @param dy
+   * @param dir
    */
-  Client.sendMove = function (dx, dy) {
-    Client.socket.emit("moveplayer", {dx: dx, dy: dy});
-  }
+  Client.sendMove = function (dir) {
+    // TODO: Julio, make it only sent the direction for player to move
+    // 2 = Down, 4 = Left, 6 = Right, 8 = Up
 
-  /**
-   * @deprecated
-   */
-  Client.changeTile = function () {
-    Client.socket.emit("moveplayer", {tile:true});
+    // check '/shared/constant.js'
+    //
+    //   MOVEMENT: 1,
+    //   ALTER_TILE: 2,
+    //   COMMUNICATION: 3,
+    Client.socket.emit("inputCommand", {
+      type: 1,
+      params: dir
+    });
+
+    // Client.socket.emit("moveplayer", {dx: dx, dy: dy});
+  };
+
+  Client.changeTile = function (tileChoice, dir) {
+
+    // check '/shared/constant.js'
+    //
+    //   MOVEMENT: 1,
+    //   ALTER_TILE: 2,
+    //   COMMUNICATION: 3,
+    Client.socket.emit('inputCommand', {
+      type: 2,
+      params: {
+        tileId: tileChoice,
+        // direction: dir
+      }
+    });
+  };
+
+  Client.playSound = function(){
+
+    // check '/shared/constant.js'
+    //
+    //   MOVEMENT: 1,
+    //   ALTER_TILE: 2,
+    //   COMMUNICATION: 3,
+    Client.socket.emit("inputCommand", {
+      type: 3,
+    });
   }
 
 })();

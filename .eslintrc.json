@@ -13,6 +13,7 @@
     "mocha": true
   },
   "rules": {
+    "linebreak-style": 0,
     "require-jsdoc": 0,
     "no-console": 2,
     "valid-jsdoc": 0,

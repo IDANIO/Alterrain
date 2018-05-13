@@ -6,7 +6,8 @@
   "scripts": {
     "test": "nyc mocha --timeout=3000 --exit",
     "pretest": "./node_modules/.bin/eslint **/*.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "dist": "./node_modules/.bin/gulp"
   },
   "repository": {
     "type": "git",
@@ -24,14 +25,18 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "helmet": "^3.12.0",
+    "nocache": "^2.0.0",
     "serve-favicon": "^2.5.0",
     "socket.io": "^2.1.0",
     "winston": "^3.0.0-rc5"
   },
   "devDependencies": {
+    "del": "^3.0.0",
     "errorhandler": "^1.5.0",
     "eslint": "^4.19.1",
     "eslint-config-google": "^0.9.1",
+    "google-closure-compiler": "^20180506.0.0",
+    "gulp": "^4.0.0",
     "mocha": "^5.1.1",
     "nyc": "^11.7.1"
   },

@@ -1,8 +1,9 @@
 'use strict';
 
-const EventEmitter = require('events');
 const World = require('./game/world.js');
 const logger = require('./logger.js');
+const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
+const CommandFactory = require('./game/command');
 
 /**
  * Server is the main server-side singleton code.
@@ -12,12 +13,20 @@ const logger = require('./logger.js');
 class Server {
   constructor(io) {
     /**
-     * @type {Map<String, Object>} HashTable that contains the currently
+     * Key: Socket.id
+     * @type {Map<String, Object>} HashTable that contains the currently.
      * connected players.
      */
     this.connectedPlayers = new Map();
 
-    this.intervalFrameRate = 60;
+    /**
+     * @type {Map<Number, Array.<Function>>}
+     */
+    this.playerInputQueues = new Map();
+
+    this.intervalFrameRate = ServerConfig.STEP_RATE || 60;
+    this.maximumPlayer = ServerConfig.MAX_PLAYERS || 50;
+
     this.lastPlayerID = 0;
 
     /**
@@ -25,23 +34,9 @@ class Server {
      */
     this.world = null;
 
-    this.setupEventEmitter();
     this.setupSocketIO(io);
   }
 
-  /**
-   * Register handlers for an event
-   * @private
-   */
-  setupEventEmitter() {
-    let emitter = new EventEmitter();
-
-    this.on = emitter.on;
-    this.once = emitter.once;
-    this.removeListener = emitter.removeListener;
-
-    this.emit = emitter.emit;
-  }
 
   /**
    * @param io {Socket}
@@ -53,9 +48,10 @@ class Server {
 
   /**
    * @param worldSettings {Object=}
+   * @param worldSettings.filename {String}
    */
-  initWorld(worldSettings) {
-    this.world = new World(this);
+  initWorld(worldSettings = {filename: null}) {
+    this.world = new World(this, worldSettings.filename);
 
     /**
      * The worldSettings defines the game world constants, such
@@ -67,13 +63,17 @@ class Server {
     this.worldSettings = Object.assign({}, worldSettings);
   }
 
+  /**
+   * Setup very thing needed before the first game tick.
+   */
+  setup(args) {
+    this.initWorld({filename: args[0]});
+  }
 
   /**
    * Start game logic and the clock
    */
   start() {
-    this.initWorld();
-
     const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
     this.intervalGameTick = setInterval(this.step.bind(this), intervalDelta);
   }
@@ -86,19 +86,14 @@ class Server {
   step(dt) {
     this.serverTime = (new Date().getTime());
 
-    // let step = ++this.world.stepCount;
+    let step = ++this.world.stepCount;
 
     // this.emit('preStep', {step, dt});
+
 
     // Main Game Update Goes Here
     this.world.step(dt);
 
-    // for (const player of this.connectedPlayers) {
-    //   if (player.state === 'new') {
-    //     player.state = 'synced';
-    //   }
-    //   player.socket.emit('worldUpdate', {});
-    // }
 
     // this.emit('postStep', {step});
   }
@@ -116,6 +111,7 @@ class Server {
     let playerId = ++this.lastPlayerID;
 
     // save player
+    this.playerInputQueues.set(playerId, []);
     this.connectedPlayers.set(socket.id, {
       socket: socket,
       state: 'new',
@@ -158,30 +154,40 @@ class Server {
    */
   onPlayerJoinWorld(socket, playerEvent) {
     // This send the data of all players to the new-joined client.
-    playerEvent.x = 50;
-    playerEvent.y = 50;
+    // TODO: Refactor
 
-    this.world.addObject(playerEvent.playerId);
+    let newX;
+    let newY;
+    do {
+      newX = Math.floor(Math.random() * WorldConfig.WIDTH);
+      newY = Math.floor(Math.random() * WorldConfig.HEIGHT);
+    } while (!this.world.isPassable(newX, newY, 2));
+
+    playerEvent.x = newX;
+    playerEvent.y = newY;
+
+    this.world.addObject(newX, newY, playerEvent.playerId);
 
     let objects = [];
-    this.world.objects.forEach((value) => {
-      objects.push(value);
+    this.world.objects.forEach((player) => {
+      objects.push({
+        x: player._x,
+        y: player._y,
+        id: player.id,
+      });
     });
 
     socket.emit('initWorld', {
       players: objects,
       tiles: this.world.getTileMap(),
+      id: playerEvent.playerId,
     });
 
     // This send out the new-joined client's data to all other clients
     socket.broadcast.emit('playerEvent', playerEvent);
 
-    /**
-     * Receive Input from Client
-     * TODO: Rename messages name to something else
-     */
-    socket.on('moveplayer', (data) => {
-      this.onReceivedInput(data, socket, playerEvent.playerId);
+    socket.on('inputCommand', (cmd) => {
+      this.onReceivedInput(cmd, socket, playerEvent.playerId);
     });
   }
 
@@ -206,33 +212,49 @@ class Server {
   }
 
   /**
-   *
-   * @param data {{dx,dy, tile}} Temp
+   * @param cmd {Object}
+   * @param cmd.type {Number} import from 'constant.js' Commands
+   * @param cmd.params {Object}
    * @param socket {Socket}
    * @param playerId {Number}
    */
-  onReceivedInput(data, socket, playerId) {
-    let player = this.world.objects.get(playerId);
+  onReceivedInput(cmd, socket, playerId) {
+    // this.queueInputForPlayer(cmd, playerId);
+    const player = this.world.objects.get(playerId);
 
-    if (data.tile) {
-      this.world.changeTile(player.x, player.y);
-      return;
+    let command;
+
+    switch (cmd.type) {
+      case Commands.MOVEMENT:
+        command = CommandFactory.makeMoveCommand(player, cmd.params);
+        break;
+      case Commands.ALTER_TILE:
+        command = CommandFactory.makeChangeTileCommand(player, cmd.params);
+        break;
+      case Commands.COMMUNICATION:
+        command = CommandFactory.makeCommunicateCommand(player, cmd.params);
+        break;
+      default:
+        logger.error(`Invalid Command ${cmd.type}`);
+        return;
     }
 
-    if (player) {
-      player.x += data.dx || 0;
-      player.y += data.dy || 0;
-    }
-
-    this.io.emit('playerMovement', {
-      id: playerId,
-      x: player.x,
-      y: player.y,
-    });
+    logger.debug(`Processing input <${cmd.type}> from playerId ${playerId}`);
+    this.world.processInput(command);
   }
 
-  getPlayerCount() {
-    return this.connectedPlayers.size;
+  /**
+   * Add an input to the input-queue for the specific player, each queue is
+   * key'd by step, because there may be multiple inputs per step.
+   * @param cmd
+   * @param playerId
+   */
+  queueInputForPlayer(cmd, playerId) {
+    let queue = this.playerInputQueues.get(playerId);
+
+    queue.push();
+
+    logger.data(queue);
   }
 }
 
