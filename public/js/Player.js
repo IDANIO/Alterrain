@@ -28,16 +28,16 @@ Player.prototype.stepTo = function(){
     console.log("Stepped");
     //Movement is in progress
     if(this.x < this.nextPos.x){
-        this.x+=2;
+        this.x++;
     }
     else if(this.x > this.nextPos.x){
-        this.x-=2;
+        this.x--;
     }
     else if(this.y < this.nextPos.y){
-        this.y+=2;
+        this.y++;
     }
     else if(this.y > this.nextPos.y){
-        this.y-=2;
+        this.y--;
     }
     //Check if done moving
     if(this.nextPos.x === this.x && this.nextPos.y === this.y){
