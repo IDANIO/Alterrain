@@ -48,9 +48,10 @@ class Server {
 
   /**
    * @param worldSettings {Object=}
+   * @param worldSettings.filename {String}
    */
-  initWorld(worldSettings) {
-    this.world = new World(this);
+  initWorld(worldSettings = {filename: null}) {
+    this.world = new World(this, worldSettings.filename);
 
     /**
      * The worldSettings defines the game world constants, such
@@ -63,11 +64,16 @@ class Server {
   }
 
   /**
+   * Setup very thing needed before the first game tick.
+   */
+  setup(args) {
+    this.initWorld({filename: args[0]});
+  }
+
+  /**
    * Start game logic and the clock
    */
   start() {
-    this.initWorld();
-
     const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
     this.intervalGameTick = setInterval(this.step.bind(this), intervalDelta);
   }

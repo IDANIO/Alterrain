@@ -1,12 +1,14 @@
 'use strict';
 
+const path = require('path');
+const fs = require('fs');
+
 const EventEmitter = require('events');
 const Character = require('./character');
 const Player = require('./player.js');
 const noise = require('../lib/perlin.js');
 
-const {Commands, Tiles,
-  TileData, WorldConfig} = require('../../shared/constant.js');
+const {Tiles, TileData, WorldConfig} = require('../../shared/constant.js');
 const logger = require('../logger.js');
 
 /**
@@ -17,8 +19,9 @@ const logger = require('../logger.js');
 class World {
   /**
    * @param server{Server}
+   * @param filename {String=}
    */
-  constructor(server) {
+  constructor(server, filename) {
     this.server = server;
 
     /**
@@ -30,12 +33,90 @@ class World {
     this.width = WorldConfig.WIDTH;
     this.height = WorldConfig.HEIGHT;
 
-    this.initTilemap();
+
+    this.initWorldData(filename);
 
     this.setupEventEmitter();
-    this.on('server__processInput', (input, playerId) => {
-      this.processInput(input, playerId);
+  }
+
+  /**
+   * Initialized the game world either by existing data or generate new.
+   * @param filename {String=}
+   * @return {boolean}
+   */
+  initWorldData(filename = null) {
+    let success = false;
+    if (typeof filename === 'string') {
+      this.tileMap = this.loadFromDiskData(filename);
+      if (this.tileMap) {
+        logger.info(`Successfully loading world data from ${filename}`);
+        return success = true;
+      }
+    }
+
+    logger.info('Creating new Tilemap...');
+    this.initTilemap();
+    this.saveWorldDataToDisk();
+    return success;
+  }
+
+  /**
+   * Register handlers for an event
+   * @private
+   */
+  setupEventEmitter() {
+    let emitter = new EventEmitter();
+
+    this.on = emitter.on;
+    this.once = emitter.once;
+    this.removeListener = emitter.removeListener;
+
+    this.emit = emitter.emit;
+  }
+
+  /**
+   * Save a world snapshot to the local disk.
+   */
+  saveWorldDataToDisk() {
+    let d = new Date();
+    let filename = `world-${d.getDay()}-${d.getHours()}-${d.getSeconds()}.json`;
+    let resolvedPath = path.join(__dirname, '../../data', filename);
+    let data = JSON.stringify(this.tileMap);
+
+    fs.writeFile(resolvedPath, data, (err) => {
+      if (err) {
+        return logger.error(`Unable to Save world data: ${resolvedPath}`);
+      }
+      logger.info(`World snapshot saved: ${resolvedPath}`);
     });
+  }
+
+  /**
+   * @param filename {String}
+   * @return {Array.<Array.<Number>>}
+   */
+  loadFromDiskData(filename) {
+    let resolvedPath = path.join(__dirname, '../../data', filename);
+
+    let mapData = null;
+
+    // fs.readFile(resolvedPath, (err, data) => {
+    //     if (err) {
+    //       return logger.error(`Unable to Read world data: ${resolvedPath}`);
+    //     }
+    //
+    //     mapData = JSON.parse(data);
+    //   }
+    // );
+
+    try {
+      mapData = JSON.parse(fs.readFileSync(resolvedPath));
+    } catch (err) {
+      logger.error(`Unable to Read world data: ${resolvedPath}`);
+      logger.error(err);
+    }
+
+    return mapData;
   }
 
   /**
@@ -64,20 +145,6 @@ class World {
     this.generateNoise(this.heightmap, this.width, this.height);
     this.generateNoise(this.moisture, this.width, this.height);
     this.generateTileMap(this.tileMap, this.heightmap, this.moisture);
-  }
-
-  /**
-   * Register handlers for an event
-   * @private
-   */
-  setupEventEmitter() {
-    let emitter = new EventEmitter();
-
-    this.on = emitter.on;
-    this.once = emitter.once;
-    this.removeListener = emitter.removeListener;
-
-    this.emit = emitter.emit;
   }
 
   /**
@@ -172,40 +239,6 @@ class World {
    */
   processInput(command) {
     command();
-
-//     switch (cmd.type) {
-// // eslint-disable-next-line no-case-declarations
-//       case Commands.MOVEMENT:
-//         let dir = cmd.params;
-//
-//         // check if can pass?
-//         if (!player.isMoving()) {
-//           player.moveStraight(dir);
-//           this.server.io.emit('playerUpdate', {
-//             id: playerId,
-//             x: player._x,
-//             y: player._y,
-//             d: player._direction,
-//           });
-//         }
-//
-//         break;
-// // eslint-disable-next-line no-case-declarations
-//       case Commands.ALTER_TILE:
-//         let tileId = cmd.params.tileId;
-//         let x2 = Character.roundXWithDirection(player._x, player._direction);
-//         let y2 = Character.roundYWithDirection(player._y, player._direction);
-//         this.changeTile(x2, y2, tileId);
-//         break;
-//       case Commands.COMMUNICATION:
-//         this.server.io.emit('playSound', {
-//           x: player._x,
-//           y: player._y,
-//         });
-//         break;
-//       default:
-//         logger.error(`Invalid Command ${cmd.type}`);
-//     }
   }
 
   /** OLD - uses elevation only and returns only 3 biomes

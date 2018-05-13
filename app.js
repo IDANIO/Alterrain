@@ -52,7 +52,8 @@ server.listen(port, () => {
     | || |_| / ___ \\| |\\  || | |_| |
    |___|____/_/   \\_\\_| \\_|___\\___/ 
                                   
-✓ App is running at http://localhost:${port} in ${app.get('env')} mode
+✓ App is running at http://localhost:${port} in ${app.get('env')} mode.
+  Command line arguments: ${process.argv.slice(2)}
   `);
 });
 
@@ -66,6 +67,7 @@ app.use(express.static(path.join(__dirname, 'public'), {maxAge: 31557600000}));
  * @type {Server}
  */
 const game = new Game(io);
+game.setup(process.argv.slice(2));
 game.start();
 
 /**
