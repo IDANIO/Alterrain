@@ -12,10 +12,4 @@ describe('Command', function() {
       assert.equal(typeof instance.executeFn, 'function');
     });
   });
-  describe('#execute', function() {
-    it('should execute with no argument.', function() {
-      let result = instance.execute();
-      assert.equal(result, 'Hello');
-    });
-  });
 });
