@@ -4,7 +4,7 @@ const EventEmitter = require('events');
 const Player = require('./player.js');
 const noise = require('../lib/perlin.js');
 
-const {WorldConfig} = require('../../shared/constant.js');
+const {TileData, WorldConfig} = require('../../shared/constant.js');
 const logger = require('../logger.js');
 
 /**
@@ -74,11 +74,13 @@ class World {
   }
 
   /**
+   * @param x {Number}
+   * @param y {Number}
    * @param playerId {Number}
    * @return {Map<Number, Character>}
    */
-  addObject(playerId) {
-    let player = new Player(this, 5, 5, playerId);
+  addObject(x, y, playerId) {
+    let player = new Player(this, x, y, playerId);
     return this.objects.set(playerId, player);
   }
 
@@ -98,7 +100,7 @@ class World {
     this.tileMap[x][y] = tileId;
 
     this.server.io.emit('worldUpdate', {
-      tiles: [[x, y, 2]],
+      tiles: [[x, y, tileId]],
     });
   }
 
@@ -109,6 +111,28 @@ class World {
    */
   isValidTile(x, y) {
     return x >= 0 && x < this.width && y >= 0 && y < this.height;
+  }
+
+  /**
+   * @param x {number}
+   * @param y {number}
+   * @param bit {number} Binary mask for direction.
+   * @return {boolean}
+   */
+  checkPassage(x, y, bit) {
+    let tile = this.tileMap[x][y];
+
+    return TileData[tile] === 0;
+  }
+
+  /**
+   * @param x {number}
+   * @param y {number}
+   * @param d {number} Direction
+   * @return {boolean}
+   */
+  isPassable(x, y, d) {
+    return this.checkPassage(x, y, (1 << (d / 2 - 1)) & 0x0f);
   }
 
   /**
@@ -131,7 +155,9 @@ class World {
    * @param dt{Number}
    */
   step(dt) {
-
+    this.objects.forEach((character)=>{
+      character.update();
+    });
   }
 
   /**

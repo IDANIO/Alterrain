@@ -2,7 +2,7 @@
 
 const World = require('./game/world.js');
 const logger = require('./logger.js');
-const {ServerConfig, Commands} = require('../shared/constant.js');
+const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -141,10 +141,19 @@ class Server {
    */
   onPlayerJoinWorld(socket, playerEvent) {
     // This send the data of all players to the new-joined client.
-    playerEvent.x = 5;
-    playerEvent.y = 5;
+    // TODO: Refactor
 
-    this.world.addObject(playerEvent.playerId);
+    let newX;
+    let newY;
+    do {
+      newX = Math.floor(Math.random() * WorldConfig.WIDTH);
+      newY = Math.floor(Math.random() * WorldConfig.HEIGHT);
+    } while (!this.world.isValidTile(newX, newY));
+
+    playerEvent.x = newX;
+    playerEvent.y = newY;
+
+    this.world.addObject(newX, newY, playerEvent.playerId);
 
     let objects = [];
     this.world.objects.forEach((player) => {
@@ -206,14 +215,14 @@ class Server {
         let dir = cmd.params;
 
         // check if can pass?
-        player.moveStraight(dir);
-
-        // then
-        this.io.emit('playerUpdate', {
-          id: playerId,
-          x: player._x,
-          y: player._y,
-        });
+        if (!player.isMoving()) {
+          player.moveStraight(dir);
+          this.io.emit('playerUpdate', {
+            id: playerId,
+            x: player._x,
+            y: player._y,
+          });
+        }
 
         break;
 // eslint-disable-next-line no-case-declarations
@@ -256,23 +265,6 @@ class Server {
     // add the input to the player's queue
     queue[data.step].push(data);
   }
-
-  // /**
-  //  *
-  //  * @param data {{x, y}} Temp
-  //  * @param socket {Socket}
-  //  */
-  // onReceivedSound(data, socket, playerId) {
-  //   let player = this.world.objects.get(playerId);
-  //   this.io.emit('playSound', {
-  //     x: player.x,
-  //     y: player.y,
-  //   });
-  // }
-  //
-  // getPlayerCount() {
-  //   return this.connectedPlayers.size;
-  // }
 }
 
 module.exports = Server;

@@ -11,6 +11,28 @@ exports.Commands = {
 
 /**
  * @constant
+ * @enum
+ */
+exports.Tiles = {
+  // NULL: 0,
+  GRASS: 0,
+  SAND: 1,
+  STONE: 2,
+  WATER: 3,
+};
+
+/**
+ * @constant
+ */
+exports.TileData = [
+  0,
+  0,
+  0,
+  1,
+];
+
+/**
+ * @constant
  */
 exports.ServerConfig = {
   MAX_PLAYERS: 50,
@@ -19,7 +41,6 @@ exports.ServerConfig = {
 
 /**
  * @constant
- * @enum
  */
 exports.WorldConfig = {
   WIDTH: 64,
