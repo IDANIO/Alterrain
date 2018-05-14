@@ -28,7 +28,7 @@ Ubuntu NodeJS 10.0 on 16.04
 
 ## Getting Started (For Graders)
 
-First, vist or website at https://idanio.online. In case the server is down, and you would like to play on your local host, please follow the following steps to set up the game.  
+First, visit our website at https://idanio.online. In case the server is down and you would like to play on your local host, please take the following steps to set up the game.  
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. (To developers) See deployment for notes on how to deploy the project on a live system.
 
@@ -38,9 +38,9 @@ A step by step series of examples that tell you how to get a development env run
 
 [Node.js](https://nodejs.org/en/) - JavaScript runtime built on Chrome's V8 JavaScript engine. 
 
-Download node.js at lesat 8.XX.X version. (We are using 10.0.0).
+Download node.js, at least 8.XX.X version. (We are using 10.0.0).
 
-After install node.js on your computer. You can now type in your terminal to check node is working.
+After install node.js on your computer. You can now type in your terminal to check if node is working.
 
 ```
 node --version
@@ -69,9 +69,9 @@ To start testing locally, simply use node
 node app.js
 ```
 
-And you can go to http://localhost:8080, good to go.
+And you can go to http://localhost:8080
 
-Enjoy exporing wonder! 
+Enjoy exploring wonder!
 :) 
 
 ## Code Style (For Developers)
@@ -98,7 +98,7 @@ cd /home/game/project
 git pull
 ```
 
-Then start the game application (only if the game is not work as expected):
+Then start the game application (only if the game is not working as expected):
 
 ```
 pm2 start game      // game is a task I already defined
