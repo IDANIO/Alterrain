@@ -1,6 +1,5 @@
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/RaiderSoap/cmpm120-project.png?columns=all)](https://waffle.io/RaiderSoap/cmpm120-project?utm_source=badge)
-
-![travis](https://travis-ci.org/RaiderSoap/cmpm120-project.svg?branch=master)
+[![Build Status](https://travis-ci.org/RaiderSoap/cmpm120-project.svg?branch=master)](https://travis-ci.org/RaiderSoap/cmpm120-project)
 
 
 # Alterrain MMO
