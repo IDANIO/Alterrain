@@ -20,26 +20,42 @@ Ubuntu NodeJS 10.0 on 16.04
 
 1 GB Memory / 25 GB Disk / SFO2
 
-## Getting Started
+## Getting Started (For Graders)
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+First, vist or website at https://idanio.online. In case the server is down, and you would like to play on your local host, please follow the following steps to set up the game.  
+
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. (To developers) See deployment for notes on how to deploy the project on a live system.
 
 ### Installing
 
 A step by step series of examples that tell you how to get a development env running
+
+[Node.js](https://nodejs.org/en/) - JavaScript runtime built on Chrome's V8 JavaScript engine. 
+
+Download node.js at lesat 8.XX.X version. (We are using 10.0.0).
+
+After install node.js on your computer. You can now type in your terminal to check node is working.
+
+```
+node --version
+
+// v10.0.0
+```
+
+Clone our repository,
 
 ```
 git clone https://github.com/RaiderSoap/cmpm120-project.git myProject
 cd myProject
 ```
 
-And install dependencies
+And install dependencies, using node package manager (installed with Node.js).
 
 ```
 npm install
 ```
 
-## Start the server
+## Start the server (For Graders)
 
 To start testing locally, simply use node
 
@@ -47,9 +63,12 @@ To start testing locally, simply use node
 node app.js
 ```
 
-And you can go to http://localhost:8080
+And you can go to http://localhost:8080, good to go.
 
-## Code Style
+Enjoy exporing wonder! 
+:) 
+
+## Code Style (For Developers)
 
 We will use ESLint.
 
@@ -59,7 +78,7 @@ Run to test code consistency:
 npm run test
 ```
 
-## Deployment
+## Deployment (For Developers)
 
 Once you have committed and pushed to this repository
 
