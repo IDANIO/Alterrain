@@ -89,7 +89,6 @@ class Character {
   update() {
     if (this.isMoving()) {
       this.updateMove();
-      logger.debug(`moving ${this._realX}, ${this._realY}`);
     }
   }
 
