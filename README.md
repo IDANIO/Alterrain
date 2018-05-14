@@ -48,7 +48,7 @@ node --version
 // v10.0.0
 ```
 
-Clone our repository,
+Clone our repository (or unzip the project and cd into the root folder),
 
 ```
 git clone https://github.com/RaiderSoap/cmpm120-project.git myProject
