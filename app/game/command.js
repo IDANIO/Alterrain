@@ -14,7 +14,7 @@ const CommandFactory = {
    * @return {Function}
    */
   makeMoveCommand: (player, params = 2) => {
-    let dir = Number(params);
+    let dir = params;
     return ()=>{
       if (!player.isMoving()) {
         player.moveStraight(dir);
@@ -34,8 +34,8 @@ const CommandFactory = {
    * @param params.tileId {Number}
    * @return {Function}
    */
-  makeChangeTileCommand: (player, params = {tileId: Tiles.GRASS}) => {
-    let tileId = Number(params.tileId);
+  makeChangeTileCommand: (player, params) => {
+    let tileId = params.tileId;
     let x2 = Character.roundXWithDirection(player._x, player._direction);
     let y2 = Character.roundYWithDirection(player._y, player._direction);
     return ()=>{
