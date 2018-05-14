@@ -40,7 +40,7 @@ A step by step series of examples that tell you how to get a development env run
 
 Download node.js, at least 8.XX.X version. (We are using 10.0.0).
 
-After install node.js on your computer. You can now type in your terminal to check if node is working.
+After installing node.js on your computer, you can now type in your terminal to check if node is working.
 
 ```
 node --version
