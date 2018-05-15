@@ -17,7 +17,7 @@ function Player(game, x, y, key, frame){
     //Add sound-making icon
     this.soundIconOffsetY = -8;
     this.soundIcon = game.add.sprite(this.x, this.y + this.soundIconOffsetY, "soundIcon");
-    this.soundIcon.anchor.x = 0.25
+    this.soundIcon.anchor.x = 0.25;
     this.soundIcon.alpha = 0;
 }
 
