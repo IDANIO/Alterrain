@@ -53,8 +53,7 @@ const CommandFactory = {
     return ()=>{
       // Temp, should not emit at here
       player.world.server.io.emit('playSound', {
-        x: player._x,
-        y: player._y,
+        id: player.id
       });
     };
   },

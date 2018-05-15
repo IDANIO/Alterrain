@@ -68,10 +68,10 @@ var Client = {};
     });
 
     /**
-     * @param data {Object} An object with an x and y property that represents the sound's position
+     * @param data {Object} An object with the id of the player who made the sound
      */
     Client.socket.on('playSound', function (data){
-      gameplayState.playAbstractSoundAt(data.x, data.y);
+      gameplayState.playAbstractSoundFrom(data.id);
     });
   };
 

@@ -9,7 +9,16 @@ function Player(game, x, y, key, frame){
     this.moveTimer = game.time.create(false);
     this.moveTimer.loop(this.moveDuration, this.stepTo, this);
     this.facing = FACING_DOWN;
-    this.arrow = null;
+    this.arrowIcon = null;
+    
+    this.soundIconDuration = 500; //In milliseconds
+    this.soundIconTimer = game.time.create(false);
+    
+    //Add sound-making icon
+    this.soundIconOffsetY = -8;
+    this.soundIcon = game.add.sprite(this.x, this.y + this.soundIconOffsetY, "soundIcon");
+    this.soundIcon.anchor.x = 0.25
+    this.soundIcon.alpha = 0;
 }
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -21,10 +30,38 @@ Player.prototype.update = function(){
     }
 };
 
-Player.prototype.enableArrow = function(){
+Player.prototype.enableArrowIcon = function(){
     //Add arrow indicator
-    console.log("Added arrow sprite");
-    this.arrow = game.add.sprite(this.x, this.y - 32, "arrow");
+    this.arrowIcon = game.add.sprite(this.x, this.y - 32, "arrowIcon");
+};
+
+Player.prototype.startSoundTimer = function(){
+    this.toggleSoundIcon();
+    this.soundIconTimer.add(this.soundIconDuration, this.toggleSoundIcon, this);
+    this.soundIconTimer.start();
+};
+
+Player.prototype.toggleSoundIcon = function(){
+    //Toggle the sound icon on or off
+    if(this.soundIcon.alpha === 0){
+        this.soundIcon.alpha = 1;
+    }
+    else if(this.soundIcon.alpha === 1){
+        this.soundIcon.alpha = 0;
+    }
+};
+
+//Update any icons that should be following the player
+Player.prototype.updateIconPositions = function(nx, ny){
+    //Arrow icon
+    if(this.arrowIcon){
+        this.arrowIcon.x = nx;
+        this.arrowIcon.y = ny - 32;
+    }
+    
+    //Sound icon
+    this.soundIcon.x = nx;
+    this.soundIcon.y = ny + this.soundIconOffsetY;
 };
 
 Player.prototype.ableToMove = function(){
@@ -101,10 +138,7 @@ Player.prototype.moveTo = function(nx, ny){
         /////DEBUG - remove later/////
         this.x = nx;
         this.y = ny;
-        if(this.arrow){
-            this.arrow.x = this.x;
-            this.arrow.y = this.y - 32;
-        }
+        this.updateIconPositions(nx, ny);
         this.canMove = true
         /////DEBUG - remove later/////
     }

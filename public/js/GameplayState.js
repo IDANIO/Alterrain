@@ -82,7 +82,7 @@ GameplayState.prototype = {
     //Set the player reference to the correct player sprite object
     setPlayerReference: function(id){
         this.player = this.playerMap[id];
-        this.player.enableArrow();
+        this.player.enableArrowIcon();
         game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN);
     },
 
@@ -143,8 +143,10 @@ GameplayState.prototype = {
         }
     },
 
-    playAbstractSoundAt: function(x, y){
-        this.playSoundFrom(this.abstractChirpSound, x * TILE_SIZE, y * TILE_SIZE);
+    playAbstractSoundFrom: function(playerId){
+        let sourcePlayer = this.playerMap[playerId];
+        this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x * TILE_SIZE, sourcePlayer.y * TILE_SIZE);
+        sourcePlayer.startSoundTimer();
     },
 
     //Moves the player to the given position
