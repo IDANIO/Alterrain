@@ -9,6 +9,7 @@ function Player(game, x, y, key, frame){
     this.moveTimer = game.time.create(false);
     this.moveTimer.loop(this.moveDuration, this.stepTo, this);
     this.facing = FACING_DOWN;
+    this.arrow = null;
 }
 
 Player.prototype = Object.create(Phaser.Sprite.prototype);
@@ -18,6 +19,12 @@ Player.prototype.update = function(){
     if(!this.canMove){
         this.stepTo();
     }
+};
+
+Player.prototype.enableArrow = function(){
+    //Add arrow indicator
+    console.log("Added arrow sprite");
+    this.arrow = game.add.sprite(this.x, this.y - 32, "arrow");
 };
 
 Player.prototype.ableToMove = function(){
@@ -94,6 +101,10 @@ Player.prototype.moveTo = function(nx, ny){
         /////DEBUG - remove later/////
         this.x = nx;
         this.y = ny;
+        if(this.arrow){
+            this.arrow.x = this.x;
+            this.arrow.y = this.y - 32;
+        }
         this.canMove = true
         /////DEBUG - remove later/////
     }

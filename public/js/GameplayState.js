@@ -82,6 +82,7 @@ GameplayState.prototype = {
     //Set the player reference to the correct player sprite object
     setPlayerReference: function(id){
         this.player = this.playerMap[id];
+        this.player.enableArrow();
         game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN);
     },
 
