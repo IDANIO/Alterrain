@@ -4,10 +4,12 @@ function Player(game, x, y, key, frame){
     Phaser.Sprite.call(this, game, x, y, key, frame);
 
     this.canMove = true;
-    this.moveDuration = 100; //In milliseconds
+    this.moveDuration = 10; //In milliseconds
     this.nextPos = {x: 0, y: 0};
+    
     this.moveTimer = game.time.create(false);
-    this.moveTimer.loop(this.moveDuration, this.stepTo, this);
+    this.moveSpeed = 2; //Must be a power of 2 and less than 32
+    
     this.facing = FACING_DOWN;
     
     this.arrowIconOffsetY = -32;
@@ -74,20 +76,20 @@ Player.prototype.ableToMove = function(){
 };
 
 Player.prototype.stepTo = function(){
-    console.log("Stepped");
     //Movement is in progress
     if(this.x < this.nextPos.x){
-        this.x++;
+        this.x += this.moveSpeed;
     }
     else if(this.x > this.nextPos.x){
-        this.x--;
+        this.x -= this.moveSpeed;
     }
     else if(this.y < this.nextPos.y){
-        this.y++;
+        this.y += this.moveSpeed;
     }
     else if(this.y > this.nextPos.y){
-        this.y--;
+        this.y -= this.moveSpeed;
     }
+    this.updateIconPositions(this.x, this.y);
     //Check if done moving
     if(this.nextPos.x === this.x && this.nextPos.y === this.y){
         this.canMove = true;
@@ -139,12 +141,17 @@ Player.prototype.moveTo = function(nx, ny){
             this.facing = FACING_UP;
             this.frame = 2;
         }
+        
+        //this.moveTimer.repeat(this.moveDuration, 32, this.stepTo, this);
+        //this.moveTimer.start();
 
+        /*
         /////DEBUG - remove later/////
         this.x = nx;
         this.y = ny;
         this.updateIconPositions(nx, ny);
         this.canMove = true
         /////DEBUG - remove later/////
+        */
     }
 };

@@ -93,17 +93,20 @@ GameplayState.prototype = {
     },
 
     handleKeys: function(e){
-        if(e.keyCode == Phaser.Keyboard.UP){
-            Client.sendMove(8);
-        }
-        if(e.keyCode == Phaser.Keyboard.DOWN){
-            Client.sendMove(2);
-        }
-        if(e.keyCode == Phaser.Keyboard.LEFT){
-            Client.sendMove(4);
-        }
-        if(e.keyCode == Phaser.Keyboard.RIGHT){
-            Client.sendMove(6);
+        //Emit signals only if the player isn't in the middle of moving already
+        if(gameplayState.player.canMove){
+            if(e.keyCode == Phaser.Keyboard.UP){
+                Client.sendMove(8);
+            }
+            if(e.keyCode == Phaser.Keyboard.DOWN){
+                Client.sendMove(2);
+            }
+            if(e.keyCode == Phaser.Keyboard.LEFT){
+                Client.sendMove(4);
+            }
+            if(e.keyCode == Phaser.Keyboard.RIGHT){
+                Client.sendMove(6);
+            }
         }
 
         //Tile choosing controls
