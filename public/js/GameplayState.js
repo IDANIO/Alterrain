@@ -94,7 +94,7 @@ GameplayState.prototype = {
 
     handleKeys: function(e){
         //Emit signals only if the player isn't in the middle of moving already
-        if(gameplayState.player.canMove){
+        if(gameplayState.player && gameplayState.player.canMove){
             if(e.keyCode == Phaser.Keyboard.UP){
                 Client.sendMove(8);
             }
@@ -212,7 +212,6 @@ GameplayState.prototype = {
     //Plays a given sound with volume inversely scaled to the distance from the source
     playSoundFrom: function(sfx, x, y){
         let dist = this.getDistance(x, y, this.player.x, this.player.y);
-        console.log("Dist: " + dist);
         let factor = dist / MIN_HEARING_DISTANCE;
         if(factor > 1){
             factor = 1;

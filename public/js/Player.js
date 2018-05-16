@@ -141,17 +141,5 @@ Player.prototype.moveTo = function(nx, ny){
             this.facing = FACING_UP;
             this.frame = 2;
         }
-        
-        //this.moveTimer.repeat(this.moveDuration, 32, this.stepTo, this);
-        //this.moveTimer.start();
-
-        /*
-        /////DEBUG - remove later/////
-        this.x = nx;
-        this.y = ny;
-        this.updateIconPositions(nx, ny);
-        this.canMove = true
-        /////DEBUG - remove later/////
-        */
     }
 };
