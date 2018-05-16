@@ -9,10 +9,13 @@ function Player(game, x, y, key, frame){
     this.moveTimer = game.time.create(false);
     this.moveTimer.loop(this.moveDuration, this.stepTo, this);
     this.facing = FACING_DOWN;
+    
+    this.arrowIconOffsetY = -32;
     this.arrowIcon = null;
     
     this.soundIconDuration = 500; //In milliseconds
     this.soundIconTimer = game.time.create(false);
+    this.canMakeSound = true;
     
     //Add sound-making icon
     this.soundIconOffsetY = -8;
@@ -32,7 +35,7 @@ Player.prototype.update = function(){
 
 Player.prototype.enableArrowIcon = function(){
     //Add arrow indicator
-    this.arrowIcon = game.add.sprite(this.x, this.y - 32, "arrowIcon");
+    this.arrowIcon = game.add.sprite(this.x, this.y + this.arrowIconOffsetY, "arrowIcon");
 };
 
 Player.prototype.startSoundTimer = function(){
@@ -45,9 +48,11 @@ Player.prototype.toggleSoundIcon = function(){
     //Toggle the sound icon on or off
     if(this.soundIcon.alpha === 0){
         this.soundIcon.alpha = 1;
+        this.canMakeSound = false;
     }
     else if(this.soundIcon.alpha === 1){
         this.soundIcon.alpha = 0;
+        this.canMakeSound = true;
     }
 };
 
@@ -56,7 +61,7 @@ Player.prototype.updateIconPositions = function(nx, ny){
     //Arrow icon
     if(this.arrowIcon){
         this.arrowIcon.x = nx;
-        this.arrowIcon.y = ny - 32;
+        this.arrowIcon.y = ny + this.arrowIconOffsetY;
     }
     
     //Sound icon

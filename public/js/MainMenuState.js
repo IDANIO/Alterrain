@@ -25,8 +25,8 @@ MainMenuState.prototype = {
         game.load.image("arrowIcon", "./assets/img/arrow.png", 32, 32);
         game.load.image("soundIcon", "./assets/img/sound.png", 64, 32);
         
-        game.load.audio("placeTileSound", "assets/audio/place_tile.ogg");
-        game.load.audio("abstractChirpSound", "assets/audio/abstract_chirp01.ogg");
+        game.load.audio("placeTileSound", ["assets/audio/place_tile.ogg", "assets/audio/place_tile.mp3"]);
+        game.load.audio("abstractChirpSound", ["assets/audio/abstract_chirp01.ogg", "assets/audio/abstract_chirp01.mp3"]);
     },
 
     create: function(){

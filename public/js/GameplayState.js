@@ -126,14 +126,13 @@ GameplayState.prototype = {
         }
 
         //Change the tile the player is standing on
-        //TODO should have some limit later on
+        //BUG - placing the same tile again shouldn't do anything
         if(e.keyCode == Phaser.Keyboard.SPACEBAR){
             Client.changeTile(this.tileChoice, gameplayState.player.facing);
         }
 
         //Play abstract sound
         if(e.keyCode == Phaser.Keyboard.E){
-            //TODO limit this so that the player can't spam the sound
             Client.playSound();
         }
 
@@ -145,8 +144,10 @@ GameplayState.prototype = {
 
     playAbstractSoundFrom: function(playerId){
         let sourcePlayer = this.playerMap[playerId];
-        this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x * TILE_SIZE, sourcePlayer.y * TILE_SIZE);
-        sourcePlayer.startSoundTimer();
+        if(sourcePlayer.canMakeSound){
+            this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x, sourcePlayer.y);
+            sourcePlayer.startSoundTimer();
+        }
     },
 
     //Moves the player to the given position
@@ -208,6 +209,7 @@ GameplayState.prototype = {
     //Plays a given sound with volume inversely scaled to the distance from the source
     playSoundFrom: function(sfx, x, y){
         let dist = this.getDistance(x, y, this.player.x, this.player.y);
+        console.log("Dist: " + dist);
         let factor = dist / MIN_HEARING_DISTANCE;
         if(factor > 1){
             factor = 1;
