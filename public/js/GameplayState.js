@@ -93,17 +93,20 @@ GameplayState.prototype = {
     },
 
     handleKeys: function(e){
-        if(e.keyCode == Phaser.Keyboard.UP){
-            Client.sendMove(8);
-        }
-        if(e.keyCode == Phaser.Keyboard.DOWN){
-            Client.sendMove(2);
-        }
-        if(e.keyCode == Phaser.Keyboard.LEFT){
-            Client.sendMove(4);
-        }
-        if(e.keyCode == Phaser.Keyboard.RIGHT){
-            Client.sendMove(6);
+        //Emit signals only if the player isn't in the middle of moving already
+        if(gameplayState.player && gameplayState.player.canMove){
+            if(e.keyCode == Phaser.Keyboard.UP){
+                Client.sendMove(8);
+            }
+            if(e.keyCode == Phaser.Keyboard.DOWN){
+                Client.sendMove(2);
+            }
+            if(e.keyCode == Phaser.Keyboard.LEFT){
+                Client.sendMove(4);
+            }
+            if(e.keyCode == Phaser.Keyboard.RIGHT){
+                Client.sendMove(6);
+            }
         }
 
         //Tile choosing controls
@@ -209,7 +212,6 @@ GameplayState.prototype = {
     //Plays a given sound with volume inversely scaled to the distance from the source
     playSoundFrom: function(sfx, x, y){
         let dist = this.getDistance(x, y, this.player.x, this.player.y);
-        console.log("Dist: " + dist);
         let factor = dist / MIN_HEARING_DISTANCE;
         if(factor > 1){
             factor = 1;
