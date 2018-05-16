@@ -82,6 +82,7 @@ GameplayState.prototype = {
     //Set the player reference to the correct player sprite object
     setPlayerReference: function(id){
         this.player = this.playerMap[id];
+        this.player.enableArrowIcon();
         game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN);
     },
 
@@ -92,17 +93,20 @@ GameplayState.prototype = {
     },
 
     handleKeys: function(e){
-        if(e.keyCode == Phaser.Keyboard.UP){
-            Client.sendMove(8);
-        }
-        if(e.keyCode == Phaser.Keyboard.DOWN){
-            Client.sendMove(2);
-        }
-        if(e.keyCode == Phaser.Keyboard.LEFT){
-            Client.sendMove(4);
-        }
-        if(e.keyCode == Phaser.Keyboard.RIGHT){
-            Client.sendMove(6);
+        //Emit signals only if the player isn't in the middle of moving already
+        if(gameplayState.player && gameplayState.player.canMove){
+            if(e.keyCode == Phaser.Keyboard.UP){
+                Client.sendMove(8);
+            }
+            if(e.keyCode == Phaser.Keyboard.DOWN){
+                Client.sendMove(2);
+            }
+            if(e.keyCode == Phaser.Keyboard.LEFT){
+                Client.sendMove(4);
+            }
+            if(e.keyCode == Phaser.Keyboard.RIGHT){
+                Client.sendMove(6);
+            }
         }
 
         //Tile choosing controls
@@ -125,14 +129,13 @@ GameplayState.prototype = {
         }
 
         //Change the tile the player is standing on
-        //TODO should have some limit later on
+        //BUG - placing the same tile again shouldn't do anything
         if(e.keyCode == Phaser.Keyboard.SPACEBAR){
             Client.changeTile(this.tileChoice, gameplayState.player.facing);
         }
 
         //Play abstract sound
         if(e.keyCode == Phaser.Keyboard.E){
-            //TODO limit this so that the player can't spam the sound
             Client.playSound();
         }
 
@@ -142,8 +145,12 @@ GameplayState.prototype = {
         }
     },
 
-    playAbstractSoundAt: function(x, y){
-        this.playSoundFrom(this.abstractChirpSound, x * TILE_SIZE, y * TILE_SIZE);
+    playAbstractSoundFrom: function(playerId){
+        let sourcePlayer = this.playerMap[playerId];
+        if(sourcePlayer.canMakeSound){
+            this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x, sourcePlayer.y);
+            sourcePlayer.startSoundTimer();
+        }
     },
 
     //Moves the player to the given position
