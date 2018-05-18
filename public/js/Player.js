@@ -35,6 +35,14 @@ Player.prototype.update = function(){
     }
 };
 
+Player.prototype.bringToTop = function(){
+    game.world.bringToTop(this);
+    game.world.bringToTop(this.soundIcon);
+    if(this.arrowIcon){
+        game.world.bringToTop(this.arrowIcon);
+    }
+};
+
 Player.prototype.enableArrowIcon = function(){
     //Add arrow indicator
     this.arrowIcon = game.add.sprite(this.x, this.y + this.arrowIconOffsetY, "arrowIcon");

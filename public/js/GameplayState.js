@@ -2,7 +2,15 @@
 var GameplayState = function(game){
     //Create a playerMap property
     this.playerMap = {};
+    //Make a reference to the local player
     this.player = null;
+    
+    //Create a 2D array for solid objects
+    this.objectMap = [];
+    for(let i = 0; i < 64; i++){ //TODO use a constant instead of 64 to reference the world size
+        this.objectMap[i] = [];
+    }
+    
     this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
@@ -33,7 +41,7 @@ GameplayState.prototype = {
         //empty
     },
 
-    create: function(){
+    create: function(){        
         this.createSoundObjects();
 
         //Set up and create the world tilemap
@@ -49,12 +57,27 @@ GameplayState.prototype = {
         //TODO need to optimize later
         this.tileChoice = 0;
 
-        //Display tile choice
-        this.tileText = game.add.text(32, 32, tileName[this.tileChoice], this.textStyle);
-        this.tileText.fixedToCamera = true;
-
         //Handle input
         game.input.keyboard.onDownCallback = this.handleKeys;
+        
+        //Create a group for solid objects - to be drawn below UI
+        this.solidObjectsGroup = game.add.group();
+        
+        //Create a group for player sprites - to be drawn below UI
+        this.playersGroup = game.add.group();
+        
+        //Create a group for player icon sprites - drawn above players but below UI
+        this.playerIconsGroup = game.add.group();
+        
+        //Create a group for UI elements
+        this.uiGroup = game.add.group();
+        this.uiGroup.fixedToCamera = true;
+        
+        //Display tile choice
+        //TODO should be a proper UI instead
+        this.tileText = game.add.text(32, 32, tileName[this.tileChoice], this.textStyle);
+        //this.tileText.fixedToCamera = true;
+        this.uiGroup.add(this.tileText);
     },
 
     shutdown: function(){
@@ -76,7 +99,16 @@ GameplayState.prototype = {
     //Adds a new player object to the world
     addNewPlayer: function(id, x, y){
         this.playerMap[id] = new Player(game, x * TILE_SIZE, y * TILE_SIZE, "player");
-        game.add.existing(this.playerMap[id]);
+        //game.add.existing(this.playerMap[id]);
+        this.playersGroup.add(this.playerMap[id]);
+        //Make sure the local player is drawn on top of other players
+        if(this.player){
+            this.player.bringToTop();
+            //Make sure the UI stays on top
+            if(this.uiGroup){
+                game.world.bringToTop(this.uiGroup);
+            }
+        }
     },
 
     //Set the player reference to the correct player sprite object
@@ -84,6 +116,11 @@ GameplayState.prototype = {
         this.player = this.playerMap[id];
         this.player.enableArrowIcon();
         game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN);
+        this.player.bringToTop();
+        //Make sure the UI stays on top
+        if(this.uiGroup){
+            game.world.bringToTop(this.uiGroup);
+        }
     },
 
     //Removes a player object from the world with the given id
@@ -195,18 +232,34 @@ GameplayState.prototype = {
     generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
-                /*if(tileMap[i][j] === 0){ //grass
-                    this.tileMap.putTile(0, i, j);
-                }
-                else if(tileMap[i][j] === 1){ //sand
-                    this.tileMap.putTile(1, i, j);
-                }
-                else if(tileMap[i][j] === 2){ //stone
-                    this.tileMap.putTile(2, i, j);
-                }*/
                 this.tileMap.putTile(tileMap[i][j], i, j);
             }
         }
+    },
+    
+    //Generates solid objects based on a given 2D object map
+    generateSolidObjects: function(objectMap){
+        for(let i = 0; i < objectMap.length; i++){
+            for(let j = 0; j < objectMap[i].length; j++){
+                this.placeSolidObject(objectMap[i][j], i, j);
+            }
+        }
+    },
+    
+    //Helper function for placing individual solid objects
+    //0 == trees
+    //1 == rocks
+    placeSolidObject: function(objectType, tileX, tileY){
+        if(objectType === 0){
+            this.objectMap[tileX][tileY] = new Tree(game, tileX * TILE_SIZE, tileY * TILE_SIZE, "willowTree");
+            //game.add.existing(this.objectMap[tileX][tileY]);
+            this.solidObjectsGroup.add(this.objectMap[tileX][tileY]);
+        }
+        //Unfinished
+        /*else if(objectType === 1){
+            this.objectMap[tileX][tileY] = new Rock(game, tileX * TILE_SIZE, tileY * TILE_SIZE);
+            game.add.existing(this.objectMap[tileX][tileY]);
+        }*/
     },
 
     //Plays a given sound with volume inversely scaled to the distance from the source

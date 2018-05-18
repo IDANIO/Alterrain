@@ -180,6 +180,7 @@ class Server {
     socket.emit('initWorld', {
       players: objects,
       tiles: this.world.getTileMap(),
+      solidObjects: this.world.getObjectMap(),
       id: playerEvent.playerId,
     });
 
