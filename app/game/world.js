@@ -6,6 +6,7 @@ const fs = require('fs');
 const EventEmitter = require('events');
 const Character = require('./character');
 const Player = require('./player.js');
+const TreasureBox = require('../objects/treasure_box.js');
 const noise = require('../lib/perlin.js');
 
 const {Tiles, TileData, WorldConfig} = require('../../shared/constant.js');
@@ -57,6 +58,7 @@ class World {
     logger.info('Creating new Tilemap...');
     this.initTilemap();
     this.initObjectMap();
+    this.spawnChests();
     this.saveWorldDataToDisk();
     return success;
   }
@@ -147,7 +149,7 @@ class World {
     this.generateNoise(this.moisture, this.width, this.height);
     this.generateTileMap(this.tileMap, this.heightmap, this.moisture);
   }
-  
+
   /**
    * @private
    */
@@ -157,11 +159,28 @@ class World {
     // 1 = rocks (not ready)
     this.objectMap = [];
 
-    for(let i = 0; i < this.height; i++){
+    for (let i = 0; i < this.height; i++) {
       this.objectMap[i] = [];
     }
 
     this.generateTrees(this.tileMap, this.objectMap);
+  }
+
+  spawnChests() {
+    this.chestObjects = [];
+    let newX;
+    let newY;
+
+    // TODO: Very bad implementation
+    for (let i = 0; i < 50; ++i) {
+      do {
+        newX = Math.floor(Math.random() * WorldConfig.WIDTH);
+        newY = Math.floor(Math.random() * WorldConfig.HEIGHT);
+      } while (!this.isPassable(newX, newY, 2));
+
+      this.chestObjects.push(new TreasureBox(this, newX, newY));
+      logger.debug(`chest spawned at (${newX},${newY}).`);
+    }
   }
 
   /**
@@ -215,7 +234,7 @@ class World {
 
     return TileData[tile] === 0;
   }
-  
+
   /**
    * @param x {number}
    * @param y {number}
@@ -224,7 +243,7 @@ class World {
    */
   checkObject(x, y, bit) {
     let obj = this.objectMap[x][y];
-    //Undefined if empty
+    // Undefined if empty
     return obj >= 0;
   }
 
@@ -235,7 +254,8 @@ class World {
    * @return {boolean}
    */
   isPassable(x, y, d) {
-    return this.checkPassage(x, y, (1 << (d / 2 - 1)) & 0x0f) && !this.checkObject(x, y, (1 << (d / 2 - 1)) & 0x0f);
+    return !this.checkObject(x, y, (1 << (d / 2 - 1)) & 0x0f)
+      && this.checkPassage(x, y, (1 << (d / 2 - 1)) & 0x0f);
   }
 
   /**
@@ -252,7 +272,7 @@ class World {
   getTileMap() {
     return this.tileMap;
   }
-  
+
   /**
    * @return {Array}
    */
@@ -410,7 +430,7 @@ class World {
       }
     }
   }
-  
+
   /**
    * Spawns trees around the world based on a given tilemap.
    * Will spawn trees on grass tiles only.
@@ -418,13 +438,13 @@ class World {
    * @param objectMap The 2D array to store the trees in as integers
    */
   generateTrees(tilemap, objectMap) {
-    //TODO use a better algorithm to spawn trees
+    // TODO use a better algorithm to spawn trees
     for (let i = 0; i < tilemap.length; i++) {
       for (let j = 0; j < tilemap.length; j++) {
         let tileType = tilemap[i][j];
-        if(tileType === 0){ //grass
-          if(Math.random() < 0.2){
-            objectMap[i][j] = 0; //Set the object type as a tree
+        if (tileType === 0) { // grass
+          if (Math.random() < 0.2) {
+            objectMap[i][j] = 0; // Set the object type as a tree
           }
         }
       }

@@ -136,7 +136,7 @@ class Server {
 
     socket.on('disconnect', () => {
       playerEvent.disconnectTime = (new Date()).getTime();
-      socket.broadcast.emit('playerEvent', playerEvent);
+      socket.broadcast.emit('playerEvent', ``);
 
       this.onPlayerDisconnected(socket);
 
@@ -177,10 +177,17 @@ class Server {
       });
     });
 
+    let chests = this.world.chestObjects.map((chest) => {
+      return {x: chest._x, y: chest._y};
+    });
+
+    logger.info(chests);
+
     socket.emit('initWorld', {
       players: objects,
       tiles: this.world.getTileMap(),
       solidObjects: this.world.getObjectMap(),
+      chests: chests,
       id: playerEvent.playerId,
     });
 
@@ -234,6 +241,9 @@ class Server {
         break;
       case Commands.COMMUNICATION:
         command = CommandFactory.makeCommunicateCommand(player, cmd.params);
+        break;
+      case Commands.INTERACTION:
+        command = CommandFactory.makeInteractCommand(player, cmd.params);
         break;
       default:
         logger.error(`Invalid Command ${cmd.type}`);
