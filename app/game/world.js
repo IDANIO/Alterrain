@@ -51,7 +51,7 @@ class World {
     /**
      * @type {Map<Number, Character>}
      */
-    this.objects = new Map();
+    this.players = new Map();
 
     /**
      * @type {ObjectContainer}
@@ -183,7 +183,7 @@ class World {
    */
   addObject(x, y, playerId) {
     let player = new Player(this, x, y, playerId);
-    return this.objects.set(playerId, player);
+    return this.players.set(playerId, player);
   }
 
   /**
@@ -235,7 +235,7 @@ class World {
    * @return {boolean}
    */
   removeObject(playerId) {
-    return this.objects.delete(playerId);
+    return this.players.delete(playerId);
   }
 
   /**
@@ -266,11 +266,9 @@ class World {
    * @param dt{Number}
    */
   step(dt) {
-    this.objects.forEach((character) => {
+    this.players.forEach((character) => {
       character.update();
     });
-
-    this.stepCount++;
   }
 
   /**
