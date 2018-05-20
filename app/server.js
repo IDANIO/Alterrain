@@ -181,8 +181,6 @@ class Server {
       return {x: chest._x, y: chest._y};
     });
 
-    logger.info(chests);
-
     socket.emit('initWorld', {
       players: objects,
       tiles: this.world.getTileMap(),

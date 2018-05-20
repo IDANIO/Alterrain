@@ -20,7 +20,7 @@ class TreasureBox extends GameObject {
    * @return {boolean}
    */
   isNewPlayer(player) {
-    return this.playerOpened.includes(player.id);
+    return !this.playerOpened.includes(player.id);
   }
 
   /**

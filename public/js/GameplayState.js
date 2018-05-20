@@ -4,13 +4,13 @@ var GameplayState = function(game){
     this.playerMap = {};
     //Make a reference to the local player
     this.player = null;
-    
+
     //Create a 2D array for solid objects
     this.objectMap = [];
     for(let i = 0; i < 64; i++){ //TODO use a constant instead of 64 to reference the world size
         this.objectMap[i] = [];
     }
-    
+
     this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
@@ -41,7 +41,7 @@ GameplayState.prototype = {
         //empty
     },
 
-    create: function(){        
+    create: function(){
         this.createSoundObjects();
 
         //Set up and create the world tilemap
@@ -59,20 +59,20 @@ GameplayState.prototype = {
 
         //Handle input
         game.input.keyboard.onDownCallback = this.handleKeys;
-        
+
         //Create a group for solid objects - to be drawn below UI
         this.solidObjectsGroup = game.add.group();
-        
+
         //Create a group for player sprites - to be drawn below UI
         this.playersGroup = game.add.group();
-        
+
         //Create a group for player icon sprites - drawn above players but below UI
         this.playerIconsGroup = game.add.group();
-        
+
         //Create a group for UI elements
         this.uiGroup = game.add.group();
         this.uiGroup.fixedToCamera = true;
-        
+
         //Display tile choice
         //TODO should be a proper UI instead
         this.tileText = game.add.text(32, 32, tileName[this.tileChoice], this.textStyle);
@@ -133,34 +133,34 @@ GameplayState.prototype = {
     handleKeys: function(e){
         //Emit signals only if the player isn't in the middle of moving already
         if(gameplayState.player && gameplayState.player.canMove){
-            if(e.keyCode == Phaser.Keyboard.UP){
+            if(e.keyCode === Phaser.Keyboard.UP){
                 Client.sendMove(8);
             }
-            if(e.keyCode == Phaser.Keyboard.DOWN){
+            if(e.keyCode === Phaser.Keyboard.DOWN){
                 Client.sendMove(2);
             }
-            if(e.keyCode == Phaser.Keyboard.LEFT){
+            if(e.keyCode === Phaser.Keyboard.LEFT){
                 Client.sendMove(4);
             }
-            if(e.keyCode == Phaser.Keyboard.RIGHT){
+            if(e.keyCode === Phaser.Keyboard.RIGHT){
                 Client.sendMove(6);
             }
         }
 
         //Tile choosing controls
-        if(e.keyCode == Phaser.Keyboard.ONE){
+        if(e.keyCode === Phaser.Keyboard.ONE){
             this.tileChoice = 0;
             //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[this.tileChoice];
         }
         //Tile choosing controls
-        if(e.keyCode == Phaser.Keyboard.TWO){
+        if(e.keyCode === Phaser.Keyboard.TWO){
             this.tileChoice = 1;
             //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[this.tileChoice];
         }
         //Tile choosing controls
-        if(e.keyCode == Phaser.Keyboard.THREE){
+        if(e.keyCode === Phaser.Keyboard.THREE){
             this.tileChoice = 2;
             //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[this.tileChoice];
@@ -168,22 +168,22 @@ GameplayState.prototype = {
 
         //Change the tile the player is standing on
         //BUG - placing the same tile again shouldn't do anything
-        if(e.keyCode == Phaser.Keyboard.SPACEBAR){
+        if(e.keyCode === Phaser.Keyboard.SPACEBAR){
             Client.changeTile(this.tileChoice, gameplayState.player.facing);
         }
-        
+
         //Interact with a treasure chest
-        if(e.keyCode == Phaser.Keyboard.Z){
+        if(e.keyCode === Phaser.Keyboard.Z){
             Client.interact();
         }
 
         //Play abstract sound
-        if(e.keyCode == Phaser.Keyboard.E){
+        if(e.keyCode === Phaser.Keyboard.E){
             Client.playSound();
         }
 
         //Quit key - go back to the main menu
-        if(e.keyCode == Phaser.Keyboard.ESC){
+        if(e.keyCode === Phaser.Keyboard.ESC){
             game.state.start("MainMenuState");
         }
     },
@@ -232,9 +232,9 @@ GameplayState.prototype = {
     },
 
     //Generates tile objects based on a given 2D tilemap
-    //0 == grass
-    //1 == sand
-    //2 == stone
+    //0 === grass
+    //1 === sand
+    //2 === stone
     generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
@@ -242,7 +242,7 @@ GameplayState.prototype = {
             }
         }
     },
-    
+
     //Generates solid objects based on a given 2D object map
     generateSolidObjects: function(objectMap){
         for(let i = 0; i < objectMap.length; i++){
@@ -251,7 +251,7 @@ GameplayState.prototype = {
             }
         }
     },
-    
+
     //Spawns treasure chests based on an array of them
     spawnTreasureChests: function(arr){
         for(let i = 0; i < arr.length; i++){
@@ -260,10 +260,10 @@ GameplayState.prototype = {
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
         }
     },
-    
+
     //Helper function for placing individual solid objects
-    //0 == trees
-    //1 == rocks
+    //0 === trees
+    //1 === rocks
     placeSolidObject: function(objectType, tileX, tileY){
         if(objectType === 0){
             this.objectMap[tileX][tileY] = new Tree(game, tileX * TILE_SIZE, tileY * TILE_SIZE, "willowTree");
@@ -276,7 +276,7 @@ GameplayState.prototype = {
             game.add.existing(this.objectMap[tileX][tileY]);
         }*/
     },
-    
+
     //Interact with a specific treasure chest
     interactWithChest: function(tileX, tileY, state){
         let treasureChest = this.objectMap[tileX][tileY];
@@ -298,7 +298,7 @@ GameplayState.prototype = {
                 treasureChest.frame = 0;
                 this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
             }
-            this.objectMap[tileX][tileY].unlock(state);
+            // this.objectMap[tileX][tileY].unlock(state);
         }
     },
 

@@ -47,7 +47,12 @@ class Player extends Character {
    * @param player
    */
   onInteraction(player) {
-
+    // TODO: Refactor
+    this.world.chestObjects.forEach((chest)=>{
+      if (chest.pos(this._x, this._y)) {
+        chest.onInteraction(this);
+      }
+    });
   }
 }
 
