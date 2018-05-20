@@ -76,6 +76,7 @@ class Server {
   start() {
     const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
     this.intervalGameTick = setInterval(this.step.bind(this), intervalDelta);
+    this.serverStartTime = (new Date().getTime());
   }
 
   /**
@@ -88,8 +89,16 @@ class Server {
 
     let step = ++this.world.stepCount;
 
+    // logger.info(`[${step}] ${this.serverTime - this.serverStartTime}`);
     // this.emit('preStep', {step, dt});
 
+    // process input commands together.
+    this.playerInputQueues.forEach((commands, playerId) => {
+      commands.forEach((cmd)=>{
+        this.world.processInput(cmd);
+      });
+      commands.length = 0; // clear the array
+    });
 
     // Main Game Update Goes Here
     this.world.step(dt);
@@ -136,7 +145,7 @@ class Server {
 
     socket.on('disconnect', () => {
       playerEvent.disconnectTime = (new Date()).getTime();
-      socket.broadcast.emit('playerEvent', playerEvent);
+      socket.broadcast.emit('playerEvent', ``);
 
       this.onPlayerDisconnected(socket);
 
@@ -169,7 +178,7 @@ class Server {
     this.world.addObject(newX, newY, playerEvent.playerId);
 
     let objects = [];
-    this.world.objects.forEach((player) => {
+    this.world.players.forEach((player) => {
       objects.push({
         x: player._x,
         y: player._y,
@@ -177,10 +186,23 @@ class Server {
       });
     });
 
+    // TODO: Refactor Subject to Change
+    // TODO: Refactor SUBJECT to change
+    // TODO: Refactor SUBJECT to change
+    // TODO: Refactor SUBJECT to change
+    let chests = this.world.getChestPosArray().map((chest) => {
+      return {x: chest._x, y: chest._y};
+    });
+
+    let trees = this.world.getTreePosArray().map((tree) => {
+      return {x: tree._x, y: tree._y};
+    });
+
     socket.emit('initWorld', {
       players: objects,
       tiles: this.world.getTileMap(),
-      solidObjects: this.world.getObjectMap(),
+      solidObjects: trees,
+      chests: chests,
       id: playerEvent.playerId,
     });
 
@@ -220,8 +242,7 @@ class Server {
    * @param playerId {Number}
    */
   onReceivedInput(cmd, socket, playerId) {
-    // this.queueInputForPlayer(cmd, playerId);
-    const player = this.world.objects.get(playerId);
+    const player = this.world.players.get(playerId);
 
     let command;
 
@@ -235,27 +256,27 @@ class Server {
       case Commands.COMMUNICATION:
         command = CommandFactory.makeCommunicateCommand(player, cmd.params);
         break;
+      case Commands.INTERACTION:
+        command = CommandFactory.makeInteractCommand(player, cmd.params);
+        break;
       default:
         logger.error(`Invalid Command ${cmd.type}`);
         return;
     }
 
-    logger.debug(`Processing input <${cmd.type}> from playerId ${playerId}`);
-    this.world.processInput(command);
+    this.queueInputForPlayer(command, playerId);
   }
 
   /**
    * Add an input to the input-queue for the specific player, each queue is
    * key'd by step, because there may be multiple inputs per step.
-   * @param cmd
+   * @param cmd {Function}
    * @param playerId
    */
   queueInputForPlayer(cmd, playerId) {
     let queue = this.playerInputQueues.get(playerId);
 
-    queue.push();
-
-    logger.data(queue);
+    queue.push(cmd);
   }
 }
 

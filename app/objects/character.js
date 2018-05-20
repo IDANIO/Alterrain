@@ -1,25 +1,11 @@
 'use strict';
 
 const logger = require('../logger.js');
+const GameObject = require('./game_object');
 
-class Character {
+class Character extends GameObject {
   constructor(world, x = 0, y = 0) {
-    /**
-     * @type {World}
-     */
-    this.world = world;
-
-    /**
-     * @type {number}
-     * @private
-     */
-    this._x = x;
-
-    /**
-     * @type {number}
-     * @private
-     */
-    this._y = y;
+    super(world, x, y);
 
     this._realX = this._x;
     this._realY = this._y;
@@ -30,15 +16,6 @@ class Character {
      */
     this._direction = 2;
     this._moveSpeed = 5;
-  }
-
-  /**
-   * @param x {Number}
-   * @param y {Number}
-   * @return {boolean}
-   */
-  pos(x, y) {
-    return this._x === x && this._y === y;
   }
 
   /**
@@ -68,22 +45,6 @@ class Character {
    */
   reverseDir(d) {
     return 10 - d;
-  }
-
-  /**
-   * @param x {Number}
-   * @param y {Number}
-   */
-  setPosition(x, y) {
-    this._x = Math.round(x);
-    this._y = Math.round(y);
-  }
-
-  /**
-   * @param other {Character}
-   */
-  copyPosition(other) {
-    this.setPosition(other._x, other._y);
   }
 
   update() {
@@ -134,11 +95,6 @@ class Character {
    * @return {boolean}
    */
   isCollidedWithCharacters(x, y) {
-    // TODO: make this efficient
-    // let objects = this.world.objects;
-    // objects.forEach((character)=>{
-    //
-    // });
     return false;
   }
 
@@ -158,18 +114,12 @@ class Character {
   }
 
   /**
-   * @param d {Number}
+   * @param x
+   * @param d
+   * @return {number}
    */
-  moveStraight(d) {
-    this.setDirection(d);
-
-    // Check can pass this terrain?
-    if (this.isMapPassable(this._x, this._y, this._direction)) {
-      this._x = Character.roundXWithDirection(this._x, d);
-      this._y = Character.roundYWithDirection(this._y, d);
-    }
-
-    logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
+  static roundXWithDirection(x, d) {
+    return x + (d === 6 ? 1 : d === 4 ? -1 : 0);
   }
 
   /**
@@ -187,21 +137,27 @@ class Character {
   }
 
   /**
-   * @param x
-   * @param d
-   * @return {*}
-   */
-  static roundXWithDirection(x, d) {
-    return x + (d === 6 ? 1 : d === 4 ? -1 : 0);
-  }
-
-  /**
    * @param y
    * @param d
-   * @return {*}
+   * @return {number}
    */
   static roundYWithDirection(y, d) {
     return y + (d === 2 ? 1 : d === 8 ? -1 : 0);
+  }
+
+  /**
+   * @param d {Number}
+   */
+  moveStraight(d) {
+    this.setDirection(d);
+
+    // Check can pass this terrain?
+    if (this.canPass(this._x, this._y, this._direction)) {
+      this._x = Character.roundXWithDirection(this._x, d);
+      this._y = Character.roundYWithDirection(this._y, d);
+    }
+
+    logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
   }
 }
 

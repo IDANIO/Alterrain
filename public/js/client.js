@@ -38,6 +38,7 @@ var Client = {};
      * @param data.players {Array} An array containing all players' x,y coordinate
      * @param data.tiles {Array} A 2D array of the world data.
      * @param data.solidObjects {Array} A 2D array of the solid objects in the world.
+     * @param data.chests {Array} A 1D array of the treasure chests in the world.
      */
     Client.socket.on('initWorld', function (data) {
       console.log(data);
@@ -49,7 +50,18 @@ var Client = {};
         gameplayState.setPlayerReference(data.id);
       }
       gameplayState.generateTiles(data.tiles);
-      gameplayState.generateSolidObjects(data.solidObjects);
+      //-Ivan's change -------------------------------------------------------//
+      data.solidObjects.forEach(function (tree) {
+        gameplayState.placeSolidObject(0, tree.x, tree.y);
+      });
+
+      //-Original-------------------------------------------------------------//
+      // gameplayState.generateSolidObjects(data.solidObjects);
+      //----------------------------------------------------------------------//
+
+      console.log("Printing data.chests");
+      console.log(data.chests);
+      gameplayState.spawnTreasureChests(data.chests);
     });
 
     /**
@@ -74,6 +86,13 @@ var Client = {};
      */
     Client.socket.on('playSound', function (data){
       gameplayState.playAbstractSoundFrom(data.id);
+    });
+
+    /**
+     * @param data {Object} An object with the x and y index of the chest and its state
+     */
+    Client.socket.on("chestUpdate", function (data){
+      gameplayState.interactWithChest(data.x, data.y, data.state);
     });
   };
 
@@ -116,12 +135,26 @@ var Client = {};
     //   MOVEMENT: 1,
     //   ALTER_TILE: 2,
     //   COMMUNICATION: 3,
+    //   INTERACT: 4,
     Client.socket.emit('inputCommand', {
       type: 2,
       params: {
         tileId: tileChoice,
         // direction: dir
       }
+    });
+  };
+
+  Client.interact = function () {
+
+    // check '/shared/constant.js'
+    //
+    //   MOVEMENT: 1,
+    //   ALTER_TILE: 2,
+    //   COMMUNICATION: 3,
+    //   INTERACT: 4,
+    Client.socket.emit("inputCommand", {
+      type: 4
     });
   };
 

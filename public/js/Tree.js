@@ -1,4 +1,4 @@
-//Player constructor
+//Tree constructor
 function Tree(game, x, y, key, frame){
     //Call to Phaser.Sprite(game, x, y, key, frame)
     Phaser.Sprite.call(this, game, x, y, key, frame);
