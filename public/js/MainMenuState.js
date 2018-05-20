@@ -20,6 +20,7 @@ MainMenuState.prototype = {
 
     preload: function(){
         game.load.spritesheet("player", "./assets/img/person_spritesheet_large.png", 32, 32);
+        game.load.spritesheet("treasureChest", "./assets/img/treasurechest_spritesheet.png", 32, 32);
         game.load.image("gameTileset", "./assets/img/game_tileset.png", 32, 32);
         game.load.image("arrowIcon", "./assets/img/arrow.png", 32, 32);
         game.load.image("soundIcon", "./assets/img/sound.png", 64, 32);
@@ -27,6 +28,7 @@ MainMenuState.prototype = {
         
         game.load.audio("placeTileSound", ["assets/audio/place_tile.ogg", "assets/audio/place_tile.mp3"]);
         game.load.audio("abstractChirpSound", ["assets/audio/abstract_chirp01.ogg", "assets/audio/abstract_chirp01.mp3"]);
+        game.load.audio("pickupLootSound", ["assets/audio/pickup_loot01.ogg", "assets/audio/pickup_loot01.mp3"]);
     },
 
     create: function(){

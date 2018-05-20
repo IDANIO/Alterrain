@@ -94,6 +94,7 @@ GameplayState.prototype = {
     createSoundObjects: function(){
         this.placeTileSound = game.add.audio("placeTileSound");
         this.abstractChirpSound = game.add.audio("abstractChirpSound");
+        this.pickupLootSound = game.add.audio("pickupLootSound");
     },
 
     //Adds a new player object to the world
@@ -169,6 +170,11 @@ GameplayState.prototype = {
         //BUG - placing the same tile again shouldn't do anything
         if(e.keyCode == Phaser.Keyboard.SPACEBAR){
             Client.changeTile(this.tileChoice, gameplayState.player.facing);
+        }
+        
+        //Interact with a treasure chest
+        if(e.keyCode == Phaser.Keyboard.Z){
+            Client.interact();
         }
 
         //Play abstract sound
@@ -246,6 +252,15 @@ GameplayState.prototype = {
         }
     },
     
+    //Spawns treasure chests based on an array of them
+    spawnTreasureChests: function(arr){
+        for(let i = 0; i < arr.length; i++){
+            this.objectMap[arr[i].x][arr[i].y] = new Treasure(game, arr[i].x * TILE_SIZE, arr[i].y * TILE_SIZE, "treasureChest");
+            //TODO check if the treasure chest requires more than 1 player to open
+            this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
+        }
+    },
+    
     //Helper function for placing individual solid objects
     //0 == trees
     //1 == rocks
@@ -261,8 +276,34 @@ GameplayState.prototype = {
             game.add.existing(this.objectMap[tileX][tileY]);
         }*/
     },
+    
+    //Interact with a specific treasure chest
+    interactWithChest: function(tileX, tileY, state){
+        let treasureChest = this.objectMap[tileX][tileY];
+        if(treasureChest){
+            //New player unlocked 1 lock in this chest
+            if(state === 0){
+                console.log("Treasure found by unique player");
+                //TODO play unlocking sound
+                //treasureChest.frame--;
+            }
+            //Old player tried to interact with treasure chest, nothing happens
+            if(state === 1){
+                console.log("Player has already interacted with treasure chest.");
+                //TODO play treasure chest locked sound effect
+            }
+            //Treasure chest's last lock opened
+            if(state === 2){
+                console.log("Treasure found by LAST unique player. Treasure is now open.");
+                treasureChest.frame = 0;
+                this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+            }
+            this.objectMap[tileX][tileY].unlock(state);
+        }
+    },
 
     //Plays a given sound with volume inversely scaled to the distance from the source
+    //TODO make the minimum hearing distance a variable instead
     playSoundFrom: function(sfx, x, y){
         let dist = this.getDistance(x, y, this.player.x, this.player.y);
         let factor = dist / MIN_HEARING_DISTANCE;
