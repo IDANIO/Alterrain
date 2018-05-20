@@ -12,7 +12,7 @@ module.exports = {
    * @param {number} max - The maximum value in the range.
    * @return {number} A random number between min and max.
    */
-  integerInRange: function (min, max) {
+  integerInRange: function(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
   },
 
@@ -22,7 +22,7 @@ module.exports = {
    * @param {Array} ary - An Array to pick a random member of.
    * @return {any} A random member of the array.
    */
-  pick: function (ary) {
+  pick: function(ary) {
     return ary[this.integerInRange(0, ary.length - 1)];
   },
 };
