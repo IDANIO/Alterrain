@@ -44,7 +44,7 @@ const CommandFactory = {
   },
 
   /**
-   * @param player {Character}
+   * @param player {Character || Player}
    * @param params {Object}
    * @return {Function}
    */
