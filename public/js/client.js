@@ -51,6 +51,8 @@ var Client = {};
       }
       gameplayState.generateTiles(data.tiles);
       gameplayState.generateSolidObjects(data.solidObjects);
+      console.log("Printing data.chests");
+      console.log(data.chests);
       gameplayState.spawnTreasureChests(data.chests);
     });
 
