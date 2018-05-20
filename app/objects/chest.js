@@ -12,7 +12,7 @@ class Chest extends GameObject {
 
     this.state = Chest.STATE_LOCKED;
 
-    this.loots = [];
+    this.loots = [Tiles.STONE];
     this.playerRequired = 1;
     this.playerHistory = [];
   }

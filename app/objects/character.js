@@ -95,11 +95,6 @@ class Character extends GameObject {
    * @return {boolean}
    */
   isCollidedWithCharacters(x, y) {
-    // TODO: make this efficient
-    // let objects = this.world.objects;
-    // objects.forEach((character)=>{
-    //
-    // });
     return false;
   }
 

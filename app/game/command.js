@@ -1,21 +1,19 @@
-const Character = require('../objects/character.js');
-const {Tiles} = require('../../shared/constant.js');
-
 /**
  * @instance
- * @type {{makeMoveCommand: function(Character, Number): Function,
- * makeChangeTileCommand: function(Character, {tileId}): Function,
- * makeCommunicateCommand: function(Character, Object): Function}}
+ * @type {{makeMoveCommand: function((Character|Player), Number=): Function,
+ * makeChangeTileCommand: function(Player, {tileId}):
+ * Function, makeCommunicateCommand: function(Player, Object): Function,
+ * makeInteractCommand: function(Player, Object): Function}}
  */
 const CommandFactory = {
   /**
-   * @param player {Character | Player}
+   * @param player {Character || Player}
    * @param params {Number}
    * @return {Function}
    */
   makeMoveCommand: (player, params = 2) => {
     let dir = params;
-    return ()=>{
+    return () => {
       if (!player.isMoving()) {
         player.moveStraight(dir);
         player.world.server.io.emit('playerUpdate', {
@@ -29,27 +27,25 @@ const CommandFactory = {
   },
 
   /**
-   * @param player {Character}
+   * @param player {Player}
    * @param params {Object}
    * @param params.tileId {Number}
    * @return {Function}
    */
   makeChangeTileCommand: (player, params) => {
     let tileId = params.tileId;
-    let x2 = Character.roundXWithDirection(player._x, player._direction);
-    let y2 = Character.roundYWithDirection(player._y, player._direction);
-    return ()=>{
-      player.world.changeTile(x2, y2, tileId);
+    return () => {
+      player.placeTile(tileId);
     };
   },
 
   /**
-   * @param player {Character || Player}
+   * @param player {Player}
    * @param params {Object}
    * @return {Function}
    */
   makeCommunicateCommand: (player, params) => {
-    return ()=>{
+    return () => {
       // Temp, should not emit at here
       player.world.server.io.emit('playSound', {
         id: player.id,
@@ -58,12 +54,12 @@ const CommandFactory = {
   },
 
   /**
-   * @param player {Character || Player}
+   * @param player {Player}
    * @param params {Object}
    * @return {Function}
    */
   makeInteractCommand: (player, params) => {
-    return ()=>{
+    return () => {
       player.onInteraction(player);
     };
   },

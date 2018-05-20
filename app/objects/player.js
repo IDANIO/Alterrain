@@ -46,6 +46,20 @@ class Player extends Character {
   }
 
   /**
+   * @param tileId {Number}
+   */
+  placeTile(tileId) {
+    let newX = Character.roundXWithDirection(this._x, this._direction);
+    let newY = Character.roundYWithDirection(this._y, this._direction);
+
+    if (this.hasItem(tileId)) {
+      this.world.changeTile(newX, newY, tileId);
+
+      this.loseItem(tileId);
+    }
+  }
+
+  /**
    * @override
    * @param player
    */
