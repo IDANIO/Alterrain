@@ -53,8 +53,19 @@ const CommandFactory = {
     return ()=>{
       // Temp, should not emit at here
       player.world.server.io.emit('playSound', {
-        id: player.id
+        id: player.id,
       });
+    };
+  },
+
+  /**
+   * @param player {Character || Player}
+   * @param params {Object}
+   * @return {Function}
+   */
+  makeInteractCommand: (player, params) => {
+    return ()=>{
+      player.onInteraction(player);
     };
   },
 };

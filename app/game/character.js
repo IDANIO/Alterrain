@@ -1,25 +1,11 @@
 'use strict';
 
 const logger = require('../logger.js');
+const GameObject = require('../objects/game_object');
 
-class Character {
+class Character extends GameObject {
   constructor(world, x = 0, y = 0) {
-    /**
-     * @type {World}
-     */
-    this.world = world;
-
-    /**
-     * @type {number}
-     * @private
-     */
-    this._x = x;
-
-    /**
-     * @type {number}
-     * @private
-     */
-    this._y = y;
+    super(world, x, y);
 
     this._realX = this._x;
     this._realY = this._y;
@@ -30,15 +16,6 @@ class Character {
      */
     this._direction = 2;
     this._moveSpeed = 5;
-  }
-
-  /**
-   * @param x {Number}
-   * @param y {Number}
-   * @return {boolean}
-   */
-  pos(x, y) {
-    return this._x === x && this._y === y;
   }
 
   /**
@@ -68,22 +45,6 @@ class Character {
    */
   reverseDir(d) {
     return 10 - d;
-  }
-
-  /**
-   * @param x {Number}
-   * @param y {Number}
-   */
-  setPosition(x, y) {
-    this._x = Math.round(x);
-    this._y = Math.round(y);
-  }
-
-  /**
-   * @param other {Character}
-   */
-  copyPosition(other) {
-    this.setPosition(other._x, other._y);
   }
 
   update() {

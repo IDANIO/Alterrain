@@ -7,6 +7,7 @@ exports.Commands = {
   MOVEMENT: 1,
   ALTER_TILE: 2,
   COMMUNICATION: 3,
+  INTERACTION: 4,
 };
 
 /**
