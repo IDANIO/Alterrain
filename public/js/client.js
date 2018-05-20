@@ -50,7 +50,15 @@ var Client = {};
         gameplayState.setPlayerReference(data.id);
       }
       gameplayState.generateTiles(data.tiles);
-      gameplayState.generateSolidObjects(data.solidObjects);
+      //-Ivan's change -------------------------------------------------------//
+      data.solidObjects.forEach(function (tree) {
+        gameplayState.placeSolidObject(0, tree.x, tree.y);
+      });
+
+      //-Original-------------------------------------------------------------//
+      // gameplayState.generateSolidObjects(data.solidObjects);
+      //----------------------------------------------------------------------//
+
       console.log("Printing data.chests");
       console.log(data.chests);
       gameplayState.spawnTreasureChests(data.chests);
@@ -79,7 +87,7 @@ var Client = {};
     Client.socket.on('playSound', function (data){
       gameplayState.playAbstractSoundFrom(data.id);
     });
-    
+
     /**
      * @param data {Object} An object with the x and y index of the chest and its state
      */
@@ -136,7 +144,7 @@ var Client = {};
       }
     });
   };
-  
+
   Client.interact = function () {
 
     // check '/shared/constant.js'

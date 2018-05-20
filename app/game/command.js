@@ -1,4 +1,4 @@
-const Character = require('./character.js');
+const Character = require('../objects/character.js');
 const {Tiles} = require('../../shared/constant.js');
 
 /**
@@ -40,7 +40,6 @@ const CommandFactory = {
     let y2 = Character.roundYWithDirection(player._y, player._direction);
     return ()=>{
       player.world.changeTile(x2, y2, tileId);
-      // Temp, should not emit at here
     };
   },
 

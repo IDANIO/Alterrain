@@ -8,13 +8,19 @@ class GameObject {
     this.world = world;
 
     /**
-     * @type {number}
+     * @abstract
+     * @type {String}
+     */
+    this.type = null;
+
+    /**
+     * @type {Number}
      * @private
      */
     this._x = x;
 
     /**
-     * @type {number}
+     * @type {Number}
      * @private
      */
     this._y = y;

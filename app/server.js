@@ -177,14 +177,22 @@ class Server {
       });
     });
 
-    let chests = this.world.chestObjects.map((chest) => {
+    // TODO: Refactor Subject to Change
+    // TODO: Refactor SUBJECT to change
+    // TODO: Refactor SUBJECT to change
+    // TODO: Refactor SUBJECT to change
+    let chests = this.world.getChestPosArray().map((chest) => {
       return {x: chest._x, y: chest._y};
+    });
+
+    let trees = this.world.getTreePosArray().map((tree) => {
+      return {x: tree._x, y: tree._y};
     });
 
     socket.emit('initWorld', {
       players: objects,
       tiles: this.world.getTileMap(),
-      solidObjects: this.world.getObjectMap(),
+      solidObjects: trees,
       chests: chests,
       id: playerEvent.playerId,
     });

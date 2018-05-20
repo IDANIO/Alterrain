@@ -1,7 +1,7 @@
 'use strict';
 
 const logger = require('../logger.js');
-const GameObject = require('../objects/game_object');
+const GameObject = require('./game_object');
 
 class Character extends GameObject {
   constructor(world, x = 0, y = 0) {
@@ -119,18 +119,12 @@ class Character extends GameObject {
   }
 
   /**
-   * @param d {Number}
+   * @param x
+   * @param d
+   * @return {number}
    */
-  moveStraight(d) {
-    this.setDirection(d);
-
-    // Check can pass this terrain?
-    if (this.isMapPassable(this._x, this._y, this._direction)) {
-      this._x = Character.roundXWithDirection(this._x, d);
-      this._y = Character.roundYWithDirection(this._y, d);
-    }
-
-    logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
+  static roundXWithDirection(x, d) {
+    return x + (d === 6 ? 1 : d === 4 ? -1 : 0);
   }
 
   /**
@@ -148,21 +142,27 @@ class Character extends GameObject {
   }
 
   /**
-   * @param x
-   * @param d
-   * @return {*}
-   */
-  static roundXWithDirection(x, d) {
-    return x + (d === 6 ? 1 : d === 4 ? -1 : 0);
-  }
-
-  /**
    * @param y
    * @param d
-   * @return {*}
+   * @return {number}
    */
   static roundYWithDirection(y, d) {
     return y + (d === 2 ? 1 : d === 8 ? -1 : 0);
+  }
+
+  /**
+   * @param d {Number}
+   */
+  moveStraight(d) {
+    this.setDirection(d);
+
+    // Check can pass this terrain?
+    if (this.canPass(this._x, this._y, this._direction)) {
+      this._x = Character.roundXWithDirection(this._x, d);
+      this._y = Character.roundYWithDirection(this._y, d);
+    }
+
+    logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
   }
 }
 

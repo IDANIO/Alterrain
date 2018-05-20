@@ -1,10 +1,13 @@
 'use strict';
 
 const Character = require('./character.js');
+const logger = require('../logger.js');
 
 class Player extends Character {
   constructor(world, x, y, id) {
     super(world, x, y);
+    this.type = 'player';
+
     this.id = id;
 
     /**
@@ -47,12 +50,13 @@ class Player extends Character {
    * @param player
    */
   onInteraction(player) {
-    // TODO: Refactor
-    this.world.chestObjects.forEach((chest)=>{
-      if (chest.pos(this._x, this._y)) {
-        chest.onInteraction(this);
-      }
-    });
+    let x2 = Character.roundXWithDirection(this._x, this._direction);
+    let y2 = Character.roundYWithDirection(this._y, this._direction);
+
+    let chest = this.world.objectContainer.colliding(x2, y2);
+    if (chest) {
+      chest.onInteraction(this);
+    }
   }
 }
 
