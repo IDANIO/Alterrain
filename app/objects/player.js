@@ -25,9 +25,9 @@ class Player extends Character {
     if (isValidItem(tileId)) {
       this.inventory[tileId] = Math.min(64, this.inventory[tileId] + count);
     }
-    this.world.server.io.emit("inventoryUpdate", {
+    this.world.server.io.emit('inventoryUpdate', {
       id: this.id,
-      inventory: this.inventory
+      inventory: this.inventory,
     });
   }
 
@@ -39,9 +39,9 @@ class Player extends Character {
     if (isValidItem(tileId)) {
       this.inventory[tileId] = Math.max(0, this.inventory[tileId] - count);
     }
-    this.world.server.io.emit("inventoryUpdate", {
+    this.world.server.io.emit('inventoryUpdate', {
       id: this.id,
-      inventory: this.inventory
+      inventory: this.inventory,
     });
   }
 
