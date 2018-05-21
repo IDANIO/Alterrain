@@ -11,6 +11,6 @@ function Tree(game, x, y, key, frame){
 Tree.prototype = Object.create(Phaser.Sprite.prototype);
 Tree.prototype.constructor = Tree;
 
-Tree.cutDown = function(){
-    //empty
+Tree.prototype.cutDown = function(){
+    this.frame = 1;
 }

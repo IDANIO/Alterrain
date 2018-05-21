@@ -11,13 +11,13 @@ function Treasure(game, x, y, key, frame){
 Treasure.prototype = Object.create(Phaser.Sprite.prototype);
 Treasure.prototype.constructor = Tree;
 
-Treasure.setSize = function(size){
+Treasure.prototype.setSize = function(size){
     this.numPlayersRequired = size;
     this.frame = size;
 };
 
 //Set whether the treasure chest should be hidden or not
-Treasure.setHidden = function(flag){
+Treasure.prototype.setHidden = function(flag){
     this.hidden = flag;
     if(this.hidden){
         this.alpha = 0;
@@ -27,10 +27,10 @@ Treasure.setHidden = function(flag){
     }
 }
 
-Treasure.digUp = function(){
+Treasure.prototype.digUp = function(){
     this.setHidden(false);
 }
 
-Treasure.unlock = function(state){
+Treasure.prototype.unlock = function(state){
     
 }
