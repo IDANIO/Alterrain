@@ -17,7 +17,7 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 32;
 
-var tileName = ["Grass", "Sand", "Stone"];
+var tileName = ["Grass", "Sand", "Stone", "Water"];
 
 // We are using num-pad representation (Ivan)
 //
@@ -72,6 +72,11 @@ GameplayState.prototype = {
         //Create a group for UI elements
         this.uiGroup = game.add.group();
         this.uiGroup.fixedToCamera = true;
+        
+        //Create the inventoryUI
+        this.playerInventoryUI = new InventoryUI(game, 30, 126, "inventoryUI");
+        this.uiGroup.add(this.playerInventoryUI);
+        this.uiGroup.add(this.playerInventoryUI.itemsText);
 
         //Display tile choice
         //TODO should be a proper UI instead
@@ -95,6 +100,8 @@ GameplayState.prototype = {
         this.placeTileSound = game.add.audio("placeTileSound");
         this.abstractChirpSound = game.add.audio("abstractChirpSound");
         this.pickupLootSound = game.add.audio("pickupLootSound");
+        this.treeCutSound = game.add.audio("treeCutSound");
+        this.treeDestroyedSound = game.add.audio("treeDestroyedSound");
     },
 
     //Adds a new player object to the world
@@ -185,6 +192,13 @@ GameplayState.prototype = {
         //Quit key - go back to the main menu
         if(e.keyCode === Phaser.Keyboard.ESC){
             game.state.start("MainMenuState");
+        }
+    },
+    
+    updatePlayerInventory: function(playerId, inventory){
+        let sourcePlayer = this.playerMap[playerId];
+        if(sourcePlayer === this.player){
+            this.playerInventoryUI.updateDisplay(inventory);
         }
     },
 
@@ -299,6 +313,20 @@ GameplayState.prototype = {
                 this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
             }
             // this.objectMap[tileX][tileY].unlock(state);
+        }
+    },
+    
+    //Cut a specific tree, playing a different sound depending on its remaining hitpoints
+    cutTree: function(tileX, tileY, hitpoints){
+        let tx = tileX * TILE_SIZE;
+        let ty = tileY * TILE_SIZE;
+        if(hitpoints > 0){
+            this.playSoundFrom(this.treeCutSound, tx, ty);
+        }
+        else if(hitpoints === 0){
+            this.playSoundFrom(this.treeDestroyedSound, tx, ty);
+            let treeObj = this.objectMap[tileX][tileY];
+            treeObj.cutDown();
         }
     },
 

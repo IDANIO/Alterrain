@@ -12,14 +12,21 @@ class Tree extends GameObject {
     this.durability = util.integerInRange(1, 4);
 
     // TODO: temp, later change this to WOOD
-    this.loot = Tiles.STONE;
+    this.loot = Tiles.GRASS;
   }
 
   onInteraction(player) {
-    this.durability--;
-    if (this.durability <= 0) {
+    if(this.durability >= 0){
+      this.durability--;
+    }
+    if (this.durability === 0) {
       player.gainItem(this.loot, util.integerInRange(1, 2));
     }
+    this.world.server.io.emit("treeCut", {
+      x: this._x,
+      y: this._y,
+      durability: this.durability
+    });
   }
 }
 
