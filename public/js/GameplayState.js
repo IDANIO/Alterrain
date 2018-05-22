@@ -17,7 +17,7 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 32;
 
-var tileName = ["Grass", "Sand", "Stone", "Water"];
+var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge"];
 
 // We are using num-pad representation (Ivan)
 //
@@ -156,19 +156,22 @@ GameplayState.prototype = {
 
         //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.ONE){
-            this.tileChoice = 0;
+            this.tileChoice = 0; //grass
             //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[this.tileChoice];
         }
-        //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.TWO){
-            this.tileChoice = 1;
+            this.tileChoice = 1; //sand
             //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[this.tileChoice];
         }
-        //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.THREE){
-            this.tileChoice = 2;
+            this.tileChoice = 2; //stone
+            //NOTE: Using the gameplayState variable feels like a bad idea
+            gameplayState.tileText.text = tileName[this.tileChoice];
+        }
+        if(e.keyCode === Phaser.Keyboard.FOUR){
+            this.tileChoice = 4; //bridge
             //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[this.tileChoice];
         }
@@ -230,18 +233,6 @@ GameplayState.prototype = {
         let sourceX = tileX * TILE_SIZE;
         let sourceY = tileY * TILE_SIZE;
         this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
-        /*if(tileType === 0){ //grass
-            this.tileMap.putTile(0, tileX, tileY);
-        }
-        else if(tileType === 1){ //sand
-            this.tileMap.putTile(1, tileX, tileY);
-        }
-        else if(tileType === 2){ //stone
-            this.tileMap.putTile(2, tileX, tileY);
-        }
-        else if(tileType === 3){ //water
-            this.tileMap.putTile(3, tileX, tileY);
-        }*/
         this.tileMap.putTile(tileType, tileX, tileY);
     },
 
@@ -270,7 +261,7 @@ GameplayState.prototype = {
     spawnTreasureChests: function(arr){
         for(let i = 0; i < arr.length; i++){
             this.objectMap[arr[i].x][arr[i].y] = new Treasure(game, arr[i].x * TILE_SIZE, arr[i].y * TILE_SIZE, "treasureChest");
-            //TODO check if the treasure chest requires more than 1 player to open
+            //TODO check if the treasure chest requires more than 1 player to open to set the correct sprite
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
         }
     },
@@ -281,7 +272,6 @@ GameplayState.prototype = {
     placeSolidObject: function(objectType, tileX, tileY){
         if(objectType === 0){
             this.objectMap[tileX][tileY] = new Tree(game, tileX * TILE_SIZE, tileY * TILE_SIZE, "willowTree");
-            //game.add.existing(this.objectMap[tileX][tileY]);
             this.solidObjectsGroup.add(this.objectMap[tileX][tileY]);
         }
         //Unfinished

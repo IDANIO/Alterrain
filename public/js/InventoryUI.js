@@ -4,7 +4,7 @@ function InventoryUI(game, x, y, key, frame){
     Phaser.Sprite.call(this, game, x, y, key, frame);
     
     this.textStyle = {font: "16px Arial", fill: "#FFF"};
-    this.tileName = ["Grass", "Sand", "Stone"];
+    this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge"];
     
     this.scale.x = 1.7;
     

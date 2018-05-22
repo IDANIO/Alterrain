@@ -101,6 +101,7 @@ var Client = {};
      * @param data.inventory {Array} The player's inventory
      */
     Client.socket.on("inventoryUpdate", function (data){
+        console.log(data.inventory);
       gameplayState.updatePlayerInventory(data.id, data.inventory);
     });
     
