@@ -1,6 +1,6 @@
 //The main menu state
 var MainMenuState = function(game){
-    this.textStyle = {font: "32px Arial", fill: "#FFF"};
+    //this.textStyle = {font: "32px Arial", fill: "#FFF"};
 };
 
 MainMenuState.prototype = {
@@ -10,15 +10,11 @@ MainMenuState.prototype = {
         
         //To make sure any pixel art that's scaled doesn't become blurry
         game.stage.smoothed = false
-        
-        this.titleText = game.add.text(GAME_WIDTH / 2, 180, "Alterrain", this.textStyle);
-        this.titleText.anchor.setTo(0.5);
-        
-        this.promptText = game.add.text(GAME_WIDTH / 2, 300, "Press Enter to Join", this.textStyle);
-        this.promptText.anchor.setTo(0.5);
     },
 
     preload: function(){
+        game.load.bitmapFont("m5x7", "assets/font/m5x7.png", "assets/font/m5x7.fnt");
+        
         game.load.spritesheet("player", "./assets/img/person_spritesheet_large.png", 32, 32);
         game.load.spritesheet("treasureChest", "./assets/img/treasurechest_spritesheet.png", 32, 32);
         game.load.spritesheet("willowTree", "./assets/img/willow_spritesheet.png", 32, 32);
@@ -36,8 +32,12 @@ MainMenuState.prototype = {
         game.load.audio("treeDestroyedSound", ["assets/audio/creak01.ogg", "assets/audio/creak01.mp3"]);
     },
 
-    create: function(){
-        game.stage.backgroundColor = "#222";
+    create: function(){        
+        this.titleText = game.add.bitmapText(GAME_WIDTH / 2, 180, "m5x7", "Alterrain", 64);
+        this.titleText.anchor.setTo(0.5);
+        
+        this.promptText = game.add.bitmapText(GAME_WIDTH / 2, 300, "m5x7", "Press Enter to Join", 64);
+        this.promptText.anchor.setTo(0.5);
 
         //Center the game
         game.scale.pageAlignHorizontally = true;

@@ -3,13 +3,14 @@ function InventoryUI(game, x, y, key, frame){
     //Call to Phaser.Sprite(game, x, y, key, frame)
     Phaser.Sprite.call(this, game, x, y, key, frame);
     
-    this.textStyle = {font: "16px Arial", fill: "#FFF"};
+    //this.textStyle = {font: "16px Arial", fill: "#FFF"};
     this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge"];
     
     this.scale.x = 1.7;
     
     //TODO should be image-based instead of text-based
-    this.itemsText = game.add.text(x + 4, y + 4, "", this.textStyle);
+    //this.itemsText = game.add.text(x + 4, y + 4, "", this.textStyle);
+    this.itemsText = game.add.bitmapText(x + 4, y + 4, "m5x7", "", 32);
 }
 
 InventoryUI.prototype = Object.create(Phaser.Sprite.prototype);

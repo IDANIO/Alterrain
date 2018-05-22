@@ -11,7 +11,7 @@ var GameplayState = function(game){
         this.objectMap[i] = [];
     }
 
-    this.textStyle = {font: "20px Arial", fill: "#FFF"};
+    //this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
 //Tile-based movement
@@ -80,8 +80,7 @@ GameplayState.prototype = {
 
         //Display tile choice
         //TODO should be a proper UI instead
-        this.tileText = game.add.text(32, 32, tileName[this.tileChoice], this.textStyle);
-        //this.tileText.fixedToCamera = true;
+        this.tileText = game.add.bitmapText(32, 32, "m5x7", tileName[this.tileChoice], 48);
         this.uiGroup.add(this.tileText);
     },
 
@@ -93,7 +92,9 @@ GameplayState.prototype = {
     },
 
     update: function(){
-        //empty
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
+            game.state.start("MainMenuState");
+        }
     },
 
     createSoundObjects: function(){
@@ -190,11 +191,6 @@ GameplayState.prototype = {
         //Play abstract sound
         if(e.keyCode === Phaser.Keyboard.E){
             Client.playSound();
-        }
-
-        //Quit key - go back to the main menu
-        if(e.keyCode === Phaser.Keyboard.ESC){
-            game.state.start("MainMenuState");
         }
     },
     
