@@ -74,9 +74,12 @@ GameplayState.prototype = {
         this.uiGroup.fixedToCamera = true;
         
         //Create the inventoryUI
-        this.playerInventoryUI = new InventoryUI(game, 30, 126, "inventoryUI");
+        this.playerInventoryUI = new InventoryUI(game, 120, 408, "inventoryUI");
         this.uiGroup.add(this.playerInventoryUI);
-        this.uiGroup.add(this.playerInventoryUI.itemsText);
+        for(let i = 0; i < this.playerInventoryUI.itemsText.length; i++){
+            this.uiGroup.add(this.playerInventoryUI.itemsText[i]);
+        }
+        //this.uiGroup.add(this.playerInventoryUI.itemsText);
 
         //Display tile choice
         //TODO should be a proper UI instead
