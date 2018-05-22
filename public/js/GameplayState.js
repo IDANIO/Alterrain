@@ -10,7 +10,9 @@ var GameplayState = function(game){
     for(let i = 0; i < 64; i++){ //TODO use a constant instead of 64 to reference the world size
         this.objectMap[i] = [];
     }
-
+    
+    this.weatherEffects = [];
+    this.isRainOn = false;
     //this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
@@ -73,6 +75,8 @@ GameplayState.prototype = {
         this.uiGroup = game.add.group();
         this.uiGroup.fixedToCamera = true;
         
+        this.initializeWeatherEffects();
+        
         //Create the inventoryUI
         this.playerInventoryUI = new InventoryUI(game, 120, 408, "inventoryUI");
         this.uiGroup.add(this.playerInventoryUI);
@@ -85,6 +89,7 @@ GameplayState.prototype = {
         //TODO should be a proper UI instead
         this.tileText = game.add.bitmapText(32, 32, "m5x7", tileName[this.tileChoice], 48);
         this.uiGroup.add(this.tileText);
+        
     },
 
     shutdown: function(){
@@ -98,6 +103,53 @@ GameplayState.prototype = {
         if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
             game.state.start("MainMenuState");
         }
+        //DEBUG - remove later
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.R)){
+            if(this.isRainOn){
+                this.stopRainEffect();
+                this.isRainOn = false;
+            }
+            else{
+                this.startRainEffect();
+                this.isRainOn = true;
+            }
+        }
+    },
+    
+    initializeWeatherEffects: function(){
+        //Screen shader
+        this.screenShader = game.add.sprite(0, 0, "screenShader");
+        this.screenShader.scale.x = game.world.width;
+        this.screenShader.scale.y = game.world.height;
+        this.screenShader.tint = 0x777777;
+        this.screenShader.alpha = 0;
+        this.weatherEffects[0] = this.screenShader;
+        //Rain
+        this.rainEmitter = game.add.emitter(game.world.centerX, 256);
+        this.rainEmitter.fixedToCamera = true;
+        this.rainEmitter.makeParticles(["raindrop"], 0, 256);
+        this.rainEmitter.gravity = 0;
+        this.rainEmitter.setRotation(0, 0);
+        this.rainEmitter.setXSpeed(-128, -128);
+        this.rainEmitter.setYSpeed(512, 512);
+        this.rainEmitter.setScale(2, 2, 2, 2);
+        this.rainEmitter.setAlpha(0.3, 0.7);
+        let area = new Phaser.Rectangle(game.world.centerX, 0, game.world.width, 1);
+        this.rainEmitter.area = area;
+        this.weatherEffects[1] = this.rainEmitter;
+        this.rainEmitter.start(false, 2000, 10);
+        this.rainEmitter.on = false;
+    },
+    
+    startRainEffect: function(){
+        this.screenShader.tint = 0x999999;
+        this.screenShader.alpha = 0.4;
+        this.rainEmitter.on = true;
+    },
+    
+    stopRainEffect: function(){
+        this.screenShader.alpha = 0;
+        this.rainEmitter.on = false;;
     },
 
     createSoundObjects: function(){
@@ -116,7 +168,10 @@ GameplayState.prototype = {
         //Make sure the local player is drawn on top of other players
         if(this.player){
             this.player.bringToTop();
-            //Make sure the UI stays on top
+            //Make sure the UI and weather stays on top
+            for(let i = 0; i < this.weatherEffects.length; i++){
+                game.world.bringToTop(this.weatherEffects[i]);
+            }
             if(this.uiGroup){
                 game.world.bringToTop(this.uiGroup);
             }
@@ -129,7 +184,10 @@ GameplayState.prototype = {
         this.player.enableArrowIcon();
         game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN);
         this.player.bringToTop();
-        //Make sure the UI stays on top
+        //Make sure the UI and weather stays on top
+        for(let i = 0; i < this.weatherEffects.length; i++){
+            game.world.bringToTop(this.weatherEffects[i]);
+        }
         if(this.uiGroup){
             game.world.bringToTop(this.uiGroup);
         }

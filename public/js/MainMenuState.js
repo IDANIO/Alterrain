@@ -24,6 +24,9 @@ MainMenuState.prototype = {
         game.load.image("inventoryUI", "./assets/img/inventory_ui.png", 48, 128);
         //game.load.image("willowTree", "./assets/img/willowtree.png", 32, 32);
         
+        game.load.image("raindrop", "assets/img/raindrop.png");
+        game.load.image("screenShader", "assets/img/screen_shader.png");
+        
         game.load.audio("placeTileSound", ["assets/audio/place_tile.ogg", "assets/audio/place_tile.mp3"]);
         game.load.audio("abstractChirpSound", ["assets/audio/abstract_chirp01.ogg", "assets/audio/abstract_chirp01.mp3"]);
         game.load.audio("pickupLootSound", ["assets/audio/pickup_loot01.ogg", "assets/audio/pickup_loot01.mp3"]);
