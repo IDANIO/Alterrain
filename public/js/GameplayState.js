@@ -289,7 +289,9 @@ GameplayState.prototype = {
       if(this.playerMap[id] === this.player){
           let nextTile = this.tileMap.getTile(x, y);
           if(this.footstepSounds[nextTile.index]){
-              this.footstepSounds[nextTile.index].play();
+              if(!this.footstepSounds[nextTile.index].isPlaying){
+                this.footstepSounds[nextTile.index].play();
+              }
           }
       }
       
