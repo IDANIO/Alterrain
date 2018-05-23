@@ -286,9 +286,11 @@ GameplayState.prototype = {
       // console.log(`${x},${y},${d}`)
       
       //Play corresponding footstep sound
-      let nextTile = this.tileMap.getTile(x, y);
-      if(this.footstepSounds[nextTile.index]){
-          this.footstepSounds[nextTile.index].play();
+      if(this.playerMap[id] === this.player){
+          let nextTile = this.tileMap.getTile(x, y);
+          if(this.footstepSounds[nextTile.index]){
+              this.footstepSounds[nextTile.index].play();
+          }
       }
       
       this.playerMap[id].setDirection(d);
