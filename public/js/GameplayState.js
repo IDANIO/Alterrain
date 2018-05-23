@@ -83,13 +83,14 @@ GameplayState.prototype = {
         for(let i = 0; i < this.playerInventoryUI.itemsText.length; i++){
             this.uiGroup.add(this.playerInventoryUI.itemsText[i]);
         }
+        this.uiGroup.add(this.playerInventoryUI.highlightUI);
         //this.uiGroup.add(this.playerInventoryUI.itemsText);
 
         //Display tile choice
         //TODO should be a proper UI instead
-        this.tileText = game.add.bitmapText(32, 32, "m5x7", tileName[this.tileChoice], 48);
+        this.tileText = game.add.bitmapText(320, 450, "m5x7", tileName[this.tileChoice], 48);
+        this.tileText.anchor.x = 0.5;
         this.uiGroup.add(this.tileText);
-        
     },
 
     shutdown: function(){
@@ -224,30 +225,34 @@ GameplayState.prototype = {
 
         //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.ONE){
-            this.tileChoice = 0; //grass
+            gameplayState.tileChoice = 0; //grass
             //NOTE: Using the gameplayState variable feels like a bad idea
-            gameplayState.tileText.text = tileName[this.tileChoice];
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
         if(e.keyCode === Phaser.Keyboard.TWO){
-            this.tileChoice = 1; //sand
+            gameplayState.tileChoice = 1; //sand
             //NOTE: Using the gameplayState variable feels like a bad idea
-            gameplayState.tileText.text = tileName[this.tileChoice];
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
         if(e.keyCode === Phaser.Keyboard.THREE){
-            this.tileChoice = 2; //stone
+            gameplayState.tileChoice = 2; //stone
             //NOTE: Using the gameplayState variable feels like a bad idea
-            gameplayState.tileText.text = tileName[this.tileChoice];
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
         if(e.keyCode === Phaser.Keyboard.FOUR){
-            this.tileChoice = 4; //bridge
+            gameplayState.tileChoice = 4; //bridge
             //NOTE: Using the gameplayState variable feels like a bad idea
-            gameplayState.tileText.text = tileName[this.tileChoice];
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
 
         //Change the tile the player is standing on
         //BUG - placing the same tile again shouldn't do anything
         if(e.keyCode === Phaser.Keyboard.SPACEBAR){
-            Client.changeTile(this.tileChoice, gameplayState.player.facing);
+            Client.changeTile(gameplayState.tileChoice, gameplayState.player.facing);
         }
 
         //Interact with a treasure chest

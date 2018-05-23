@@ -22,6 +22,7 @@ MainMenuState.prototype = {
         game.load.image("arrowIcon", "./assets/img/arrow.png", 32, 32);
         game.load.image("soundIcon", "./assets/img/sound.png", 64, 32);
         game.load.image("inventoryUI", "./assets/img/inventory_ui.png", 48, 128);
+        game.load.image("highlightUI", "./assets/img/highlight_ui.png", 37, 34);
         //game.load.image("willowTree", "./assets/img/willowtree.png", 32, 32);
         
         game.load.image("raindrop", "assets/img/raindrop.png");

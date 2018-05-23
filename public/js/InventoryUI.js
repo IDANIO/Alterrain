@@ -7,19 +7,28 @@ function InventoryUI(game, x, y, key, frame){
     this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge"];
     
     this.stringMargin = 36;
-    this.countOffsetX = 50;
-    this.countOffsetY = 14;
+    this.countOffsetX = 58;
+    this.countOffsetY = 24;
+    this.highlightOffsetX = 37;
+    this.highlightOffsetY = 1;
+    
+    this.highlightUI = game.add.sprite(x + this.highlightOffsetX, y + this.highlightOffsetY, "highlightUI");
     
     //this.itemsText = game.add.text(x + 4, y + 4, "", this.textStyle);
     //this.itemsText = game.add.bitmapText(x + 50, y + 14, "m5x7", "", 32);
     this.itemsText = [];
     for(let i = 0; i < 9; i++){
-        this.itemsText[i] = game.add.bitmapText(x + (i * this.stringMargin) + this.countOffsetX, y + this.countOffsetY, "m5x7", "0", 32);
+        this.itemsText[i] = game.add.bitmapText(x + (i * this.stringMargin) + this.countOffsetX, y + this.countOffsetY, "m5x7", "0", 21);
     }
 }
 
 InventoryUI.prototype = Object.create(Phaser.Sprite.prototype);
 InventoryUI.prototype.constructor = InventoryUI;
+
+InventoryUI.prototype.updateHighlight = function(index){
+    console.log("index is " + index);
+    this.highlightUI.x = this.x + (index * this.stringMargin) + this.highlightOffsetX;
+}
 
 InventoryUI.prototype.updateDisplay = function(inventory){
     let tempText = "";

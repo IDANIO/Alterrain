@@ -149,7 +149,6 @@ var Client = {};
   };
 
   Client.changeTile = function (tileChoice, dir) {
-
     // check '/shared/constant.js'
     //
     //   MOVEMENT: 1,
