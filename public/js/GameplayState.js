@@ -164,7 +164,7 @@ GameplayState.prototype = {
         this.sandSound = game.add.audio("sandFootsteps");
         this.stoneSound = game.add.audio("stoneFootsteps");
         
-        this.tileSounds = [this.grassSound, this.sandSound, this.stoneSound, this.stoneSound];
+        this.tileSounds = [this.grassSound, this.sandSound, this.stoneSound];
     },
 
     //Adds a new player object to the world
@@ -313,7 +313,9 @@ GameplayState.prototype = {
         let sourceY = tileY * TILE_SIZE;
         //this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
         this.tileMap.putTile(tileType, tileX, tileY);
-        this.playSoundFrom(this.tileSounds[tileType], sourceX, sourceY);
+        if(this.tileSounds[tileType]){
+            this.playSoundFrom(this.tileSounds[tileType], sourceX, sourceY);
+        }
     },
 
     //Generates tile objects based on a given 2D tilemap

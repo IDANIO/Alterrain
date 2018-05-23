@@ -26,7 +26,6 @@ InventoryUI.prototype = Object.create(Phaser.Sprite.prototype);
 InventoryUI.prototype.constructor = InventoryUI;
 
 InventoryUI.prototype.updateHighlight = function(index){
-    console.log("index is " + index);
     this.highlightUI.x = this.x + (index * this.stringMargin) + this.highlightOffsetX;
 }
 
