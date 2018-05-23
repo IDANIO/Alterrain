@@ -158,6 +158,15 @@ GameplayState.prototype = {
         this.pickupLootSound = game.add.audio("pickupLootSound");
         this.treeCutSound = game.add.audio("treeCutSound");
         this.treeDestroyedSound = game.add.audio("treeDestroyedSound");
+        
+        this.grassFootsteps = game.add.audio("grassFootsteps");
+        this.grassFootsteps.volume = 0.4;
+        this.sandFootsteps = game.add.audio("sandFootsteps");
+        this.sandFootsteps.volume = 0.4;
+        this.stoneFootsteps = game.add.audio("stoneFootsteps");
+        this.stoneFootsteps.volume = 0.4;
+        
+        this.footstepSounds = [this.grassFootsteps, this.sandFootsteps, this.stoneFootsteps];
     },
 
     //Adds a new player object to the world
@@ -272,9 +281,16 @@ GameplayState.prototype = {
 
     //Moves the player to the given position
     movePlayer: function(id, x, y, d){
-        //this.playerMap[id].x = x;
-        //this.playerMap[id].y = y;
+       //this.playerMap[id].x = x;
+       //this.playerMap[id].y = y;
       // console.log(`${x},${y},${d}`)
+      
+      //Play corresponding footstep sound
+      let nextTile = this.tileMap.getTile(x, y);
+      if(this.footstepSounds[nextTile.index]){
+          this.footstepSounds[nextTile.index].play();
+      }
+      
       this.playerMap[id].setDirection(d);
         if(this.playerMap[id].ableToMove()){
             this.playerMap[id].moveTo(x * TILE_SIZE, y * TILE_SIZE);

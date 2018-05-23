@@ -33,6 +33,10 @@ MainMenuState.prototype = {
         
         game.load.audio("treeCutSound", ["assets/audio/chop01.ogg", "assets/audio/chop01.mp3"]);
         game.load.audio("treeDestroyedSound", ["assets/audio/creak01.ogg", "assets/audio/creak01.mp3"]);
+        
+        game.load.audio("grassFootsteps", ["assets/audio/grass_footsteps.ogg", "assets/audio/grass_footsteps.mp3"]);
+        game.load.audio("sandFootsteps", ["assets/audio/sand_footsteps.ogg", "assets/audio/sand_footsteps.mp3"]);
+        game.load.audio("stoneFootsteps", ["assets/audio/stone_footsteps.ogg", "assets/audio/stone_footsteps.mp3"]);
     },
 
     create: function(){        
