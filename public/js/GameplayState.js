@@ -159,14 +159,11 @@ GameplayState.prototype = {
         this.treeCutSound = game.add.audio("treeCutSound");
         this.treeDestroyedSound = game.add.audio("treeDestroyedSound");
         
-        this.grassFootsteps = game.add.audio("grassFootsteps");
-        this.grassFootsteps.volume = 0.4;
-        this.sandFootsteps = game.add.audio("sandFootsteps");
-        this.sandFootsteps.volume = 0.4;
-        this.stoneFootsteps = game.add.audio("stoneFootsteps");
-        this.stoneFootsteps.volume = 0.4;
+        this.grassSound = game.add.audio("grassFootsteps");
+        this.sandSound = game.add.audio("sandFootsteps");
+        this.stoneSound = game.add.audio("stoneFootsteps");
         
-        this.footstepSounds = [this.grassFootsteps, this.sandFootsteps, this.stoneFootsteps];
+        this.tileSounds = [this.grassSound, this.sandSound, this.stoneSound, this.stoneSound];
     },
 
     //Adds a new player object to the world
@@ -285,7 +282,7 @@ GameplayState.prototype = {
        //this.playerMap[id].y = y;
       // console.log(`${x},${y},${d}`)
       
-      //Play corresponding footstep sound
+      /*//Play corresponding footstep sound
       if(this.playerMap[id] === this.player){
           let nextTile = this.tileMap.getTile(x, y);
           if(this.footstepSounds[nextTile.index]){
@@ -293,7 +290,7 @@ GameplayState.prototype = {
                 this.footstepSounds[nextTile.index].play();
               }
           }
-      }
+      }*/
       
       this.playerMap[id].setDirection(d);
         if(this.playerMap[id].ableToMove()){
@@ -309,8 +306,9 @@ GameplayState.prototype = {
         }
         let sourceX = tileX * TILE_SIZE;
         let sourceY = tileY * TILE_SIZE;
-        this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
+        //this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
         this.tileMap.putTile(tileType, tileX, tileY);
+        this.playSoundFrom(this.tileSounds[tileType], sourceX, sourceY);
     },
 
     //Generates tile objects based on a given 2D tilemap
