@@ -334,7 +334,7 @@ GameplayState.prototype = {
     generateSolidObjects: function(objectMap){
         for(let i = 0; i < objectMap.length; i++){
             for(let j = 0; j < objectMap[i].length; j++){
-                this.placeSolidObject(objectMap[i][j], i, j);
+                this.placeSolidObject(objectMap[i][j], i, j, objectMap[i][j].durability);
             }
         }
     },
@@ -343,7 +343,8 @@ GameplayState.prototype = {
     spawnTreasureChests: function(arr){
         for(let i = 0; i < arr.length; i++){
             this.objectMap[arr[i].x][arr[i].y] = new Treasure(game, arr[i].x * TILE_SIZE, arr[i].y * TILE_SIZE, "treasureChest");
-            //TODO check if the treasure chest requires more than 1 player to open to set the correct sprite
+            this.objectMap[arr[i].x][arr[i].y].setState(arr[i].state);
+            this.objectMap[arr[i].x][arr[i].y].setSize(arr[i].playerRequired);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
         }
     },
@@ -351,9 +352,10 @@ GameplayState.prototype = {
     //Helper function for placing individual solid objects
     //0 === trees
     //1 === rocks
-    placeSolidObject: function(objectType, tileX, tileY){
+    placeSolidObject: function(objectType, tileX, tileY, objectState){
         if(objectType === 0){
             this.objectMap[tileX][tileY] = new Tree(game, tileX * TILE_SIZE, tileY * TILE_SIZE, "willowTree");
+            this.objectMap[tileX][tileY].setState(objectState);
             this.solidObjectsGroup.add(this.objectMap[tileX][tileY]);
         }
         //Unfinished
@@ -371,7 +373,7 @@ GameplayState.prototype = {
             if(state === 0){
                 console.log("Treasure found by unique player");
                 //TODO play unlocking sound
-                //treasureChest.frame--;
+                treasureChest.frame--;
             }
             //Old player tried to interact with treasure chest, nothing happens
             if(state === 1){
@@ -380,9 +382,12 @@ GameplayState.prototype = {
             }
             //Treasure chest's last lock opened
             if(state === 2){
-                console.log("Treasure found by LAST unique player. Treasure is now open.");
-                treasureChest.frame = 0;
+                treasureChest.frame = 1;
                 this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+            }
+            if(state == 3){
+                treasureChest.frame = 0;
+                //TODO play looting sound
             }
             // this.objectMap[tileX][tileY].unlock(state);
         }

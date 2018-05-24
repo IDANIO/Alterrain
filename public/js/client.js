@@ -52,7 +52,7 @@ var Client = {};
       gameplayState.generateTiles(data.tiles);
       //-Ivan's change -------------------------------------------------------//
       data.solidObjects.forEach(function (tree) {
-        gameplayState.placeSolidObject(0, tree.x, tree.y);
+        gameplayState.placeSolidObject(0, tree.x, tree.y, tree.durability);
       });
 
       //-Original-------------------------------------------------------------//
