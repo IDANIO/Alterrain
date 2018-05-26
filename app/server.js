@@ -191,7 +191,12 @@ class Server {
     // TODO: Refactor SUBJECT to change
     // TODO: Refactor SUBJECT to change
     let chests = this.world.getChestPosArray().map((chest) => {
-      return {x: chest._x, y: chest._y, playerRequired: chest.playerRequired, state: chest.state};
+      return {
+        x: chest._x,
+        y: chest._y,
+        playerRequired: chest.playerRequired,
+        state: chest.state,
+      };
     });
 
     let trees = this.world.getTreePosArray().map((tree) => {
