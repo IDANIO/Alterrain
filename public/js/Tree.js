@@ -13,4 +13,13 @@ Tree.prototype.constructor = Tree;
 
 Tree.prototype.cutDown = function(){
     this.frame = 1;
-}
+};
+
+Tree.prototype.setState = function(hitpoints){
+    if(hitpoints <= 0){
+        this.frame = 1;
+    }
+    else{
+        this.frame = 0;
+    }
+};

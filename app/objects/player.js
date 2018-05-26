@@ -14,7 +14,7 @@ class Player extends Character {
      * Initialized to zero.
      * @type {Array.<Number>} Key: Tiles Enum. Value: item count.
      */
-    this.inventory = Array(...Array(4)).map(Number.prototype.valueOf, 0);
+    this.inventory = Array(...Array(5)).map(Number.prototype.valueOf, 0);
   }
 
   /**

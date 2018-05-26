@@ -191,11 +191,16 @@ class Server {
     // TODO: Refactor SUBJECT to change
     // TODO: Refactor SUBJECT to change
     let chests = this.world.getChestPosArray().map((chest) => {
-      return {x: chest._x, y: chest._y};
+      return {
+        x: chest._x,
+        y: chest._y,
+        playerRequired: chest.playerRequired,
+        state: chest.state,
+      };
     });
 
     let trees = this.world.getTreePosArray().map((tree) => {
-      return {x: tree._x, y: tree._y};
+      return {x: tree._x, y: tree._y, durability: tree.durability};
     });
 
     socket.emit('initWorld', {
