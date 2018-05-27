@@ -1,6 +1,8 @@
 //The main menu state
 var MainMenuState = function(game){
     //this.textStyle = {font: "32px Arial", fill: "#FFF"};
+    this.joinTextY = 300;
+    this.controlsTextY = 360;
 };
 
 MainMenuState.prototype = {
@@ -23,6 +25,7 @@ MainMenuState.prototype = {
         game.load.image("soundIcon", "./assets/img/sound.png", 64, 32);
         game.load.image("inventoryUI", "./assets/img/inventory_ui.png", 48, 128);
         game.load.image("highlightUI", "./assets/img/highlight_ui.png", 37, 34);
+        game.load.image("menuHighlight", "./assets/img/menu_highlight.png");
         //game.load.image("willowTree", "./assets/img/willowtree.png", 32, 32);
         
         game.load.image("raindrop", "assets/img/raindrop.png");
@@ -44,16 +47,43 @@ MainMenuState.prototype = {
         this.titleText = game.add.bitmapText(GAME_WIDTH / 2, 180, "m5x7", "Alterrain", 64);
         this.titleText.anchor.setTo(0.5);
         
-        this.promptText = game.add.bitmapText(GAME_WIDTH / 2, 300, "m5x7", "Press Space to Join", 64);
-        this.promptText.anchor.setTo(0.5);
+        this.joinText = game.add.bitmapText(GAME_WIDTH / 2, this.joinTextY, "m5x7", "Join Game", 48);
+        this.joinText.anchor.setTo(0.5);
+        
+        this.controlsText = game.add.bitmapText(GAME_WIDTH / 2, this.controlsTextY, "m5x7", "Controls", 48);
+        this.controlsText.anchor.setTo(0.5);
+        
+        this.menuHighlight = game.add.sprite(GAME_WIDTH / 2, this.joinTextY - 8, "menuHighlight");
+        this.menuHighlight.anchor.setTo(0.5);
+        this.menuChoice = 0;
 
         //Center the game
         game.scale.pageAlignHorizontally = true;
     },
 
     update: function(){
+        //Switch between controls
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.UP)){
+            if(this.menuChoice === 1){
+                this.menuChoice = 0;
+                this.menuHighlight.y = this.joinTextY - 8;
+            }
+        }
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.DOWN)){
+            if(this.menuChoice === 0){
+                this.menuChoice = 1;
+                this.menuHighlight.y = this.controlsTextY - 8;
+            }
+        }
+        
+        //Select a menu option
         if(game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR)){
-            game.state.start("GameplayState");
+            if(this.menuChoice === 0){
+                game.state.start("GameplayState");
+            }
+            else if(this.menuChoice === 1){
+                game.state.start("ControlsState");
+            }
         }
     }
 }
