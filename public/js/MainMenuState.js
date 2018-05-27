@@ -44,7 +44,7 @@ MainMenuState.prototype = {
         this.titleText = game.add.bitmapText(GAME_WIDTH / 2, 180, "m5x7", "Alterrain", 64);
         this.titleText.anchor.setTo(0.5);
         
-        this.promptText = game.add.bitmapText(GAME_WIDTH / 2, 300, "m5x7", "Press Enter to Join", 64);
+        this.promptText = game.add.bitmapText(GAME_WIDTH / 2, 300, "m5x7", "Press Space to Join", 64);
         this.promptText.anchor.setTo(0.5);
 
         //Center the game
@@ -52,7 +52,7 @@ MainMenuState.prototype = {
     },
 
     update: function(){
-        if(game.input.keyboard.justPressed(Phaser.Keyboard.ENTER)){
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR)){
             game.state.start("GameplayState");
         }
     }
