@@ -24,11 +24,6 @@ class GameObject {
      * @private
      */
     this._y = y;
-
-    // setup event handler
-    this.world.on('world_update', (dt) => {
-      this.onUpdate(dt);
-    });
   }
 
   /**

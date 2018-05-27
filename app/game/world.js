@@ -276,6 +276,11 @@ class World {
    */
   removeObject(object) {
     this.objectContainer.remove(object);
+
+    this.server.io.emit('objectRemoval', {
+      x: object._x,
+      y: object._y,
+    });
   }
 
   /**
@@ -306,7 +311,7 @@ class World {
    * @param dt{Number}
    */
   step(dt) {
-    this.emit('world_update', dt);
+    this.objectContainer.update(dt);
 
     // update all players.
     this.players.forEach((character) => {

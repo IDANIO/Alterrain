@@ -91,33 +91,38 @@ var Client = {};
     /**
      * @param data {Object} An object with the x and y index of the chest and its state
      */
-    Client.socket.on("chestUpdate", function (data){
+    Client.socket.on('chestUpdate', function (data){
       gameplayState.interactWithChest(data.x, data.y, data.state);
     });
-    
+
+    Client.socket.on('objectRemoval', function (data) {
+      console.log('Object deleted..');
+      gameplayState.deleteObjectAt(data.x, data.y);
+    });
+
     /**
      * @param data {Object}
      * @param data.id {Number} The player's ID
      * @param data.inventory {Array} The player's inventory
      */
-    Client.socket.on("inventoryUpdate", function (data){
+    Client.socket.on('inventoryUpdate', function (data){
       gameplayState.updatePlayerInventory(data.id, data.inventory);
     });
-    
+
     /**
      * @param data {Object}
      * @param data.x {Number} The tree's x position in tiles
      * @param data.y {Number} The tree's y position in tiles
      * @param data.durability {Number} The tree's remaining hitpoints
      */
-    Client.socket.on("treeCut", function (data){
+    Client.socket.on('treeCut', function (data){
       gameplayState.cutTree(data.x, data.y, data.durability);
     });
-    
+
     /**
      * @param data {Number} The weather type
      */
-    Client.socket.on("weatherChange", function (data){
+    Client.socket.on('weatherChange', function (data){
       gameplayState.startWeatherEffect(data);
     });
   };
