@@ -185,6 +185,9 @@ class Server {
 
     this.world.addPlayer(newX, newY, playerEvent.playerId);
 
+    const TileObject = require('./objects/tile_object.js');
+    let obj = new TileObject(this.world, newX, newY, 4);
+
     let objects = [];
     this.world.players.forEach((player) => {
       objects.push({

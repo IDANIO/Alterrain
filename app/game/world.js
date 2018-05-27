@@ -100,7 +100,7 @@ class World {
    * @private
    */
   setupEventEmitter() {
-    let emitter = new EventEmitter();
+    const emitter = new EventEmitter();
 
     /**
      * @type {Function}

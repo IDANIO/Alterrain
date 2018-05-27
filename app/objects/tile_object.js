@@ -41,7 +41,7 @@ class TileObject extends GameObject {
   /**
    * @abstract
    */
-  onRain() { console.log('good') }
+  onRain() { }
 
   /**
    * @abstract
