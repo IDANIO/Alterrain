@@ -6,6 +6,12 @@ function InventoryUI(game, x, y, key, frame){
     //this.textStyle = {font: "16px Arial", fill: "#FFF"};
     this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge"];
     
+    //Specific index of each tile in the inventory
+    this.GRASS_TILE = 0;
+    this.SAND_TILE = 1;
+    this.STONE_TILE = 2;
+    this.BRIDGE_TILE = 3;
+    
     this.stringMargin = 36;
     this.countOffsetX = 58;
     this.countOffsetY = 24;
@@ -32,7 +38,14 @@ InventoryUI.prototype.updateHighlight = function(index){
 InventoryUI.prototype.updateDisplay = function(inventory){
     let tempText = "";
     for(let i = 0; i < inventory.length; i++){
-        this.itemsText[i].text = inventory[i];
+        let tileIndex = -1;
+        //Hacky solution
+        if(i <= 3){
+            this.itemsText[i].text = inventory[i];
+        }
+        else{
+            this.itemsText[i-1].text = inventory[i];
+        }
         //if(inventory[i] > 0){
             //this.items.push([this.tileName[i] + ": x" + inventory[i]]);
             //tempText += this.tileName[i] + " x" + inventory[i] + "\n";

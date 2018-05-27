@@ -258,7 +258,7 @@ GameplayState.prototype = {
             gameplayState.tileChoice = 4; //bridge
             //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[gameplayState.tileChoice];
-            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
         }
 
         //Change the tile the player is standing on
