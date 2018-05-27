@@ -17,6 +17,8 @@ function InventoryUI(game, x, y, key, frame){
     this.countOffsetY = 24;
     this.highlightOffsetX = 37;
     this.highlightOffsetY = 1;
+    this.numbersOffsetX = 52;
+    this.numbersOffsetY = -6;
     
     this.highlightUI = game.add.sprite(x + this.highlightOffsetX, y + this.highlightOffsetY, "highlightUI");
     
@@ -25,6 +27,11 @@ function InventoryUI(game, x, y, key, frame){
     this.itemsText = [];
     for(let i = 0; i < 9; i++){
         this.itemsText[i] = game.add.bitmapText(x + (i * this.stringMargin) + this.countOffsetX, y + this.countOffsetY, "m5x7", "0", 21);
+    }
+    
+    this.numbersText = [];
+    for(let i = 0; i < 9; i++){
+        this.numbersText[i] = game.add.bitmapText(x + (i * this.stringMargin) + this.numbersOffsetX, y + this.numbersOffsetY, "m5x7", (i + 1) + "", 21);
     }
 }
 
