@@ -235,7 +235,7 @@ class Server {
     // Remove from Game World
     let player = this.connectedPlayers.get(socket.id);
     if (player) {
-      this.world.removeObject(player.playerId);
+      this.world.removePlayer(player.playerId);
     } else {
       logger.error('should not happen');
     }

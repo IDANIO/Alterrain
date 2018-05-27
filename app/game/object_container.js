@@ -62,7 +62,20 @@ class ObjectContainer {
     }
   }
 
-  remove() {
+  /**
+   * @param object {GameObject}
+   * @return {boolean}
+   */
+  remove(object) {
+    let arr = this.tree.find((elt) => elt.object === object);
+    let success = false;
+
+    arr.forEach((elt)=>{
+      this.tree.remove(elt);
+      success = true;
+    });
+
+    return success;
   }
 
   debugPrint() {

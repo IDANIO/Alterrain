@@ -28,6 +28,8 @@ class World {
    * @param filename {String=}
    */
   constructor(server, filename) {
+    this.setupEventEmitter();
+
     /**
      * @type {Server}
      */
@@ -79,7 +81,10 @@ class World {
     this.weatherDuration = WorldConfig.WEATHER_DURATION;
 
     this.initWorldData(filename);
-    this.setupEventEmitter();
+
+    this.on('objectRemoval', (obj) => {
+      this.removeObject(obj);
+    });
   }
 
   /**
@@ -101,6 +106,7 @@ class World {
    */
   setupEventEmitter() {
     const emitter = new EventEmitter();
+    emitter.setMaxListeners(0);
 
     /**
      * @type {Function}
@@ -261,8 +267,15 @@ class World {
    * @param playerId {Number}
    * @return {boolean}
    */
-  removeObject(playerId) {
+  removePlayer(playerId) {
     return this.players.delete(playerId);
+  }
+
+  /**
+   * @param object {GameObject}
+   */
+  removeObject(object) {
+    this.objectContainer.remove(object);
   }
 
   /**
@@ -293,6 +306,8 @@ class World {
    * @param dt{Number}
    */
   step(dt) {
+    this.emit('world_update', dt);
+
     // update all players.
     this.players.forEach((character) => {
       character.update();

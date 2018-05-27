@@ -11,8 +11,19 @@ class Tree extends GameObject {
 
     this.durability = util.integerInRange(1, 4);
 
+    this.removeCount = 5 * 60; // 30 * 60;
+
     // TODO: temp, later change this to WOOD
     this.loot = Tiles.GRASS;
+  }
+
+  onUpdate(dt) {
+    if (this.durability <= 0) {
+      this.removeCount--;
+    }
+    if (this.removeCount <= 0) {
+      this.world.emit('objectRemoval', this);
+    }
   }
 
   onInteraction(player) {

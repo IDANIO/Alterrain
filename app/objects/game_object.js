@@ -24,6 +24,11 @@ class GameObject {
      * @private
      */
     this._y = y;
+
+    // setup event handler
+    this.world.on('world_update', (dt) => {
+      this.onUpdate(dt);
+    });
   }
 
   /**
@@ -53,8 +58,9 @@ class GameObject {
 
   /**
    * Called when the game world steps.
+   * @param {Number} dt
    */
-  onUpdate() { }
+  onUpdate(dt) { }
 
   /**
    * Called when the object is spawned to the world.
