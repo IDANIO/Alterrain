@@ -48,6 +48,6 @@ exports.ServerConfig = {
 exports.WorldConfig = {
   WIDTH: 64,
   HEIGHT: 64,
-  WEATHER_DURATION: (1000), // 3 min in millisecond
+  WEATHER_DURATION: (60 * 1000), // 1 min in millisecond
 };
 

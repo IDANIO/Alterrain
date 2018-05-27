@@ -215,7 +215,7 @@ class World {
   changeTile(x, y, tileId = Tiles.GRASS) {
     if (!this.isValidTile(x, y)) {
       logger.error(`Invalid tile position at (${x},${y})`);
-      return;
+      return false;
     }
 
     logger.debug(`Tile at (${x}, ${y}) is changed to ${tileId}.`);
@@ -226,7 +226,11 @@ class World {
       this.server.io.emit('worldUpdate', {
         tiles: [[x, y, tileId]],
       });
+
+      return true;
     }
+
+    return false;
   }
 
   /**
