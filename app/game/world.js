@@ -220,11 +220,13 @@ class World {
 
     logger.debug(`Tile at (${x}, ${y}) is changed to ${tileId}.`);
 
-    this.tilemap.setTile(x, y, tileId);
+    if (this.tilemap.getTileAt(x, y) !== tileId) {
+      this.tilemap.setTile(x, y, tileId);
 
-    this.server.io.emit('worldUpdate', {
-      tiles: [[x, y, tileId]],
-    });
+      this.server.io.emit('worldUpdate', {
+        tiles: [[x, y, tileId]],
+      });
+    }
   }
 
   /**
