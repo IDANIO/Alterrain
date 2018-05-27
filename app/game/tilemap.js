@@ -148,12 +148,12 @@ class Tilemap {
       }
       return 0; // grass
     }
-    if (e <= this.stoneMax) {
-      if(m < this.snowRatio){
-        return 2; // TODO snow
-      }
-      return 2; // stone
+    //if (e <= this.stoneMax) {
+    if(m < this.snowRatio){
+      return 2; // TODO snow
     }
+    return 2; // stone
+    //}
   }
   
   /**

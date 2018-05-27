@@ -1,5 +1,5 @@
-var WORLD_WIDTH = 128;
-var WORLD_HEIGHT = 128;
+var WORLD_WIDTH = 64;
+var WORLD_HEIGHT = 64;
 
 //The main menu state
 var GameplayState = function(game){
@@ -143,6 +143,15 @@ GameplayState.prototype = {
         this.weatherEffects[1] = this.rainEmitter;
         this.rainEmitter.start(false, 2000, 10);
         this.rainEmitter.on = false;
+    },
+    
+    startWeatherEffect: function(weatherType){
+        if(weatherType === 0){ //no weather
+            this.stopRainEffect();
+        }
+        else if(weatherType === 1){
+            this.startRainEffect();
+        }
     },
     
     startRainEffect: function(){
