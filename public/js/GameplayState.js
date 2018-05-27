@@ -323,11 +323,11 @@ GameplayState.prototype = {
         }
         let sourceX = tileX * TILE_SIZE;
         let sourceY = tileY * TILE_SIZE;
-        //this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
+        this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
         this.tileMap.putTile(tileType, tileX, tileY);
-        if(this.tileSounds[tileType]){
-            this.playSoundFrom(this.tileSounds[tileType], sourceX, sourceY);
-        }
+        //if(this.tileSounds[tileType]){
+            //this.playSoundFrom(this.tileSounds[tileType], sourceX, sourceY);
+        //}
     },
 
     //Generates tile objects based on a given 2D tilemap
@@ -375,6 +375,13 @@ GameplayState.prototype = {
             this.objectMap[tileX][tileY] = new Rock(game, tileX * TILE_SIZE, tileY * TILE_SIZE);
             game.add.existing(this.objectMap[tileX][tileY]);
         }*/
+    },
+    
+    //Delete an object at a given tile position
+    deleteObjectAt: function(tileX, tileY){
+        if(this.objectMap[tileX][tileY]){
+            this.objectMap[tileX][tileY].destroy();
+        }
     },
 
     //Interact with a specific treasure chest
