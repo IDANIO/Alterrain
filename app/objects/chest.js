@@ -12,7 +12,7 @@ class Chest extends GameObject {
 
     this.state = Chest.STATE_LOCKED;
 
-    this.loots = [Tiles.STONE, Tiles.SAND];
+    this.loots = [Tiles.BRIDGE, Tiles.STONE, Tiles.SAND];
     this.playerRequired = 1;
     this.playerHistory = [];
   }
@@ -29,7 +29,7 @@ class Chest extends GameObject {
    */
   awardPlayer(player) {
     let item = util.pick(this.loots);
-    player.gainItem(item, 1);
+    player.gainItem(item, 3);
   }
 
   /**

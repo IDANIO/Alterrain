@@ -20,6 +20,7 @@ exports.Tiles = {
   SAND: 1,
   STONE: 2,
   WATER: 3,
+  BRIDGE: 4,
 };
 
 /**
@@ -30,6 +31,7 @@ exports.TileData = [
   0,
   0,
   1,
+  0,
 ];
 
 /**
