@@ -87,6 +87,9 @@ GameplayState.prototype = {
             this.uiGroup.add(this.playerInventoryUI.itemsText[i]);
         }
         this.uiGroup.add(this.playerInventoryUI.highlightUI);
+        for(let i = 0; i < this.playerInventoryUI.itemsText.length; i++){
+            this.uiGroup.add(this.playerInventoryUI.numbersText[i]);
+        }
         //this.uiGroup.add(this.playerInventoryUI.itemsText);
 
         //Display tile choice
