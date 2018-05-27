@@ -306,6 +306,9 @@ class World {
 
       this.emit('weatherChange', this.currentWeather);
 
+      // TODO: Refactor
+      this.server.io.emit('weatherChange', this.currentWeather);
+
       logger.data(`World Weather has changed to ${this.currentWeather}.`);
     }
   }
