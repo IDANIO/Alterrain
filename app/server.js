@@ -75,8 +75,20 @@ class Server {
    */
   start() {
     const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
-    this.intervalGameTick = setInterval(this.step.bind(this), intervalDelta);
+
     this.serverStartTime = (new Date().getTime());
+
+    this.lastServerTime = this.serverStartTime;
+
+    this.intervalGameTick = setInterval(() => {
+      let elapsed = (new Date().getTime());
+
+      const dt = elapsed - this.lastServerTime;
+
+      this.step(dt);
+
+      this.lastServerTime = elapsed;
+    }, intervalDelta);
   }
 
   /**
@@ -85,11 +97,8 @@ class Server {
    * @param {Number=} dt - elapsed time since last step was called.
    */
   step(dt) {
-    this.serverTime = (new Date().getTime());
-
     let step = ++this.world.stepCount;
 
-    // logger.info(`[${step}] ${this.serverTime - this.serverStartTime}`);
     // this.emit('preStep', {step, dt});
 
     // process input commands together.
@@ -102,7 +111,6 @@ class Server {
 
     // Main Game Update Goes Here
     this.world.step(dt);
-
 
     // this.emit('postStep', {step});
   }
@@ -175,7 +183,7 @@ class Server {
     playerEvent.x = newX;
     playerEvent.y = newY;
 
-    this.world.addObject(newX, newY, playerEvent.playerId);
+    this.world.addPlayer(newX, newY, playerEvent.playerId);
 
     let objects = [];
     this.world.players.forEach((player) => {

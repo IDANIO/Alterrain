@@ -5,6 +5,8 @@ const fs = require('fs');
 
 const EventEmitter = require('events');
 
+const util = require('../util.js');
+
 const Tilemap = require('./tilemap.js');
 const ObjectContainer = require('./object_container.js');
 
@@ -64,6 +66,18 @@ class World {
      */
     this.tilemap = null;
 
+    /**
+     * @type {World.WEATHER|number}
+     */
+    this.currentWeather = World.WEATHER.DRY;
+
+    /**
+     * @type {number}
+     */
+    this.weatherCount = 0;
+
+    this.weatherDuration = WorldConfig.WEATHER_DURATION;
+
     this.initWorldData(filename);
     this.setupEventEmitter();
   }
@@ -88,7 +102,14 @@ class World {
   setupEventEmitter() {
     let emitter = new EventEmitter();
 
+    /**
+     * @type {Function}
+     */
     this.on = emitter.on;
+
+    /**
+     * @type {Function}
+     */
     this.once = emitter.once;
     this.removeListener = emitter.removeListener;
 
@@ -142,8 +163,8 @@ class World {
     // TODO: Very bad implementation
     for (let i = 0; i < 50; ++i) {
       do {
-        newX = Math.floor(Math.random() * WorldConfig.WIDTH);
-        newY = Math.floor(Math.random() * WorldConfig.HEIGHT);
+        newX = Math.floor(Math.random() * this.width);
+        newY = Math.floor(Math.random() * this.height);
       } while (!this.isPassable(newX, newY, 2));
 
       let chest = new Chest(this, newX, newY);
@@ -181,7 +202,7 @@ class World {
    * @param playerId {Number}
    * @return {Map<Number, Character>}
    */
-  addObject(x, y, playerId) {
+  addPlayer(x, y, playerId) {
     let player = new Player(this, x, y, playerId);
     return this.players.set(playerId, player);
   }
@@ -266,9 +287,27 @@ class World {
    * @param dt{Number}
    */
   step(dt) {
+    // update all players.
     this.players.forEach((character) => {
       character.update();
     });
+
+    // update weather
+    this.weatherCount += dt;
+    if (this.weatherCount >= this.weatherDuration) {
+      this.weatherCount = 0;
+
+      this.currentWeather = util.pick([
+        World.WEATHER.DRY,
+        World.WEATHER.RAIN,
+        World.WEATHER.BLIZZARD,
+        World.WEATHER.SANDSTORM,
+      ]);
+
+      this.emit('weatherChange', this.currentWeather);
+
+      logger.data(`World Weather has changed to ${this.currentWeather}.`);
+    }
   }
 
   /**
@@ -278,5 +317,17 @@ class World {
     command();
   }
 }
+
+/**
+ * @const
+ * @enum
+ * @type {{DRY: number, RAIN: number, BLIZZARD: number, SANDSTORM: number}}
+ */
+World.WEATHER = {
+  DRY: 0,
+  RAIN: 1,
+  BLIZZARD: 2,
+  SANDSTORM: 3,
+};
 
 module.exports = World;

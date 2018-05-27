@@ -16,16 +16,16 @@ class Tree extends GameObject {
   }
 
   onInteraction(player) {
-    if(this.durability >= 0){
+    if (this.durability >= 0) {
       this.durability--;
     }
     if (this.durability === 0) {
       player.gainItem(this.loot, util.integerInRange(1, 2));
     }
-    this.world.server.io.emit("treeCut", {
+    this.world.server.io.emit('treeCut', {
       x: this._x,
       y: this._y,
-      durability: this.durability
+      durability: this.durability,
     });
   }
 }
