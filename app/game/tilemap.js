@@ -51,15 +51,24 @@ class Tilemap {
 
     this.generateTerrain();
   }
-  
-  generateTerrain() {
-    this.generateNoise(this.heightmap, this.world.width, this.world.height, this.frequency);
-    this.islandMask1 = this.generateIslandMask(this.world.width, this.world.height, 8, 8, 9, 9);
-    this.islandMask2 = this.generateIslandMask(this.world.width, this.world.height, 96, 8, 97, 9);
-    this.islandMask3 = this.generateIslandMask(this.world.width, this.world.height, 64, 96, 65, 97);
-    this.blendMasks(this.heightmap, [this.islandMask1, this.islandMask2, this.islandMask3]);
 
-    this.generateNoise(this.moisture, this.world.width, this.world.height,this.frequency);
+  generateTerrain() {
+    this.generateNoise(this.heightmap, this.world.width,
+      this.world.height, this.frequency);
+
+    this.islandMask1 = this.generateIslandMask(this.world.width,
+      this.world.height, 8, 8, 9, 9);
+    this.islandMask2 = this.generateIslandMask(this.world.width,
+      this.world.height, 96, 8, 97, 9);
+    this.islandMask3 = this.generateIslandMask(this.world.width,
+      this.world.height, 64, 96, 65, 97);
+
+    this.blendMasks(this.heightmap,
+      [this.islandMask1, this.islandMask2, this.islandMask3]);
+
+    this.generateNoise(this.moisture, this.world.width,
+      this.world.height, this.frequency);
+
     this.generateTileMap(this.data, this.heightmap, this.moisture);
   }
 
@@ -134,28 +143,28 @@ class Tilemap {
       return 3; // water
     }
     if (e < this.sandMax) {
-      if(m < this.beachRatio){
+      if (m < this.beachRatio) {
         return 1; // sand
       }
       return 0; // grass
     }
     if (e < this.grassMax) {
-      if(m < this.desertRatio){
+      if (m < this.desertRatio) {
         return 1; // TODO desert
       }
-      if(m < this.forestRatio){
+      if (m < this.forestRatio) {
         return 0; // TODO forest
       }
       return 0; // grass
     }
-    //if (e <= this.stoneMax) {
-    if(m < this.snowRatio){
+    // if (e <= this.stoneMax) {
+    if (m < this.snowRatio) {
       return 2; // TODO snow
     }
     return 2; // stone
-    //}
+    // }
   }
-  
+
   /**
    * Returns a 2D array of a circular gradient
    * @param width The width of the 2D array
@@ -185,38 +194,39 @@ class Tilemap {
     }
     return maskArray;
   }
-  
-  blendMasks(arr, masks){
+
+  blendMasks(arr, masks) {
     let blendMap = [];
     for (let i = 0; i < arr[0].length; i++) {
       blendMap[i] = [];
     }
     let blendMapMax = -10;
     let blendMapMin = 10;
-    for(let i = 0; i < arr.length; i++){
-      for(let j = 0; j < arr[i].length; j++){
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr[i].length; j++) {
         let blendValue = 1;
-        for(let n = 0; n < masks.length; n++){
+        for (let n = 0; n < masks.length; n++) {
           blendValue *= masks[n][i][j];
         }
-        if(blendValue > blendMapMax){
+        if (blendValue > blendMapMax) {
           blendMapMax = blendValue;
         }
-        if(blendValue < blendMapMin){
+        if (blendValue < blendMapMin) {
           blendMapMin = blendValue;
         }
         blendMap[i][j] = blendValue;
       }
     }
 
-    for(let i = 0; i < blendMap.length; i++){
-      for(let j = 0; j < blendMap[i].length; j++){
-        blendMap[i][j] = (blendMap[i][j] - blendMapMin) / (blendMapMax - blendMapMin);
+    for (let i = 0; i < blendMap.length; i++) {
+      for (let j = 0; j < blendMap[i].length; j++) {
+        blendMap[i][j] = (blendMap[i][j] - blendMapMin) /
+          (blendMapMax - blendMapMin);
       }
     }
 
-    for(let i = 0; i < arr.length; i++){
-      for(let j = 0; j < arr[i].length; j++){
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr[i].length; j++) {
         arr[i][j] -= blendMap[i][j];
       }
     }
