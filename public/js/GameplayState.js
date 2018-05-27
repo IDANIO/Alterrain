@@ -1,3 +1,6 @@
+var WORLD_WIDTH = 128;
+var WORLD_HEIGHT = 128;
+
 //The main menu state
 var GameplayState = function(game){
     //Create a playerMap property
@@ -7,7 +10,7 @@ var GameplayState = function(game){
 
     //Create a 2D array for solid objects
     this.objectMap = [];
-    for(let i = 0; i < 64; i++){ //TODO use a constant instead of 64 to reference the world size
+    for(let i = 0; i < WORLD_HEIGHT; i++){ //TODO use a constant instead of 64 to reference the world size
         this.objectMap[i] = [];
     }
     
@@ -48,13 +51,13 @@ GameplayState.prototype = {
 
         //Set up and create the world tilemap
         //TODO use constants instead of hard-coded numbers
-        game.world.setBounds(0, 0, 64 * TILE_SIZE, 64 * TILE_SIZE);
+        game.world.setBounds(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE);
         this.tileGroup = game.add.group();
         this.tileMap = game.add.tilemap();
         this.tileMap.setTileSize(TILE_SIZE, TILE_SIZE);
         this.tileMap.addTilesetImage("gameTileset");
         //new Tilemap(layerName, widthInTiles, heightInTiles, tileWidth, tileHeight)
-        this.mainLayer = this.tileMap.create("mainLayer", 64, 64, TILE_SIZE, TILE_SIZE);
+        this.mainLayer = this.tileMap.create("mainLayer", WORLD_WIDTH, WORLD_HEIGHT, TILE_SIZE, TILE_SIZE);
 
         //TODO need to optimize later
         this.tileChoice = 0;
