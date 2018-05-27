@@ -41,7 +41,7 @@ var Client = {};
      * @param data.chests {Array} A 1D array of the treasure chests in the world.
      */
     Client.socket.on('initWorld', function (data) {
-      console.log(data);
+      //console.log(data);
       var players = data.players;
       for (var i = 0; i < players.length; i++) {
         gameplayState.addNewPlayer(players[i].id, players[i].x, players[i].y)
@@ -59,8 +59,8 @@ var Client = {};
       // gameplayState.generateSolidObjects(data.solidObjects);
       //----------------------------------------------------------------------//
 
-      console.log("Printing data.chests");
-      console.log(data.chests);
+      //console.log("Printing data.chests");
+      //console.log(data.chests);
       gameplayState.spawnTreasureChests(data.chests);
     });
 
@@ -112,6 +112,13 @@ var Client = {};
      */
     Client.socket.on("treeCut", function (data){
       gameplayState.cutTree(data.x, data.y, data.durability);
+    });
+    
+    /**
+     * @param data {Number} The weather type
+     */
+    Client.socket.on("weatherChange", function (data){
+      gameplayState.startWeatherEffect(data);
     });
   };
 
