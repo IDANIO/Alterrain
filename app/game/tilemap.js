@@ -39,7 +39,7 @@ class Tilemap {
     }
 
     this.frequency = 2.6;
-    this.waterMax = 0.3;
+    this.waterMax = 0.25;
     this.sandMax = 0.45;
     this.grassMax = 0.65;
     this.stoneMax = 1;
@@ -153,7 +153,7 @@ class Tilemap {
         return 1; // TODO desert
       }
       if (m < this.forestRatio) {
-        return 0; // TODO forest
+        return 5; // forest
       }
       return 0; // grass
     }

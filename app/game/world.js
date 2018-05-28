@@ -191,9 +191,15 @@ class World {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         let tileType = this.tilemap.getTileAt(x, y);
-        if (tileType === Tiles.GRASS) { // grass
-          if (Math.random() < 0.2) {
+        if (tileType === Tiles.FOREST) { // forest
+          if (Math.random() < 0.8) {
             // Set the object type as a tree
+            let tree = new Tree(this, x, y);
+            this.objectContainer.add(tree);
+          }
+        }
+        else if(tileType === Tiles.GRASS){
+          if(Math.random() < 0.1){
             let tree = new Tree(this, x, y);
             this.objectContainer.add(tree);
           }
