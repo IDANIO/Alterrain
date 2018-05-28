@@ -152,8 +152,14 @@ GameplayState.prototype = {
         if(weatherType === 0){ //no weather
             this.stopRainEffect();
         }
-        else if(weatherType === 1){
+        else if(weatherType === 1){ //rain
             this.startRainEffect();
+        }
+        else if(weatherType === 2){
+            this.startRainEffect(); //TODO blizzard
+        }
+        else if(weatherType === 3){
+            this.startRainEffect(); //TODO sandstorm
         }
     },
     

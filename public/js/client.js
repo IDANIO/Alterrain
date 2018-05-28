@@ -39,6 +39,7 @@ var Client = {};
      * @param data.tiles {Array} A 2D array of the world data.
      * @param data.solidObjects {Array} A 2D array of the solid objects in the world.
      * @param data.chests {Array} A 1D array of the treasure chests in the world.
+     * @param data.weather {Number} The current weather of the world
      */
     Client.socket.on('initWorld', function (data) {
       //console.log(data);
@@ -58,10 +59,9 @@ var Client = {};
       //-Original-------------------------------------------------------------//
       // gameplayState.generateSolidObjects(data.solidObjects);
       //----------------------------------------------------------------------//
-
-      //console.log("Printing data.chests");
-      //console.log(data.chests);
+      
       gameplayState.spawnTreasureChests(data.chests);
+      gameplayState.startWeatherEffect(data.weather);
     });
 
     /**
