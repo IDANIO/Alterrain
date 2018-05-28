@@ -4,7 +4,7 @@ function InventoryUI(game, x, y, key, frame){
     Phaser.Sprite.call(this, game, x, y, key, frame);
     
     //this.textStyle = {font: "16px Arial", fill: "#FFF"};
-    this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest"];
+    this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert"];
     
     //Specific index of each tile in the inventory
     this.GRASS_TILE = 0;

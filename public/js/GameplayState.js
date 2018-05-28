@@ -346,6 +346,8 @@ GameplayState.prototype = {
     //3 == water
     //4 == bridge
     //5 == forest
+    //6 == snow
+    //7 == desert
     generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){

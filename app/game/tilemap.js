@@ -150,7 +150,7 @@ class Tilemap {
     }
     if (e < this.grassMax) {
       if (m < this.desertRatio) {
-        return 1; // TODO desert
+        return 7; // desert
       }
       if (m < this.forestRatio) {
         return 5; // forest
@@ -159,7 +159,7 @@ class Tilemap {
     }
     // if (e <= this.stoneMax) {
     if (m < this.snowRatio) {
-      return 2; // TODO snow
+      return 6; // snow
     }
     return 2; // stone
     // }
