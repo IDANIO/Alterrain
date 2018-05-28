@@ -20,6 +20,10 @@ exports.Tiles = {
   SAND: 1,
   STONE: 2,
   WATER: 3,
+  BRIDGE: 4,
+  FOREST: 5,
+  SNOW: 6,
+  DESERT: 7,
 };
 
 /**
@@ -30,6 +34,10 @@ exports.TileData = [
   0,
   0,
   1,
+  0,
+  0,
+  0,
+  0,
 ];
 
 /**
@@ -46,5 +54,6 @@ exports.ServerConfig = {
 exports.WorldConfig = {
   WIDTH: 64,
   HEIGHT: 64,
+  WEATHER_DURATION: (60 * 1000), // 1 min in millisecond
 };
 

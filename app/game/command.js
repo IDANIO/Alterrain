@@ -27,7 +27,7 @@ const CommandFactory = {
   },
 
   /**
-   * @param player {Player}
+   * @param player {Character || Player}
    * @param params {Object}
    * @param params.tileId {Number}
    * @return {Function}
@@ -40,7 +40,7 @@ const CommandFactory = {
   },
 
   /**
-   * @param player {Player}
+   * @param player {Character || Player}
    * @param params {Object}
    * @return {Function}
    */
@@ -54,7 +54,7 @@ const CommandFactory = {
   },
 
   /**
-   * @param player {Player}
+   * @param player {Character || Player}
    * @param params {Object}
    * @return {Function}
    */

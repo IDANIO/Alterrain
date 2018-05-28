@@ -38,8 +38,37 @@ class Tilemap {
       this.moisture[i] = [];
     }
 
-    this.generateNoise(this.heightmap, this.world.width, this.world.height);
-    this.generateNoise(this.moisture, this.world.width, this.world.height);
+    this.frequency = 2.6;
+    this.waterMax = 0.25;
+    this.sandMax = 0.45;
+    this.grassMax = 0.65;
+    this.stoneMax = 1;
+
+    this.beachRatio = 0.5;
+    this.forestRatio = 0.66;
+    this.desertRatio = 0.33;
+    this.snowRatio = 0.5;
+
+    this.generateTerrain();
+  }
+
+  generateTerrain() {
+    this.generateNoise(this.heightmap, this.world.width,
+      this.world.height, this.frequency);
+
+    this.islandMask1 = this.generateIslandMask(this.world.width,
+      this.world.height, 8, 8, 9, 9);
+    this.islandMask2 = this.generateIslandMask(this.world.width,
+      this.world.height, 96, 8, 97, 9);
+    this.islandMask3 = this.generateIslandMask(this.world.width,
+      this.world.height, 64, 96, 65, 97);
+
+    this.blendMasks(this.heightmap,
+      [this.islandMask1, this.islandMask2, this.islandMask3]);
+
+    this.generateNoise(this.moisture, this.world.width,
+      this.world.height, this.frequency);
+
     this.generateTileMap(this.data, this.heightmap, this.moisture);
   }
 
@@ -88,16 +117,18 @@ class Tilemap {
    * @returns {number} an integer that corresponds to a specific tile type
    */
   getBiomeType(e, m) {
-    if (e < 0.4) {
+    if (e < this.waterMax) {
       return 3; // water
     }
-    if (e < 0.55) {
+    if (e < this.sandMax) {
       return 1; // sand
     }
-    if (e < 0.7) {
+    if (e < this.grassMax) {
       return 0; // grass
     }
-    return 2; // stone
+    if (e <= this.stoneMax) {
+      return 2;
+    }
   }
 
   /** USE THIS FUNCTION WHEN WE HAVE MORE BIOMES
@@ -107,67 +138,98 @@ class Tilemap {
    * @param m The 2D array that represents the moisture
    * @returns {number} an integer that corresponds to a specific tile type
    */
-  getBiomeTypeBetter(e, m) { // 0 = grass, 1 = sand, 2 = stone, 3 = water
-    if (e < 0.1) {
-      // ocean
-      return 3;
+   getBiomeTypeBetter(e, m) { // 0 = grass, 1 = sand, 2 = stone, 3 = water
+    if (e < this.waterMax) {
+      return 3; // water
     }
-    if (e < 0.12) {
-      // beach
-      return 1;
+    if (e < this.sandMax) {
+      if (m < this.beachRatio) {
+        return 1; // sand
+      }
+      return 0; // grass
     }
-    if (e > 0.8) {
-      if (m < 0.1) {
-        // scorched
+    if (e < this.grassMax) {
+      if (m < this.desertRatio) {
+        return 7; // desert
       }
-      if (m < 0.2) {
-        // bare
+      if (m < this.forestRatio) {
+        return 5; // forest
       }
-      if (m < 0.5) {
-        // tundra
-        return 2;
-      }
-      // snow
-      return 2;
+      return 0; // grass
     }
-    if (e > 0.6) {
-      if (m < 0.33) {
-        // temperate desert
-        return 1;
-      }
-      if (m < 0.66) {
-        // shrubland
-        return 0;
-      }
-      // taiga
-      return 2;
+    // if (e <= this.stoneMax) {
+    if (m < this.snowRatio) {
+      return 6; // snow
     }
-    if (e > 0.3) {
-      if (m < 0.16) {
-        // temperate desert
-        return 1;
+    return 2; // stone
+    // }
+  }
+
+  /**
+   * Returns a 2D array of a circular gradient
+   * @param width The width of the 2D array
+   * @param height The height of the 2D array
+   * @param x1 The min range for the x position of the gradient
+   * @param y1 The min range for the y position of the gradient
+   * @param x2 The max range for the x position of the gradient
+   * @param y2 The max range for the y position of the gradient
+   */
+  generateIslandMask(width, height, x1, y1, x2, y2) {
+    let maskArray = [];
+    for (let i = 0; i < height; i++) {
+      maskArray[i] = [];
+    }
+
+    let centerX = x1 + Math.floor((Math.random() * ((x2 - x1) + 1)));
+    let centerY = y1 + Math.floor((Math.random() * ((y2 - y1) + 1)));
+
+    for (let i = 0; i < width; i++) {
+      for (let j = 0; j < height; j++) {
+        let distX = (centerX - i) * (centerX - i);
+        let distY = (centerY - j) * (centerY - j);
+        let distToCenter = Math.sqrt(distX + distY);
+        distToCenter /= width;
+        maskArray[i][j] = distToCenter;
       }
-      if (m < 0.5) {
-        // grassland
-        return 0;
+    }
+    return maskArray;
+  }
+
+  blendMasks(arr, masks) {
+    let blendMap = [];
+    for (let i = 0; i < arr[0].length; i++) {
+      blendMap[i] = [];
+    }
+    let blendMapMax = -10;
+    let blendMapMin = 10;
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr[i].length; j++) {
+        let blendValue = 1;
+        for (let n = 0; n < masks.length; n++) {
+          blendValue *= masks[n][i][j];
+        }
+        if (blendValue > blendMapMax) {
+          blendMapMax = blendValue;
+        }
+        if (blendValue < blendMapMin) {
+          blendMapMin = blendValue;
+        }
+        blendMap[i][j] = blendValue;
       }
-      if (m < 0.83) {
-        // temperate deciduous forest
+    }
+
+    for (let i = 0; i < blendMap.length; i++) {
+      for (let j = 0; j < blendMap[i].length; j++) {
+        blendMap[i][j] = (blendMap[i][j] - blendMapMin) /
+          (blendMapMax - blendMapMin);
       }
-      // temperate rain forest
     }
-    if (m < 0.16) {
-      // subtropical desert
-      return 1;
+
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr[i].length; j++) {
+        arr[i][j] -= blendMap[i][j];
+      }
     }
-    if (m < 0.33) {
-      // grassland
-      return 0;
-    }
-    if (m < 0.66) {
-      // tropical seasonal rainforest
-    }
-    // tropical rainforest
   }
 
   /**
@@ -209,7 +271,7 @@ class Tilemap {
       for (let j = 0; j < tilemap.length; j++) {
         let e = heightmap[i][j];
         let m = moisture[i][j];
-        let tileType = this.getBiomeType(e, m);
+        let tileType = this.getBiomeTypeBetter(e, m);
         tilemap[i][j] = tileType;
       }
     }

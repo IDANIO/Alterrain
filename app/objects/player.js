@@ -2,6 +2,7 @@
 
 const Character = require('./character.js');
 const logger = require('../logger.js');
+const {Tiles} = require('../../shared/constant.js');
 
 class Player extends Character {
   constructor(world, x, y, id) {
@@ -14,7 +15,7 @@ class Player extends Character {
      * Initialized to zero.
      * @type {Array.<Number>} Key: Tiles Enum. Value: item count.
      */
-    this.inventory = Array(...Array(4)).map(Number.prototype.valueOf, 0);
+    this.inventory = Array(...Array(9)).map(Number.prototype.valueOf, 0);
   }
 
   /**
@@ -60,11 +61,38 @@ class Player extends Character {
     let newX = Character.roundXWithDirection(this._x, this._direction);
     let newY = Character.roundYWithDirection(this._y, this._direction);
 
-    if (this.hasItem(tileId)) {
-      this.world.changeTile(newX, newY, tileId);
-
+    if (this.hasItem(tileId) &&
+        this.tileTypeCheck(tileId, newX, newY) &&
+        this.world.changeTile(newX, newY, tileId)) {
       this.loseItem(tileId);
     }
+  }
+
+  /**
+   * @private
+   * @param tileId
+   * @param x
+   * @param y
+   */
+  tileTypeCheck(tileId, x, y) {
+    let targetTile = this.world.tilemap.getTileAt(x, y);
+    let isValid = true;
+
+    if (tileId !== Tiles.BRIDGE && targetTile === Tiles.WATER ) {
+      isValid = false;
+    }
+
+    if (tileId === Tiles.BRIDGE && targetTile !== Tiles.WATER ) {
+      isValid = false;
+    }
+
+    if (!isValid) {
+      this.world.server.io.emit('errorSound', {
+        id: this.id,
+      });
+    }
+
+    return isValid;
   }
 
   /**
@@ -87,7 +115,7 @@ class Player extends Character {
  * @return {boolean}
  */
 function isValidItem(tileId) {
-  return 0 <= tileId && tileId <= 4;
+  return 0 <= tileId && tileId <= 9;
 }
 
 module.exports = Player;

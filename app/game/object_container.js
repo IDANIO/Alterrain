@@ -16,6 +16,22 @@ class ObjectContainer {
   }
 
   /**
+   * @param dt {number}
+   */
+  update(dt) {
+    let count = 0;
+
+    this.tree.each((elt) => {
+      if (elt) {
+        elt.object.onUpdate(dt);
+        count++;
+      }
+    });
+
+    // logger.info(`updating [${count}/${this.tree.size}] objects.`);
+  }
+
+  /**
    * @param object {GameObject}
    * @return {GameObject} for chaining.
    */
@@ -62,7 +78,21 @@ class ObjectContainer {
     }
   }
 
-  remove() {
+  /**
+   * @param object {GameObject}
+   * @return {boolean}
+   */
+  remove(object) {
+    let arr = this.tree.find((elt) => elt.object === object);
+    let success = false;
+
+    arr.forEach((elt)=>{
+      this.tree.remove(elt);
+      success = true;
+    });
+
+    logger.info(`tree removed, now has ${this.tree.size}`);
+    return success;
   }
 
   debugPrint() {

@@ -1,3 +1,6 @@
+var WORLD_WIDTH = 64;
+var WORLD_HEIGHT = 64;
+
 //The main menu state
 var GameplayState = function(game){
     //Create a playerMap property
@@ -7,17 +10,19 @@ var GameplayState = function(game){
 
     //Create a 2D array for solid objects
     this.objectMap = [];
-    for(let i = 0; i < 64; i++){ //TODO use a constant instead of 64 to reference the world size
+    for(let i = 0; i < WORLD_HEIGHT; i++){ //TODO use a constant instead of 64 to reference the world size
         this.objectMap[i] = [];
     }
-
-    this.textStyle = {font: "20px Arial", fill: "#FFF"};
+    
+    this.weatherEffects = [];
+    this.isRainOn = false;
+    //this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
 //Tile-based movement
 var playerSpeed = 32;
 
-var tileName = ["Grass", "Sand", "Stone", "Water"];
+var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert"];
 
 // We are using num-pad representation (Ivan)
 //
@@ -46,13 +51,13 @@ GameplayState.prototype = {
 
         //Set up and create the world tilemap
         //TODO use constants instead of hard-coded numbers
-        game.world.setBounds(0, 0, 64 * TILE_SIZE, 64 * TILE_SIZE);
+        game.world.setBounds(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE);
         this.tileGroup = game.add.group();
         this.tileMap = game.add.tilemap();
         this.tileMap.setTileSize(TILE_SIZE, TILE_SIZE);
         this.tileMap.addTilesetImage("gameTileset");
         //new Tilemap(layerName, widthInTiles, heightInTiles, tileWidth, tileHeight)
-        this.mainLayer = this.tileMap.create("mainLayer", 64, 64, TILE_SIZE, TILE_SIZE);
+        this.mainLayer = this.tileMap.create("mainLayer", WORLD_WIDTH, WORLD_HEIGHT, TILE_SIZE, TILE_SIZE);
 
         //TODO need to optimize later
         this.tileChoice = 0;
@@ -73,15 +78,24 @@ GameplayState.prototype = {
         this.uiGroup = game.add.group();
         this.uiGroup.fixedToCamera = true;
         
+        this.initializeWeatherEffects();
+        
         //Create the inventoryUI
-        this.playerInventoryUI = new InventoryUI(game, 30, 126, "inventoryUI");
+        this.playerInventoryUI = new InventoryUI(game, 120, 408, "inventoryUI");
         this.uiGroup.add(this.playerInventoryUI);
-        this.uiGroup.add(this.playerInventoryUI.itemsText);
+        for(let i = 0; i < this.playerInventoryUI.itemsText.length; i++){
+            this.uiGroup.add(this.playerInventoryUI.itemsText[i]);
+        }
+        this.uiGroup.add(this.playerInventoryUI.highlightUI);
+        for(let i = 0; i < this.playerInventoryUI.itemsText.length; i++){
+            this.uiGroup.add(this.playerInventoryUI.numbersText[i]);
+        }
+        //this.uiGroup.add(this.playerInventoryUI.itemsText);
 
         //Display tile choice
         //TODO should be a proper UI instead
-        this.tileText = game.add.text(32, 32, tileName[this.tileChoice], this.textStyle);
-        //this.tileText.fixedToCamera = true;
+        this.tileText = game.add.bitmapText(320, 450, "m5x7", tileName[this.tileChoice], 48);
+        this.tileText.anchor.x = 0.5;
         this.uiGroup.add(this.tileText);
     },
 
@@ -93,15 +107,86 @@ GameplayState.prototype = {
     },
 
     update: function(){
-        //empty
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
+            game.state.start("MainMenuState");
+        }
+        //DEBUG - remove later
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.R)){
+            if(this.isRainOn){
+                this.stopRainEffect();
+                this.isRainOn = false;
+            }
+            else{
+                this.startRainEffect();
+                this.isRainOn = true;
+            }
+        }
+    },
+    
+    initializeWeatherEffects: function(){
+        //Screen shader
+        this.screenShader = game.add.sprite(0, 0, "screenShader");
+        this.screenShader.scale.x = game.world.width;
+        this.screenShader.scale.y = game.world.height;
+        this.screenShader.tint = 0x777777;
+        this.screenShader.alpha = 0;
+        this.weatherEffects[0] = this.screenShader;
+        //Rain
+        this.rainEmitter = game.add.emitter(game.world.centerX, 256);
+        this.rainEmitter.fixedToCamera = true;
+        this.rainEmitter.makeParticles(["raindrop"], 0, 256);
+        this.rainEmitter.gravity = 0;
+        this.rainEmitter.setRotation(0, 0);
+        this.rainEmitter.setXSpeed(-128, -128);
+        this.rainEmitter.setYSpeed(512, 512);
+        this.rainEmitter.setScale(2, 2, 2, 2);
+        this.rainEmitter.setAlpha(0.3, 0.7);
+        let area = new Phaser.Rectangle(game.world.centerX, 0, game.world.width, 1);
+        this.rainEmitter.area = area;
+        this.weatherEffects[1] = this.rainEmitter;
+        this.rainEmitter.start(false, 2000, 10);
+        this.rainEmitter.on = false;
+    },
+    
+    startWeatherEffect: function(weatherType){
+        if(weatherType === 0){ //no weather
+            this.stopRainEffect();
+        }
+        else if(weatherType === 1){ //rain
+            this.startRainEffect();
+        }
+        else if(weatherType === 2){
+            this.startRainEffect(); //TODO blizzard
+        }
+        else if(weatherType === 3){
+            this.startRainEffect(); //TODO sandstorm
+        }
+    },
+    
+    startRainEffect: function(){
+        this.screenShader.tint = 0x999999;
+        this.screenShader.alpha = 0.4;
+        this.rainEmitter.on = true;
+    },
+    
+    stopRainEffect: function(){
+        this.screenShader.alpha = 0;
+        this.rainEmitter.on = false;;
     },
 
     createSoundObjects: function(){
         this.placeTileSound = game.add.audio("placeTileSound");
+        this.errorSound = game.add.audio("errorSound");
         this.abstractChirpSound = game.add.audio("abstractChirpSound");
         this.pickupLootSound = game.add.audio("pickupLootSound");
         this.treeCutSound = game.add.audio("treeCutSound");
         this.treeDestroyedSound = game.add.audio("treeDestroyedSound");
+        
+        this.grassSound = game.add.audio("grassFootsteps");
+        this.sandSound = game.add.audio("sandFootsteps");
+        this.stoneSound = game.add.audio("stoneFootsteps");
+        
+        this.tileSounds = [this.grassSound, this.sandSound, this.stoneSound];
     },
 
     //Adds a new player object to the world
@@ -112,7 +197,10 @@ GameplayState.prototype = {
         //Make sure the local player is drawn on top of other players
         if(this.player){
             this.player.bringToTop();
-            //Make sure the UI stays on top
+            //Make sure the UI and weather stays on top
+            for(let i = 0; i < this.weatherEffects.length; i++){
+                game.world.bringToTop(this.weatherEffects[i]);
+            }
             if(this.uiGroup){
                 game.world.bringToTop(this.uiGroup);
             }
@@ -125,7 +213,10 @@ GameplayState.prototype = {
         this.player.enableArrowIcon();
         game.camera.follow(this.player, Phaser.Camera.FOLLOW_TOPDOWN);
         this.player.bringToTop();
-        //Make sure the UI stays on top
+        //Make sure the UI and weather stays on top
+        for(let i = 0; i < this.weatherEffects.length; i++){
+            game.world.bringToTop(this.weatherEffects[i]);
+        }
         if(this.uiGroup){
             game.world.bringToTop(this.uiGroup);
         }
@@ -156,27 +247,44 @@ GameplayState.prototype = {
 
         //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.ONE){
-            this.tileChoice = 0;
-            //NOTE: Using the gameplayState variable feels like a bad idea
-            gameplayState.tileText.text = tileName[this.tileChoice];
+            gameplayState.tileChoice = 0; //grass
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
-        //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.TWO){
-            this.tileChoice = 1;
-            //NOTE: Using the gameplayState variable feels like a bad idea
-            gameplayState.tileText.text = tileName[this.tileChoice];
+            gameplayState.tileChoice = 1; //sand
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
-        //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.THREE){
-            this.tileChoice = 2;
-            //NOTE: Using the gameplayState variable feels like a bad idea
-            gameplayState.tileText.text = tileName[this.tileChoice];
+            gameplayState.tileChoice = 2; //stone
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
+        }
+        if(e.keyCode === Phaser.Keyboard.FOUR){
+            gameplayState.tileChoice = 4; //bridge
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
+        if(e.keyCode === Phaser.Keyboard.FIVE){
+            gameplayState.tileChoice = 5; //forest
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
+        if(e.keyCode === Phaser.Keyboard.SIX){
+            gameplayState.tileChoice = 6; //snow
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
+        if(e.keyCode === Phaser.Keyboard.SEVEN){
+            gameplayState.tileChoice = 7; //desert
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
         }
 
         //Change the tile the player is standing on
-        //BUG - placing the same tile again shouldn't do anything
         if(e.keyCode === Phaser.Keyboard.SPACEBAR){
-            Client.changeTile(this.tileChoice, gameplayState.player.facing);
+            Client.changeTile(gameplayState.tileChoice, gameplayState.player.facing);
         }
 
         //Interact with a treasure chest
@@ -187,11 +295,6 @@ GameplayState.prototype = {
         //Play abstract sound
         if(e.keyCode === Phaser.Keyboard.E){
             Client.playSound();
-        }
-
-        //Quit key - go back to the main menu
-        if(e.keyCode === Phaser.Keyboard.ESC){
-            game.state.start("MainMenuState");
         }
     },
     
@@ -209,12 +312,30 @@ GameplayState.prototype = {
             sourcePlayer.startSoundTimer();
         }
     },
+    
+    playErrorSound: function(playerId){
+        let sourcePlayer = this.playerMap[playerId];
+        if(sourcePlayer === this.player){
+            this.errorSound.play();
+        }
+    },
 
     //Moves the player to the given position
     movePlayer: function(id, x, y, d){
-        //this.playerMap[id].x = x;
-        //this.playerMap[id].y = y;
+       //this.playerMap[id].x = x;
+       //this.playerMap[id].y = y;
       // console.log(`${x},${y},${d}`)
+      
+      /*//Play corresponding footstep sound
+      if(this.playerMap[id] === this.player){
+          let nextTile = this.tileMap.getTile(x, y);
+          if(this.footstepSounds[nextTile.index]){
+              if(!this.footstepSounds[nextTile.index].isPlaying){
+                this.footstepSounds[nextTile.index].play();
+              }
+          }
+      }*/
+      
       this.playerMap[id].setDirection(d);
         if(this.playerMap[id].ableToMove()){
             this.playerMap[id].moveTo(x * TILE_SIZE, y * TILE_SIZE);
@@ -230,25 +351,21 @@ GameplayState.prototype = {
         let sourceX = tileX * TILE_SIZE;
         let sourceY = tileY * TILE_SIZE;
         this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
-        /*if(tileType === 0){ //grass
-            this.tileMap.putTile(0, tileX, tileY);
-        }
-        else if(tileType === 1){ //sand
-            this.tileMap.putTile(1, tileX, tileY);
-        }
-        else if(tileType === 2){ //stone
-            this.tileMap.putTile(2, tileX, tileY);
-        }
-        else if(tileType === 3){ //water
-            this.tileMap.putTile(3, tileX, tileY);
-        }*/
         this.tileMap.putTile(tileType, tileX, tileY);
+        //if(this.tileSounds[tileType]){
+            //this.playSoundFrom(this.tileSounds[tileType], sourceX, sourceY);
+        //}
     },
 
     //Generates tile objects based on a given 2D tilemap
     //0 === grass
     //1 === sand
     //2 === stone
+    //3 == water
+    //4 == bridge
+    //5 == forest
+    //6 == snow
+    //7 == desert
     generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
@@ -261,7 +378,7 @@ GameplayState.prototype = {
     generateSolidObjects: function(objectMap){
         for(let i = 0; i < objectMap.length; i++){
             for(let j = 0; j < objectMap[i].length; j++){
-                this.placeSolidObject(objectMap[i][j], i, j);
+                this.placeSolidObject(objectMap[i][j], i, j, objectMap[i][j].durability);
             }
         }
     },
@@ -270,7 +387,8 @@ GameplayState.prototype = {
     spawnTreasureChests: function(arr){
         for(let i = 0; i < arr.length; i++){
             this.objectMap[arr[i].x][arr[i].y] = new Treasure(game, arr[i].x * TILE_SIZE, arr[i].y * TILE_SIZE, "treasureChest");
-            //TODO check if the treasure chest requires more than 1 player to open
+            this.objectMap[arr[i].x][arr[i].y].setState(arr[i].state);
+            this.objectMap[arr[i].x][arr[i].y].setSize(arr[i].playerRequired);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
         }
     },
@@ -278,10 +396,10 @@ GameplayState.prototype = {
     //Helper function for placing individual solid objects
     //0 === trees
     //1 === rocks
-    placeSolidObject: function(objectType, tileX, tileY){
+    placeSolidObject: function(objectType, tileX, tileY, objectState){
         if(objectType === 0){
             this.objectMap[tileX][tileY] = new Tree(game, tileX * TILE_SIZE, tileY * TILE_SIZE, "willowTree");
-            //game.add.existing(this.objectMap[tileX][tileY]);
+            this.objectMap[tileX][tileY].setState(objectState);
             this.solidObjectsGroup.add(this.objectMap[tileX][tileY]);
         }
         //Unfinished
@@ -289,6 +407,13 @@ GameplayState.prototype = {
             this.objectMap[tileX][tileY] = new Rock(game, tileX * TILE_SIZE, tileY * TILE_SIZE);
             game.add.existing(this.objectMap[tileX][tileY]);
         }*/
+    },
+    
+    //Delete an object at a given tile position
+    deleteObjectAt: function(tileX, tileY){
+        if(this.objectMap[tileX][tileY]){
+            this.objectMap[tileX][tileY].destroy();
+        }
     },
 
     //Interact with a specific treasure chest
@@ -299,7 +424,7 @@ GameplayState.prototype = {
             if(state === 0){
                 console.log("Treasure found by unique player");
                 //TODO play unlocking sound
-                //treasureChest.frame--;
+                treasureChest.frame--;
             }
             //Old player tried to interact with treasure chest, nothing happens
             if(state === 1){
@@ -308,9 +433,12 @@ GameplayState.prototype = {
             }
             //Treasure chest's last lock opened
             if(state === 2){
-                console.log("Treasure found by LAST unique player. Treasure is now open.");
-                treasureChest.frame = 0;
+                treasureChest.frame = 1;
                 this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+            }
+            if(state == 3){
+                treasureChest.frame = 0;
+                //TODO play looting sound
             }
             // this.objectMap[tileX][tileY].unlock(state);
         }

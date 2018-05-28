@@ -53,8 +53,9 @@ class GameObject {
 
   /**
    * Called when the game world steps.
+   * @param {Number} dt
    */
-  onUpdate() { }
+  onUpdate(dt) { }
 
   /**
    * Called when the object is spawned to the world.

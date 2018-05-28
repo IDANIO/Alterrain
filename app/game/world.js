@@ -5,6 +5,8 @@ const fs = require('fs');
 
 const EventEmitter = require('events');
 
+const util = require('../util.js');
+
 const Tilemap = require('./tilemap.js');
 const ObjectContainer = require('./object_container.js');
 
@@ -26,6 +28,8 @@ class World {
    * @param filename {String=}
    */
   constructor(server, filename) {
+    this.setupEventEmitter();
+
     /**
      * @type {Server}
      */
@@ -64,8 +68,23 @@ class World {
      */
     this.tilemap = null;
 
+    /**
+     * @type {World.WEATHER|number}
+     */
+    this.currentWeather = World.WEATHER.DRY;
+
+    /**
+     * @type {number}
+     */
+    this.weatherCount = 0;
+
+    this.weatherDuration = WorldConfig.WEATHER_DURATION;
+
     this.initWorldData(filename);
-    this.setupEventEmitter();
+
+    this.on('objectRemoval', (obj) => {
+      this.removeObject(obj);
+    });
   }
 
   /**
@@ -86,9 +105,17 @@ class World {
    * @private
    */
   setupEventEmitter() {
-    let emitter = new EventEmitter();
+    const emitter = new EventEmitter();
+    emitter.setMaxListeners(0);
 
+    /**
+     * @type {Function}
+     */
     this.on = emitter.on;
+
+    /**
+     * @type {Function}
+     */
     this.once = emitter.once;
     this.removeListener = emitter.removeListener;
 
@@ -142,8 +169,8 @@ class World {
     // TODO: Very bad implementation
     for (let i = 0; i < 50; ++i) {
       do {
-        newX = Math.floor(Math.random() * WorldConfig.WIDTH);
-        newY = Math.floor(Math.random() * WorldConfig.HEIGHT);
+        newX = Math.floor(Math.random() * this.width);
+        newY = Math.floor(Math.random() * this.height);
       } while (!this.isPassable(newX, newY, 2));
 
       let chest = new Chest(this, newX, newY);
@@ -164,9 +191,14 @@ class World {
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         let tileType = this.tilemap.getTileAt(x, y);
-        if (tileType === Tiles.GRASS) { // grass
-          if (Math.random() < 0.2) {
+        if (tileType === Tiles.FOREST) { // forest
+          if (Math.random() < 0.8) {
             // Set the object type as a tree
+            let tree = new Tree(this, x, y);
+            this.objectContainer.add(tree);
+          }
+        } else if (tileType === Tiles.GRASS) {
+          if (Math.random() < 0.05) {
             let tree = new Tree(this, x, y);
             this.objectContainer.add(tree);
           }
@@ -181,7 +213,7 @@ class World {
    * @param playerId {Number}
    * @return {Map<Number, Character>}
    */
-  addObject(x, y, playerId) {
+  addPlayer(x, y, playerId) {
     let player = new Player(this, x, y, playerId);
     return this.players.set(playerId, player);
   }
@@ -194,16 +226,22 @@ class World {
   changeTile(x, y, tileId = Tiles.GRASS) {
     if (!this.isValidTile(x, y)) {
       logger.error(`Invalid tile position at (${x},${y})`);
-      return;
+      return false;
     }
 
     logger.debug(`Tile at (${x}, ${y}) is changed to ${tileId}.`);
 
-    this.tilemap.setTile(x, y, tileId);
+    if (this.tilemap.getTileAt(x, y) !== tileId) {
+      this.tilemap.setTile(x, y, tileId);
 
-    this.server.io.emit('worldUpdate', {
-      tiles: [[x, y, tileId]],
-    });
+      this.server.io.emit('worldUpdate', {
+        tiles: [[x, y, tileId]],
+      });
+
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -234,8 +272,20 @@ class World {
    * @param playerId {Number}
    * @return {boolean}
    */
-  removeObject(playerId) {
+  removePlayer(playerId) {
     return this.players.delete(playerId);
+  }
+
+  /**
+   * @param object {GameObject}
+   */
+  removeObject(object) {
+    this.objectContainer.remove(object);
+
+    this.server.io.emit('objectRemoval', {
+      x: object._x,
+      y: object._y,
+    });
   }
 
   /**
@@ -266,9 +316,32 @@ class World {
    * @param dt{Number}
    */
   step(dt) {
+    this.objectContainer.update(dt);
+
+    // update all players.
     this.players.forEach((character) => {
       character.update();
     });
+
+    // update weather
+    this.weatherCount += dt;
+    if (this.weatherCount >= this.weatherDuration) {
+      this.weatherCount = 0;
+
+      this.currentWeather = util.pick([
+        World.WEATHER.DRY,
+        World.WEATHER.RAIN,
+        World.WEATHER.BLIZZARD,
+        World.WEATHER.SANDSTORM,
+      ]);
+
+      this.emit('weatherChange', this.currentWeather);
+
+      // TODO: Refactor
+      this.server.io.emit('weatherChange', this.currentWeather);
+
+      logger.data(`World Weather has changed to ${this.currentWeather}.`);
+    }
   }
 
   /**
@@ -278,5 +351,17 @@ class World {
     command();
   }
 }
+
+/**
+ * @const
+ * @enum
+ * @type {{DRY: number, RAIN: number, BLIZZARD: number, SANDSTORM: number}}
+ */
+World.WEATHER = {
+  DRY: 0,
+  RAIN: 1,
+  BLIZZARD: 2,
+  SANDSTORM: 3,
+};
 
 module.exports = World;
