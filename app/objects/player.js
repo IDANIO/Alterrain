@@ -2,6 +2,7 @@
 
 const Character = require('./character.js');
 const logger = require('../logger.js');
+const {Tiles} = require('../../shared/constant.js');
 
 class Player extends Character {
   constructor(world, x, y, id) {
@@ -60,9 +61,31 @@ class Player extends Character {
     let newX = Character.roundXWithDirection(this._x, this._direction);
     let newY = Character.roundYWithDirection(this._y, this._direction);
 
-    if (this.hasItem(tileId) && this.world.changeTile(newX, newY, tileId)) {
+    if (this.hasItem(tileId) &&
+        this.tileTypeCheck(tileId, newX, newY) &&
+        this.world.changeTile(newX, newY, tileId)) {
       this.loseItem(tileId);
     }
+  }
+
+  /**
+   * @private
+   * @param tileId
+   * @param x
+   * @param y
+   */
+  tileTypeCheck(tileId, x, y) {
+    let targetTile = this.world.tilemap.getTileAt(x, y);
+
+    if (tileId !== Tiles.BRIDGE && targetTile === Tiles.WATER ) {
+      return false;
+    }
+
+    if (tileId === Tiles.BRIDGE && targetTile !== Tiles.WATER ) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
