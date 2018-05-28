@@ -108,6 +108,7 @@ GameplayState.prototype = {
 
     update: function(){
         if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
+            this.stopAllSounds();
             game.state.start("MainMenuState");
         }
         //DEBUG - remove later
@@ -164,12 +165,18 @@ GameplayState.prototype = {
     },
     
     startRainEffect: function(){
+        if(!this.lightRainSound.isPlaying){
+            this.lightRainSound.play();
+        }
         this.screenShader.tint = 0x999999;
         this.screenShader.alpha = 0.4;
         this.rainEmitter.on = true;
     },
     
     stopRainEffect: function(){
+        if(this.lightRainSound.isPlaying){
+            this.lightRainSound.stop();
+        }
         this.screenShader.alpha = 0;
         this.rainEmitter.on = false;;
     },
@@ -186,7 +193,15 @@ GameplayState.prototype = {
         this.sandSound = game.add.audio("sandFootsteps");
         this.stoneSound = game.add.audio("stoneFootsteps");
         
+        this.lightRainSound = game.add.audio("lightRain", 1, true);
+        
         this.tileSounds = [this.grassSound, this.sandSound, this.stoneSound];
+    },
+    
+    stopAllSounds: function(){
+        if(this.lightRainSound.isPlaying){
+            this.lightRainSound.stop();
+        }
     },
 
     //Adds a new player object to the world
