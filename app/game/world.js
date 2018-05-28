@@ -197,9 +197,8 @@ class World {
             let tree = new Tree(this, x, y);
             this.objectContainer.add(tree);
           }
-        }
-        else if(tileType === Tiles.GRASS){
-          if(Math.random() < 0.05){
+        } else if (tileType === Tiles.GRASS) {
+          if (Math.random() < 0.05) {
             let tree = new Tree(this, x, y);
             this.objectContainer.add(tree);
           }

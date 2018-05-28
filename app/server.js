@@ -217,7 +217,7 @@ class Server {
       solidObjects: trees,
       chests: chests,
       id: playerEvent.playerId,
-      weather: this.world.currentWeather
+      weather: this.world.currentWeather,
     });
 
     // This send out the new-joined client's data to all other clients
