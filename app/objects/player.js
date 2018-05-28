@@ -85,10 +85,10 @@ class Player extends Character {
     if (tileId === Tiles.BRIDGE && targetTile !== Tiles.WATER ) {
       isValid = false;
     }
-    
-    if(!isValid){
+
+    if (!isValid) {
       this.world.server.io.emit('errorSound', {
-        id: this.id
+        id: this.id,
       });
     }
 
