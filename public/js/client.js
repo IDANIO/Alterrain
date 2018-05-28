@@ -108,6 +108,14 @@ var Client = {};
     Client.socket.on('inventoryUpdate', function (data){
       gameplayState.updatePlayerInventory(data.id, data.inventory);
     });
+    
+    /**
+     * @param data {Object}
+     * @param data.id {Number} The player's ID
+     */
+    Client.socket.on("errorSound", function (data){
+      gameplayState.playErrorSound(data.id);
+    });
 
     /**
      * @param data {Object}

@@ -22,7 +22,7 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 32;
 
-var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge"];
+var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert"];
 
 // We are using num-pad representation (Ivan)
 //
@@ -176,6 +176,7 @@ GameplayState.prototype = {
 
     createSoundObjects: function(){
         this.placeTileSound = game.add.audio("placeTileSound");
+        this.errorSound = game.add.audio("errorSound");
         this.abstractChirpSound = game.add.audio("abstractChirpSound");
         this.pickupLootSound = game.add.audio("pickupLootSound");
         this.treeCutSound = game.add.audio("treeCutSound");
@@ -247,31 +248,41 @@ GameplayState.prototype = {
         //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.ONE){
             gameplayState.tileChoice = 0; //grass
-            //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[gameplayState.tileChoice];
             gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
         if(e.keyCode === Phaser.Keyboard.TWO){
             gameplayState.tileChoice = 1; //sand
-            //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[gameplayState.tileChoice];
             gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
         if(e.keyCode === Phaser.Keyboard.THREE){
             gameplayState.tileChoice = 2; //stone
-            //NOTE: Using the gameplayState variable feels like a bad idea
             gameplayState.tileText.text = tileName[gameplayState.tileChoice];
             gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice);
         }
         if(e.keyCode === Phaser.Keyboard.FOUR){
             gameplayState.tileChoice = 4; //bridge
-            //NOTE: Using the gameplayState variable feels like a bad idea
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
+        if(e.keyCode === Phaser.Keyboard.FIVE){
+            gameplayState.tileChoice = 5; //forest
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
+        if(e.keyCode === Phaser.Keyboard.SIX){
+            gameplayState.tileChoice = 6; //snow
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
+        if(e.keyCode === Phaser.Keyboard.SEVEN){
+            gameplayState.tileChoice = 7; //desert
             gameplayState.tileText.text = tileName[gameplayState.tileChoice];
             gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
         }
 
         //Change the tile the player is standing on
-        //BUG - placing the same tile again shouldn't do anything
         if(e.keyCode === Phaser.Keyboard.SPACEBAR){
             Client.changeTile(gameplayState.tileChoice, gameplayState.player.facing);
         }
@@ -299,6 +310,13 @@ GameplayState.prototype = {
         if(sourcePlayer.canMakeSound){
             this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x, sourcePlayer.y);
             sourcePlayer.startSoundTimer();
+        }
+    },
+    
+    playErrorSound: function(playerId){
+        let sourcePlayer = this.playerMap[playerId];
+        if(sourcePlayer === this.player){
+            this.errorSound.play();
         }
     },
 

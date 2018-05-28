@@ -15,7 +15,7 @@ class Player extends Character {
      * Initialized to zero.
      * @type {Array.<Number>} Key: Tiles Enum. Value: item count.
      */
-    this.inventory = Array(...Array(5)).map(Number.prototype.valueOf, 0);
+    this.inventory = Array(...Array(9)).map(Number.prototype.valueOf, 0);
   }
 
   /**
@@ -76,16 +76,23 @@ class Player extends Character {
    */
   tileTypeCheck(tileId, x, y) {
     let targetTile = this.world.tilemap.getTileAt(x, y);
+    let isValid = true;
 
     if (tileId !== Tiles.BRIDGE && targetTile === Tiles.WATER ) {
-      return false;
+      isValid = false;
     }
 
     if (tileId === Tiles.BRIDGE && targetTile !== Tiles.WATER ) {
-      return false;
+      isValid = false;
+    }
+    
+    if(!isValid){
+      this.world.server.io.emit('errorSound', {
+        id: this.id
+      });
     }
 
-    return true;
+    return isValid;
   }
 
   /**
@@ -108,7 +115,7 @@ class Player extends Character {
  * @return {boolean}
  */
 function isValidItem(tileId) {
-  return 0 <= tileId && tileId <= 4;
+  return 0 <= tileId && tileId <= 9;
 }
 
 module.exports = Player;
