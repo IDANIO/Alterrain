@@ -11,7 +11,7 @@ class Tree extends GameObject {
 
     this.durability = util.integerInRange(3, 8);
 
-    this.removeCount = 5 * 60; // 30 * 60;
+    this.removeCount = 1 * 60; // 30 * 60;
 
     this.loot = Tiles.BRIDGE;
   }
