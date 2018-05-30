@@ -8,7 +8,7 @@ function Player(game, x, y, key, frame){
     this.nextPos = {x: 0, y: 0};
     
     this.moveTimer = game.time.create(false);
-    this.moveSpeed = 4; //Must be a power of 2 and less than 32
+    this.moveSpeed = 8; //Must be a power of 2 and less than 32
     
     this.facing = FACING_DOWN;
     
