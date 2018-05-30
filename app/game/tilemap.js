@@ -38,8 +38,8 @@ class Tilemap {
       this.moisture[i] = [];
     }
 
-    this.frequency = 4.5;
-    this.waterMax = 0.25;
+    this.frequency = 4.3;
+    this.waterMax = 0.3;
     this.sandMax = 0.45;
     this.grassMax = 0.65;
     this.stoneMax = 1;
@@ -57,11 +57,11 @@ class Tilemap {
       this.world.height, this.frequency);
 
     this.islandMask1 = this.generateIslandMask(this.world.width,
-      this.world.height, 8, 8, 9, 9);
+      this.world.height, -32, -32, -31, -31);
     this.islandMask2 = this.generateIslandMask(this.world.width,
-      this.world.height, 96, 8, 97, 9);
+      this.world.height, 44, 44, 45, 45);
     this.islandMask3 = this.generateIslandMask(this.world.width,
-      this.world.height, 64, 96, 65, 97);
+      this.world.height, 102, 102, 103, 103);
 
     this.blendMasks(this.heightmap,
       [this.islandMask1, this.islandMask2, this.islandMask3]);
