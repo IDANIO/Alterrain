@@ -97,6 +97,11 @@ GameplayState.prototype = {
         this.tileText = game.add.bitmapText(320, 450, "m5x7", tileName[this.tileChoice], 48);
         this.tileText.anchor.x = 0.5;
         this.uiGroup.add(this.tileText);
+        
+        //Loading "screen" while the tilemap is generated
+        this.controlsUI = new ControlsUI(game, 0, 0);
+        this.loadingText = game.add.bitmapText(GAME_WIDTH / 2, 400, "m5x7", "Loading...", 48);
+        this.loadingText.anchor.setTo(0.5);
     },
 
     shutdown: function(){
@@ -383,12 +388,14 @@ GameplayState.prototype = {
     //5 == forest
     //6 == snow
     //7 == desert
-    generateTiles: function(tileMap){
+    generateTiles: function(tileMap){ 
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
                 this.tileMap.putTile(tileMap[i][j], i, j);
             }
         }
+        this.controlsUI.destroy();
+        this.loadingText.destroy();
     },
 
     //Generates solid objects based on a given 2D object map
