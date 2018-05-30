@@ -38,7 +38,7 @@ class Tilemap {
       this.moisture[i] = [];
     }
 
-    this.frequency = 2.6;
+    this.frequency = 4.5;
     this.waterMax = 0.25;
     this.sandMax = 0.45;
     this.grassMax = 0.65;

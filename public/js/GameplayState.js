@@ -1,5 +1,5 @@
-var WORLD_WIDTH = 64;
-var WORLD_HEIGHT = 64;
+var WORLD_WIDTH = 88;
+var WORLD_HEIGHT = 88;
 
 //The main menu state
 var GameplayState = function(game){
@@ -439,14 +439,14 @@ GameplayState.prototype = {
         if(treasureChest){
             //New player unlocked 1 lock in this chest
             if(state === 0){
-                console.log("Treasure found by unique player");
-                //TODO play unlocking sound
+                this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
                 treasureChest.frame--;
                 
             }
             //Old player tried to interact with treasure chest, nothing happens
             if(state === 1){
-                this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                //TODO locked sound
+                console.log("Old player tried unlocking treasure chest");
             }
             //Treasure chest's last lock opened
             if(state === 2){
@@ -454,8 +454,10 @@ GameplayState.prototype = {
                 this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
             }
             if(state == 3){
-                treasureChest.frame = 0;
-                this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                if(treasureChest.frame !== 0){
+                    treasureChest.frame = 0;
+                    this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                }
             }
             // this.objectMap[tileX][tileY].unlock(state);
         }
