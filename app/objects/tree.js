@@ -9,12 +9,11 @@ class Tree extends GameObject {
     super(world, x, y);
     this.type = 'tree';
 
-    this.durability = util.integerInRange(1, 4);
+    this.durability = util.integerInRange(3, 8);
 
     this.removeCount = 5 * 60; // 30 * 60;
 
-    // TODO: temp, later change this to WOOD
-    this.loot = Tiles.GRASS;
+    this.loot = Tiles.BRIDGE;
   }
 
   onUpdate(dt) {
@@ -31,7 +30,7 @@ class Tree extends GameObject {
       this.durability--;
     }
     if (this.durability === 0) {
-      player.gainItem(this.loot, util.integerInRange(1, 2));
+      player.gainItem(this.loot, util.integerInRange(1, 3));
     }
     this.world.server.io.emit('treeCut', {
       x: this._x,

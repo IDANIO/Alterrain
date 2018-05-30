@@ -52,8 +52,8 @@ exports.ServerConfig = {
  * @constant
  */
 exports.WorldConfig = {
-  WIDTH: 64,
-  HEIGHT: 64,
+  WIDTH: 88,
+  HEIGHT: 88,
   WEATHER_DURATION: (60 * 1000), // 1 min in millisecond
 };
 

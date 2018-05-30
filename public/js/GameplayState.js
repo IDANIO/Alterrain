@@ -1,5 +1,5 @@
-var WORLD_WIDTH = 64;
-var WORLD_HEIGHT = 64;
+var WORLD_WIDTH = 88;
+var WORLD_HEIGHT = 88;
 
 //The main menu state
 var GameplayState = function(game){
@@ -186,6 +186,8 @@ GameplayState.prototype = {
         this.errorSound = game.add.audio("errorSound");
         this.abstractChirpSound = game.add.audio("abstractChirpSound");
         this.pickupLootSound = game.add.audio("pickupLootSound");
+        this.chestOpenSound = game.add.audio("chestOpenSound");
+        this.chestUnlockSound = game.add.audio("chestUnlockSound");
         this.treeCutSound = game.add.audio("treeCutSound");
         this.treeDestroyedSound = game.add.audio("treeDestroyedSound");
         
@@ -437,23 +439,25 @@ GameplayState.prototype = {
         if(treasureChest){
             //New player unlocked 1 lock in this chest
             if(state === 0){
-                console.log("Treasure found by unique player");
-                //TODO play unlocking sound
+                this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
                 treasureChest.frame--;
+                
             }
             //Old player tried to interact with treasure chest, nothing happens
             if(state === 1){
-                console.log("Player has already interacted with treasure chest.");
-                //TODO play treasure chest locked sound effect
+                //TODO locked sound
+                console.log("Old player tried unlocking treasure chest");
             }
             //Treasure chest's last lock opened
             if(state === 2){
                 treasureChest.frame = 1;
-                this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
             }
             if(state == 3){
-                treasureChest.frame = 0;
-                //TODO play looting sound
+                if(treasureChest.frame !== 0){
+                    treasureChest.frame = 0;
+                    this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                }
             }
             // this.objectMap[tileX][tileY].unlock(state);
         }
