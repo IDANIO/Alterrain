@@ -35,6 +35,8 @@ MainMenuState.prototype = {
         game.load.audio("errorSound", ["assets/audio/wrong.ogg", "assets/audio/wrong.mp3"]);
         game.load.audio("abstractChirpSound", ["assets/audio/abstract_chirp01.ogg", "assets/audio/abstract_chirp01.mp3"]);
         game.load.audio("pickupLootSound", ["assets/audio/pickup_loot01.ogg", "assets/audio/pickup_loot01.mp3"]);
+        game.load.audio("chestOpenSound", ["assets/audio/creak.ogg", "assets/audio/creak.mp3"]);
+        game.load.audio("chestUnlockSound", ["assets/audio/unlock.ogg", "assets/audio/unlock.mp3"]);
         
         game.load.audio("treeCutSound", ["assets/audio/chop01.ogg", "assets/audio/chop01.mp3"]);
         game.load.audio("treeDestroyedSound", ["assets/audio/creak01.ogg", "assets/audio/creak01.mp3"]);
