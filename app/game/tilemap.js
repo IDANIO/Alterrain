@@ -44,6 +44,7 @@ class Tilemap {
     this.grassMax = 0.65;
     this.stoneMax = 1;
 
+    this.iceRatio = 0.1;
     this.beachRatio = 0.5;
     this.forestRatio = 0.66;
     this.desertRatio = 0.33;
@@ -140,6 +141,9 @@ class Tilemap {
    */
    getBiomeTypeBetter(e, m) { // 0 = grass, 1 = sand, 2 = stone, 3 = water
     if (e < this.waterMax) {
+      if(m < this.iceRatio){
+        return 8; // ice
+      }
       return 3; // water
     }
     if (e < this.sandMax) {

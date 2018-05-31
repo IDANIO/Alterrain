@@ -24,6 +24,7 @@ exports.Tiles = {
   FOREST: 5,
   SNOW: 6,
   DESERT: 7,
+  ICE: 8,
 };
 
 /**
@@ -34,6 +35,7 @@ exports.TileData = [
   0,
   0,
   1,
+  0,
   0,
   0,
   0,
