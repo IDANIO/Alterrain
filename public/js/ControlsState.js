@@ -12,10 +12,14 @@ ControlsState.prototype = {
         
         this.returnText = game.add.bitmapText(GAME_WIDTH / 2, 400, "m5x7", "Press Esc to go back", 48);
         this.returnText.anchor.setTo(0.5);
+        
+        this.blipHigh = game.add.audio("blipHigh");
+        this.blipHigh.volume = 0.25;
     },
 
     update: function(){
         if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
+            this.blipHigh.play();
             game.state.start("MainMenuState");
         }
     }
