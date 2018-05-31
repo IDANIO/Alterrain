@@ -20,6 +20,10 @@ MainMenuState.prototype = {
         game.load.spritesheet("player", "./assets/img/person_spritesheet_large.png", 32, 32);
         game.load.spritesheet("treasureChest", "./assets/img/treasurechest_spritesheet.png", 32, 32);
         game.load.spritesheet("willowTree", "./assets/img/willow_spritesheet.png", 32, 32);
+        
+        //Hacky solution for tile particles
+        game.load.spritesheet("tileSpritesheet", "./assets/img/game_tileset.png", 32, 32);
+        
         game.load.image("gameTileset", "./assets/img/game_tileset.png", 32, 32);
         game.load.image("arrowIcon", "./assets/img/arrow.png", 32, 32);
         game.load.image("soundIcon", "./assets/img/sound.png", 64, 32);

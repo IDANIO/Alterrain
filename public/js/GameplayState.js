@@ -419,6 +419,7 @@ GameplayState.prototype = {
             this.objectMap[arr[i].x][arr[i].y].setState(arr[i].state);
             this.objectMap[arr[i].x][arr[i].y].setSize(arr[i].playerRequired);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
+            this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y].lootEmitter);
         }
     },
 
@@ -455,7 +456,7 @@ GameplayState.prototype = {
                 treasureChest.frame--;
                 
             }
-            //Old player tried to interact with treasure chest, nothing happens
+            //Old player tried to interact with treasure chest, so nothing happens
             if(state === 1){
                 //TODO locked sound
                 console.log("Old player tried unlocking treasure chest");
@@ -463,11 +464,13 @@ GameplayState.prototype = {
             //Treasure chest's last lock opened
             if(state === 2){
                 treasureChest.frame = 1;
+                treasureChest.lootEmitter.start(false, 500, 250);
                 this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
             }
             if(state == 3){
                 if(treasureChest.frame !== 0){
                     treasureChest.frame = 0;
+                    treasureChest.lootEmitter.on = false;
                     this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
                 }
             }
