@@ -89,7 +89,6 @@ class Server {
 
       this.lastServerTime = elapsed;
     }, intervalDelta);
-
   }
 
   /**
