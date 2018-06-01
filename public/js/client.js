@@ -59,7 +59,7 @@ var Client = {};
       //-Original-------------------------------------------------------------//
       // gameplayState.generateSolidObjects(data.solidObjects);
       //----------------------------------------------------------------------//
-      
+
       gameplayState.spawnTreasureChests(data.chests);
       gameplayState.startWeatherEffect(data.weather);
     });
@@ -95,8 +95,17 @@ var Client = {};
       gameplayState.interactWithChest(data.x, data.y, data.state);
     });
 
+    /**
+     * data is an Array of Objects {x, y, durability}
+     */
+    Client.socket.on('objectUpdate', function (data) {
+      console.log('New trees are spawned..');
+      data.forEach(function (obj) {
+        gameplayState.placeSolidObject(0, obj.x, obj.y, obj.durability);
+      });
+    });
+
     Client.socket.on('objectRemoval', function (data) {
-      console.log('Object deleted..');
       gameplayState.deleteObjectAt(data.x, data.y);
     });
 
@@ -108,7 +117,7 @@ var Client = {};
     Client.socket.on('inventoryUpdate', function (data){
       gameplayState.updatePlayerInventory(data.id, data.inventory);
     });
-    
+
     /**
      * @param data {Object}
      * @param data.id {Number} The player's ID

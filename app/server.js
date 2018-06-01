@@ -89,6 +89,7 @@ class Server {
 
       this.lastServerTime = elapsed;
     }, intervalDelta);
+
   }
 
   /**
@@ -98,8 +99,6 @@ class Server {
    */
   step(dt) {
     let step = ++this.world.stepCount;
-
-    // this.emit('preStep', {step, dt});
 
     // process input commands together.
     this.playerInputQueues.forEach((commands, playerId) => {
@@ -111,8 +110,6 @@ class Server {
 
     // Main Game Update Goes Here
     this.world.step(dt);
-
-    // this.emit('postStep', {step});
   }
 
   /**

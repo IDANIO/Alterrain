@@ -11,6 +11,9 @@ class Tilemap {
      */
     this.world = world;
 
+    this.grassTiles = [];
+    this.forestTiles = [];
+
     /**
      * 0 = grass
      * 1 = sand
@@ -51,6 +54,17 @@ class Tilemap {
     this.snowRatio = 0.5;
 
     this.generateTerrain();
+  }
+
+  /**
+   * @param callback {Function}
+   */
+  foreach(callback) {
+    for (let i = 0; i < this.world.width; i++) {
+      for (let j = 0; j < this.world.height; j++) {
+        callback(i, j, this.data[i][j]);
+      }
+    }
   }
 
   generateTerrain() {
@@ -141,7 +155,7 @@ class Tilemap {
    */
    getBiomeTypeBetter(e, m) { // 0 = grass, 1 = sand, 2 = stone, 3 = water
     if (e < this.waterMax) {
-      if(m < this.iceRatio){
+      if (m < this.iceRatio) {
         return 8; // ice
       }
       return 3; // water
