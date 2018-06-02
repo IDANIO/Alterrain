@@ -174,7 +174,8 @@ GameplayState.prototype = {
             this.lightRainSound.play();
         }
         this.screenShader.tint = 0x999999;
-        this.screenShader.alpha = 0.4;
+        game.add.tween(this.screenShader).to( { alpha: 0.4 }, 1500, "Linear", true);
+        //this.screenShader.alpha = 0.4;
         this.rainEmitter.on = true;
     },
     
@@ -182,7 +183,8 @@ GameplayState.prototype = {
         if(this.lightRainSound.isPlaying){
             this.lightRainSound.stop();
         }
-        this.screenShader.alpha = 0;
+        game.add.tween(this.screenShader).to( { alpha: 0 }, 1500, "Linear", true);
+        //this.screenShader.alpha = 0;
         this.rainEmitter.on = false;;
     },
 
