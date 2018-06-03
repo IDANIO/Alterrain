@@ -46,15 +46,15 @@ exports.TileData = [
  * @constant
  */
 exports.TileSpeed = [
-  4,
-  4,
-  4,
+  5,
+  5,
+  5,
   0,
+  5,
+  5,
+  5,
   4,
-  4,
-  4,
-  3,
-  4,
+  5,
 ];
 
 /**

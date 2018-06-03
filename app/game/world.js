@@ -285,7 +285,7 @@ class World {
   removeObject(object) {
     this.objectContainer.remove(object);
 
-    logger.info(`object removed, now has ${
+    logger.data(`object removed, now has ${
       this.objectContainer.tree.size
     } objects. `);
 

@@ -176,7 +176,7 @@ class Server {
       disconnectTime: 0,
     };
 
-    logger.data(`[${playerEvent.id}] Has joined the world
+    logger.info(`[${playerEvent.id}] Has joined the world
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
@@ -190,7 +190,7 @@ class Server {
 
       this.onPlayerDisconnected(socket);
 
-      logger.data(`[${playerEvent.id}][playerEvent] disconnect
+      logger.info(`[${playerEvent.id}][playerEvent] disconnect
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
