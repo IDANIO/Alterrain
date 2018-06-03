@@ -222,6 +222,8 @@ class Server {
     socket.on('inputCommand', (cmd) => {
       this.onReceivedInput(cmd, socket, playerEvent.playerId);
     });
+
+    this.world.emit('playerSpawn');
   }
 
   /**

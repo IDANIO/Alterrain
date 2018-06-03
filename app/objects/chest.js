@@ -17,8 +17,21 @@ class Chest extends GameObject {
       Tiles.FOREST, Tiles.SNOW, Tiles.DESERT,
       Tiles.ICE,
     ];
+
     this.playerRequired = 1;
     this.playerHistory = [];
+
+    this.count = 10 * 1000;
+  }
+
+  onUpdate(dt) {
+    if (this.state === Chest.STATE_LOOTED) {
+      this.count -= dt;
+
+      if (this.count <= 0) {
+        this.world.emit('objectRemoval', this);
+      }
+    }
   }
 
   /**

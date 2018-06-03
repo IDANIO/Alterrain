@@ -9,12 +9,12 @@ class DualChest extends Chest {
     this.playerRequired = 2;
   }
 
-  /**
-   * @override
-   * @param player
-   */
-  onUnlock(player) {
+  onInteraction(...args) {
+    super.onInteraction(...args);
+  }
 
+  onUnlock(...args) {
+    super.onUnlock(...args);
   }
 
   onOpened(player) {
