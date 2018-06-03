@@ -84,7 +84,7 @@ GameplayState.prototype = {
         this.initializeWeatherEffects();
         
         //Create the inventoryUI
-        this.playerInventoryUI = new InventoryUI(game, 120, 408, "inventoryUI");
+        this.playerInventoryUI = new InventoryUI(game, 120, 393, "inventoryUI");
         this.uiGroup.add(this.playerInventoryUI);
         for(let i = 0; i < this.playerInventoryUI.itemsText.length; i++){
             this.uiGroup.add(this.playerInventoryUI.itemsText[i]);
