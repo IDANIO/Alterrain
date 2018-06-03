@@ -84,6 +84,10 @@ class World {
     this.on('objectRemoval', (obj) => {
       this.removeObject(obj);
     });
+
+    this.on('playerSpawn', ()=>{
+      this.onPlayerSpawn();
+    });
   }
 
   /**
@@ -96,7 +100,7 @@ class World {
 
     this.tilemap = new Tilemap(this);
     this.initializeTrees();
-    this.spawnChests();
+    this.initializeChests();
   }
 
   /**
@@ -121,61 +125,22 @@ class World {
     this.emit = emitter.emit;
   }
 
-  /**
-   * Save a world snapshot to the local disk.
-   */
-  saveWorldDataToDisk() {
-    let d = new Date();
-    let filename = `world-${d.getDay()}-${d.getHours()}-${d.getSeconds()}.json`;
-    let resolvedPath = path.join(__dirname, '../../data', filename);
-    let data = JSON.stringify(this.tileMap);
+  onPlayerSpawn() {
+    let chest = this.spawnChest();
 
-    fs.writeFile(resolvedPath, data, (err) => {
-      if (err) {
-        return logger.error(`Unable to Save world data: ${resolvedPath}`);
-      }
-      logger.info(`World snapshot saved: ${resolvedPath}`);
-    });
-  }
-
-  /**
-   * @param filename {String}
-   * @return {Array.<Array.<Number>>}
-   */
-  loadFromDiskData(filename) {
-    let resolvedPath = path.join(__dirname, '../../data', filename);
-
-    let mapData = null;
-
-    try {
-      mapData = JSON.parse(fs.readFileSync(resolvedPath));
-    } catch (err) {
-      logger.error(`Unable to Read world data: ${resolvedPath}`);
-      logger.error(err);
-    }
-
-    return mapData;
+    logger.data(`a chest spawned at (${chest._x},${chest._y}).`);
   }
 
   /**
    * @private
    */
-  spawnChests() {
+  initializeChests() {
     this.chestObjects = [];
-    let newX;
-    let newY;
 
-    // TODO: Very bad implementation
-    for (let i = 0; i < 50; ++i) {
-      do {
-        newX = Math.floor(Math.random() * this.width);
-        newY = Math.floor(Math.random() * this.height);
-      } while (!this.isPassable(newX, newY, 2));
+    for (let i = 0; i < 5; ++i) {
+      let chest = this.spawnChest();
 
-      let chest = new Chest(this, newX, newY);
-      this.chestObjects.push(chest);
-      this.objectContainer.add(chest);
-      logger.debug(`chest spawned at (${newX},${newY}).`);
+      logger.debug(`a chest spawned at (${chest._x},${chest._y}).`);
     }
 
     this.objectContainer.debugPrint();
@@ -212,6 +177,25 @@ class World {
   }
 
   /**
+   * @return {Chest}
+   */
+  spawnChest() {
+    let newX;
+    let newY;
+
+    do {
+      newX = Math.floor(Math.random() * this.width);
+      newY = Math.floor(Math.random() * this.height);
+    } while (!this.isPassable(newX, newY, 2));
+
+    let chest = new Chest(this, newX, newY);
+    this.chestObjects.push(chest);
+    this.objectContainer.add(chest);
+
+    return chest;
+  }
+
+  /**
    *
    */
   spawnTree(x, y) {
@@ -224,14 +208,6 @@ class World {
       y: y,
       durability: tree.durability,
     });
-  }
-
-  randomSpawnChest() {
-    let x = util.integerInRange(0, this.width);
-    let y = util.integerInRange(0, this.height);
-    let chest = new Chest(this, x, y);
-    this.chestObjects.push(chest);
-    this.objectContainer.add(chest);
   }
 
   /**
@@ -308,6 +284,10 @@ class World {
    */
   removeObject(object) {
     this.objectContainer.remove(object);
+
+    logger.info(`object removed, now has ${
+      this.objectContainer.tree.size
+    } objects. `);
 
     this.server.io.emit('objectRemoval', {
       x: object._x,

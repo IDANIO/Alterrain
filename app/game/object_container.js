@@ -91,7 +91,6 @@ class ObjectContainer {
       success = true;
     });
 
-    logger.info(`tree removed, now has ${this.tree.size}`);
     return success;
   }
 
