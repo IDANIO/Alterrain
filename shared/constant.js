@@ -61,7 +61,7 @@ exports.WorldConfig = {
   // we don't need this any more, the max number of trees is the number of
   // trees in the start of the game.
 
-  TREE_GEN_SPEED: 5, // Each time the rain stops, chance trees
+  TREE_GEN_SPEED: 50, // Each time the rain stops, chance trees
                      // instantly generate.
                      // the higher the higher chance to gen more
                      // tress. you can try play around with it and see what

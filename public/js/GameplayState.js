@@ -311,8 +311,8 @@ GameplayState.prototype = {
             gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
         }
 
-        //Change the tile the player is standing on
-        if(e.keyCode === Phaser.Keyboard.SPACEBAR){
+        //Change the tile in front of the player
+        if(e.keyCode === Phaser.Keyboard.X){
             Client.changeTile(gameplayState.tileChoice, gameplayState.player.facing);
         }
 

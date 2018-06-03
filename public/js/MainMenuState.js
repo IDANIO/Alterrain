@@ -110,7 +110,7 @@ MainMenuState.prototype = {
         }
         
         //Select a menu option
-        if(game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR)){
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.Z)){
             if(this.menuChoice === 0){
                 this.blipHigh.play();
                 game.state.start("GameplayState");

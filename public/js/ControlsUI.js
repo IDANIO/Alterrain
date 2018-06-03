@@ -18,7 +18,7 @@ function ControlsUI(game, x, y){
     this.interactText = game.add.bitmapText(x + GAME_WIDTH / 2, y + 210, "m5x7", "Z to interact with objects", 48);
     this.interactText.anchor.setTo(0.5);
     
-    this.placeText = game.add.bitmapText(x + GAME_WIDTH / 2, y + 250, "m5x7", "Space to place tiles", 48);
+    this.placeText = game.add.bitmapText(x + GAME_WIDTH / 2, y + 250, "m5x7", "X to place tiles", 48);
     this.placeText.anchor.setTo(0.5);
     
     this.makeSoundText = game.add.bitmapText(x + GAME_WIDTH / 2, y + 290, "m5x7", "E to make a sound", 48);
