@@ -18,11 +18,11 @@ function InventoryUI(game, x, y, key, frame){
     
     this.stringMargin = 36;
     this.countOffsetX = 58;
-    this.countOffsetY = 24;
+    this.countOffsetY = 39;
     this.highlightOffsetX = 37;
-    this.highlightOffsetY = 1;
+    this.highlightOffsetY = 16;
     this.numbersOffsetX = 52;
-    this.numbersOffsetY = -6;
+    this.numbersOffsetY = 6;
     
     this.highlightUI = game.add.sprite(x + this.highlightOffsetX, y + this.highlightOffsetY, "highlightUI");
     

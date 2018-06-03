@@ -20,3 +20,12 @@ window.onload = function(){
 
     game.state.start("MainMenuState");
 };
+
+//Disable scrolling code from:
+//https://stackoverflow.com/questions/8916620/disable-arrow-key-scrolling-in-users-browser
+window.addEventListener("keydown", function(e) {
+    // space and arrow keys
+    if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);

@@ -37,9 +37,12 @@ MainMenuState.prototype = {
         game.load.image("arrowIcon", "./assets/img/arrow.png", 32, 32);
         game.load.image("soundIcon", "./assets/img/sound.png", 64, 32);
         game.load.image("lockIcon", "./assets/img/lock.png");
+        game.load.image("lockBackground", "./assets/img/chest_icon_box.png");
         game.load.image("inventoryUI", "./assets/img/inventory_ui.png", 48, 128);
         game.load.image("highlightUI", "./assets/img/highlight_ui.png", 37, 34);
         game.load.image("menuHighlight", "./assets/img/menu_highlight.png");
+        game.load.image("zIcon", "./assets/img/Z_key_icon.png");
+        game.load.image("spaceIcon", "./assets/img/Space_key_icon.png");
 
         //Weather-related images
         game.load.image("raindrop", "assets/img/raindrop.png");
@@ -89,16 +92,21 @@ MainMenuState.prototype = {
 
         this.controlsText = game.add.bitmapText(GAME_WIDTH / 2, this.controlsTextY, "m5x7", "Controls", 48);
         this.controlsText.anchor.setTo(0.5);
+        
 
         this.menuHighlight = game.add.sprite(GAME_WIDTH / 2, this.joinTextY - 8, "menuHighlight");
         this.menuHighlight.anchor.setTo(0.5);
         this.menuChoice = 0;
+        
+        this.zIcon = game.add.sprite(this.menuHighlight.x - this.menuHighlight.width / 2 - 36, 
+                                     this.menuHighlight.y - this.menuHighlight.height / 2 + 2, "zIcon");
+        this.spaceIcon = game.add.sprite(this.menuHighlight.x + this.menuHighlight.width / 2 + 4, 
+                                         this.menuHighlight.y - this.menuHighlight.height / 2 + 2, "spaceIcon");
 
         this.blipHigh = game.add.audio("blipHigh");
         this.blipHigh.volume = 0.25;
         this.blipLow = game.add.audio("blipLow");
         this.blipLow.volume = 0.25;
- 
     },
 
     update: function(){
@@ -107,6 +115,8 @@ MainMenuState.prototype = {
             if(this.menuChoice === 1){
                 this.menuChoice = 0;
                 this.menuHighlight.y = this.joinTextY - 8;
+                this.zIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
+                this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
                 this.blipLow.play();
             }
         }
@@ -114,12 +124,15 @@ MainMenuState.prototype = {
             if(this.menuChoice === 0){
                 this.menuChoice = 1;
                 this.menuHighlight.y = this.controlsTextY - 8;
+                this.zIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
+                this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
                 this.blipLow.play();
             }
         }
 
         //Select a menu option
-        if(game.input.keyboard.justPressed(Phaser.Keyboard.Z)){
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.Z) ||
+           game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR)){
             if(this.menuChoice === 0){
                 this.blipHigh.play();
                 game.state.start("GameplayState");

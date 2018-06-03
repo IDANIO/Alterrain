@@ -38,6 +38,10 @@ class Tree extends GameObject {
       durability: this.durability,
     });
   }
+
+  serialize() {
+    return `${super.serialize()} ${this.durability}`;
+  }
 }
 
 module.exports = Tree;

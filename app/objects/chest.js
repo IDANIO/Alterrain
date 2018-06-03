@@ -125,6 +125,10 @@ class Chest extends GameObject {
    */
   onLooted(player) {
   }
+
+  serialize() {
+    return `${super.serialize()} ${this.state} ${this.playersRequired}`;
+  }
 }
 
 Chest.STATE_LOCKED = 0;
