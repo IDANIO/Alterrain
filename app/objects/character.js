@@ -184,6 +184,10 @@ class Character extends GameObject {
 
     logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
   }
+
+  serialize() {
+    return `${this._realX} ${this._realY} ${this._direction}`;
+  }
 }
 
 module.exports = Character;

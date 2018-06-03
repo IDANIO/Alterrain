@@ -8,15 +8,7 @@ module.exports = (world) => {
   let str = '';
 
   world.players.forEach((player) => {
-    str += `${
-      player.id
-    } ${
-      player._realX
-    } ${
-      player._realY
-    } ${
-      player._direction
-    }|`;
+    str += `${player.serialize()}|`;
   });
 
   return str;

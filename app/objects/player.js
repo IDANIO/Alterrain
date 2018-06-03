@@ -108,6 +108,10 @@ class Player extends Character {
       chest.onInteraction(this);
     }
   }
+
+  serialize() {
+    return `${this.id} ${super.serialize()}`;
+  }
 }
 
 /**
