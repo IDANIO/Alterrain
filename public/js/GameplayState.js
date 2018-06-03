@@ -426,6 +426,7 @@ GameplayState.prototype = {
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y].lootEmitter);
             this.treasureUIGroup.add(this.objectMap[arr[i].x][arr[i].y].lockCountText);
+            this.treasureUIGroup.add(this.objectMap[arr[i].x][arr[i].y].lockIcon);
         }
     },
 

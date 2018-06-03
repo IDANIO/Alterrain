@@ -7,7 +7,8 @@ function Treasure(game, x, y, key, frame){
     this.numPlayersRequired = 1;
     this.frame = 1;
     
-    this.lockCountText = game.add.bitmapText(x, y - 12, "m5x7", "1x Lock", 24);
+    this.lockCountText = game.add.bitmapText(x, y - 12, "m5x7", "1x", 24);
+    this.lockIcon = game.add.sprite(x + 20, y - 12, "lockIcon");
     
     this.lootEmitter = game.add.emitter(x + 16, y + 14);
     this.lootEmitter.makeParticles("tileSpritesheet", [0, 1, 2, 5, 6, 7, 8], 16);
@@ -26,7 +27,7 @@ Treasure.prototype.setSize = function(size){
         this.numPlayersRequired = size;
         //this.frame = size + 1;
         this.frame = 2;
-        this.lockCountText.text = size + "x Lock";
+        this.lockCountText.text = size + "x";
     }
 };
 
@@ -59,6 +60,7 @@ Treasure.prototype.open = function(){
     this.frame = 1;
     this.lootEmitter.start(false, 500, 250);
     this.lockCountText.destroy();
+    this.lockIcon.destroy();
 };
 
 Treasure.prototype.digUp = function(){
