@@ -1,19 +1,18 @@
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/RaiderSoap/cmpm120-project.png?columns=all)](https://waffle.io/RaiderSoap/cmpm120-project?utm_source=badge)
-[![Build Status](https://travis-ci.org/RaiderSoap/cmpm120-project.svg?branch=master)](https://travis-ci.org/RaiderSoap/cmpm120-project)
-
 
 # Alterrain MMO
 
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/RaiderSoap/cmpm120-project.png?columns=all)](https://waffle.io/RaiderSoap/cmpm120-project?utm_source=badge)
+[![Build Status](https://travis-ci.org/RaiderSoap/cmpm120-project.svg?branch=master)](https://travis-ci.org/RaiderSoap/cmpm120-project)
+
+![idanio](./idanio.gif)
+
 UCSC CMPM 120 Phaser Multiplayer Game
-
-![idanio](https://lh3.googleusercontent.com/aFFYSESE8jP0ZcKnuHvzoMPax--0lzu1CCx-nAlrrT709nIDy3y1twr6CdCdApdzCtI5uwryoI_dEp-ZCfS2MqtRAlQvWExQ966Bm4FrW7EcVf-sl-lCmPnhpEH1KRRq-yIvP3TCqoiHiJOUlZyGHc2ftPnfYh4wjDqhtr_icgjtScE1MViGMvDxm7UZ8tW6EBhiv_N3OeMAZbAoEqxaiOnMsUzZSAOui_BGz5iQX104Nb84552h9cUk-wt_ityrd4_KIAyrbgYE8zd4YA44vGQ6zJYGtG-bMaABTB-2mPQdiFeqUFmRj66_kDe-7ETAYqNxa0hEX7nJ_DBlC6botTSpdpVx55LdMkkJ2MWSmTGrQ3bqFuLA28SVUsup7X4LPU2DCw0ZIFqIwcxbYO05-1SRTssNUpuj-m9soFTUBC8ACWBpBpH4UP6XVq1OujqfF_lfRRX45Bp4rJ2dajWQVwnVKoEolK2XbtiVevoRXt4tFJ8xcbFAuH_0sNQURlvoNpSc3cO2T0O4ej07mmVxmhhdyiykVaaijHoxM1EppJgGR2_v3MkDZbljWfmdy2VRyDKXDRLq_pXN0LjGR3d_p23dJsVFpTdOQ8DR-Q=w1377-h367-no "idanio")
-
 
 ## Team
 
-* **Ivan Xu** (yxu83) - [RaiderSoap](https://github.com/RaiderSoap)
-* **Julio Choy** - [svntax](https://github.com/svntax)
-* **David Kirkpatrick** - [DavidKirkpatrick95](https://github.com/DavidKirkpatrick95)
+* **Yanwen Xu** ([RaiderSoap](https://github.com/RaiderSoap) ) - :floppy_disk: Back-End developer
+* **Julio Choy** ([svntax](https://github.com/svntax)) - :computer: Front-End developer
+* **David Kirkpatrick** ([DavidKirkpatrick95](https://github.com/DavidKirkpatrick95)) - :art: Games Artist
 
 ### Links
 
@@ -134,3 +133,6 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
+Big thanks to Nathan Altice and Elizabeth Swensen.
+
+:kissing_heart:
