@@ -3,6 +3,8 @@
 const logger = require('../logger.js');
 const GameObject = require('./game_object');
 
+const {TileSpeedFactor} = require('../../shared/constant.js');
+
 class Character extends GameObject {
   constructor(world, x = 0, y = 0) {
     super(world, x, y);
@@ -16,6 +18,8 @@ class Character extends GameObject {
      */
     this._direction = 2;
     this._moveSpeed = 5;
+
+    this._speedFactor = 1;
   }
 
   /**
@@ -49,6 +53,9 @@ class Character extends GameObject {
 
   update() {
     if (this.isMoving()) {
+      const terrainID = this.world.tilemap.getTileAt(this._x, this._y);
+      this._speedFactor = TileSpeedFactor[terrainID];
+
       this.updateMove();
     }
   }
@@ -123,10 +130,18 @@ class Character extends GameObject {
   }
 
   /**
+   * @private
+   * @return {number}
+   */
+  realMoveSpeed() {
+    return this._moveSpeed * this._speedFactor;
+  }
+
+  /**
    * @return {number}
    */
   distancePerFrame() {
-    return Math.pow(2, this._moveSpeed) / 256;
+    return Math.pow(2, this.realMoveSpeed()) / 256;
   }
 
   /**
