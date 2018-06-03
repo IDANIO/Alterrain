@@ -105,6 +105,10 @@ GameplayState.prototype = {
         this.controlsUI = new ControlsUI(game, 0, 0);
         this.loadingText = game.add.bitmapText(GAME_WIDTH / 2, 400, "m5x7", "Loading...", 48);
         this.loadingText.anchor.setTo(0.5);
+
+
+        // -------------------------------------- Ivan's change
+        this.cursors = game.input.keyboard.createCursorKeys();
     },
 
     shutdown: function(){
@@ -114,7 +118,56 @@ GameplayState.prototype = {
 
     },
 
+    // Code Modified from RPG Maker
+    updateInput(){
+      let x = 0;
+      let y = 0;
+
+      // Arrow input
+      if (this.cursors.up.isDown) {
+        y--;
+      }
+      if (this.cursors.down.isDown) {
+        y++;
+      }
+
+      if (this.cursors.left.isDown) {
+        x--;
+      }
+      if (this.cursors.right.isDown) {
+        x++;
+      }
+
+      let dir8 = 0;
+      if (x !== 0 || y !== 0) {
+        dir8 = 5 - y * 3 + x;
+      }
+
+      if (x !== 0 && y !== 0) {
+        if (this._preferredAxis === 'x') {
+          y = 0;
+        } else {
+          x = 0;
+        }
+      } else if (x !== 0) {
+        this._preferredAxis = 'y';
+      } else if (y !== 0) {
+        this._preferredAxis = 'x';
+      }
+
+      let dir4 = 0;
+      if (x !== 0 || y !== 0) {
+        dir4 = 5 - y * 3 + x;
+      }
+
+      if (this.player && this.player.canMove){
+        Client.sendInputs(dir4);
+      }
+    },
+
     update: function(){
+        this.updateInput();
+
         if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
             this.stopAllSounds();
             game.state.start("MainMenuState");
@@ -257,20 +310,24 @@ GameplayState.prototype = {
 
     handleKeys: function(e){
         //Emit signals only if the player isn't in the middle of moving already
-        if(gameplayState.player && gameplayState.player.canMove){
-            if(e.keyCode === Phaser.Keyboard.UP){
-                Client.sendMove(8);
-            }
-            if(e.keyCode === Phaser.Keyboard.DOWN){
-                Client.sendMove(2);
-            }
-            if(e.keyCode === Phaser.Keyboard.LEFT){
-                Client.sendMove(4);
-            }
-            if(e.keyCode === Phaser.Keyboard.RIGHT){
-                Client.sendMove(6);
-            }
-        }
+        // if(gameplayState.player && gameplayState.player.canMove){
+        //     if(e.keyCode === Phaser.Keyboard.UP){
+        //         // Client.sendMove(8);
+        //       console.log(8);
+        //     }
+        //     if(e.keyCode === Phaser.Keyboard.DOWN){
+        //         // Client.sendMove(2);
+        //       console.log(2);
+        //     }
+        //     if(e.keyCode === Phaser.Keyboard.LEFT){
+        //         // Client.sendMove(4);
+        //       console.log(4);
+        //     }
+        //     if(e.keyCode === Phaser.Keyboard.RIGHT){
+        //         // Client.sendMove(6);
+        //       console.log(6);
+        //     }
+        // }
 
         //Tile choosing controls
         if(e.keyCode === Phaser.Keyboard.ONE){
@@ -362,7 +419,7 @@ GameplayState.prototype = {
 
        sprite.updateIconPositions(screenX, screenY);
 
-       // sprite.canMove = Number.isInteger(x) && Number.isInteger(y);
+       sprite.canMove = Number.isInteger(x) && Number.isInteger(y);
 
        sprite.x = screenX;
        sprite.y = screenY;

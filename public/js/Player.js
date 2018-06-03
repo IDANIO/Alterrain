@@ -30,9 +30,9 @@ Player.prototype = Object.create(Phaser.Sprite.prototype);
 Player.prototype.constructor = Player;
 
 Player.prototype.update = function(){
-    if(!this.canMove){
-        this.stepTo();
-    }
+    // if(!this.canMove){
+    //     this.stepTo();
+    // }
 };
 
 Player.prototype.bringToTop = function(){

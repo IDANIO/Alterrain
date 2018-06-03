@@ -221,25 +221,41 @@ var Client = {};
     console.log('newPlayer')
   };
 
-  /**
-   * @param dir
-   */
-  Client.sendMove = function (dir) {
-    // TODO: Julio, make it only sent the direction for player to move
-    // 2 = Down, 4 = Left, 6 = Right, 8 = Up
+  // Client.inputThreshold = 15;
+  Client.sendInputs = function (dir) {
 
-    // check '/shared/constant.js'
-    //
-    //   MOVEMENT: 1,
-    //   ALTER_TILE: 2,
-    //   COMMUNICATION: 3,
+    // Only send if moved.
+    if  (dir === 0) {
+      return;
+    }
+
+    console.log('send');
+
     Client.socket.emit('inputCommand', {
-      type: 1,
+      type: 1, // MOVEMENT
       params: dir
     });
-
-    // Client.socket.emit("moveplayer", {dx: dx, dy: dy});
   };
+
+  // /**
+  //  * @param dir
+  //  */
+  // Client.sendMove = function (dir) {
+  //   // TODO: Julio, make it only sent the direction for player to move
+  //   // 2 = Down, 4 = Left, 6 = Right, 8 = Up
+  //
+  //   // check '/shared/constant.js'
+  //   //
+  //   //   MOVEMENT: 1,
+  //   //   ALTER_TILE: 2,
+  //   //   COMMUNICATION: 3,
+  //   Client.socket.emit('inputCommand', {
+  //     type: 1,
+  //     params: dir
+  //   });
+  //
+  //   // Client.socket.emit("moveplayer", {dx: dx, dy: dy});
+  // };
 
   Client.changeTile = function (tileChoice, dir) {
     // check '/shared/constant.js'
