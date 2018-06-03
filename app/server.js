@@ -43,7 +43,6 @@ class Server {
     this.setupSocketIO(io);
   }
 
-
   /**
    * @param io {Socket}
    */
@@ -98,15 +97,18 @@ class Server {
 
       this.step(dt);
 
-      // ------- create world descriptor
-      let str = describeAll(this.world.players);
+      // ------- create world descriptor, ignore if there is no players
 
-      this.outgoingBuffer.push({
-        t: this.gameTick,
-        d: str,
-      });
+      if (this.connectedPlayers.size !== 0) {
+        let str = describeAll(this.world.players);
 
-      this.sendOutgoingBuffer();
+        this.outgoingBuffer.push({
+          t: this.gameTick,
+          d: str,
+        });
+
+        this.sendOutgoingBuffer();
+      }
 
       // ------
 
@@ -172,7 +174,7 @@ class Server {
     let playerEvent = {
       id: socket.id,
       playerId: playerId,
-      joinTime: (new Date()).getTime(),
+      joinTime: this.getSeverTime(),
       disconnectTime: 0,
     };
 
@@ -181,12 +183,11 @@ class Server {
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
 
-
     this.onPlayerJoinWorld(socket, playerEvent);
 
     socket.on('disconnect', () => {
-      playerEvent.disconnectTime = (new Date()).getTime();
-      socket.broadcast.emit('playerEvent', ``);
+      playerEvent.disconnectTime = this.getSeverTime();
+      socket.broadcast.emit('playerEvent');
 
       this.onPlayerDisconnected(socket);
 
@@ -203,9 +204,8 @@ class Server {
    * @param playerEvent {Object}
    */
   onPlayerJoinWorld(socket, playerEvent) {
-    // This send the data of all playerstr to the new-joined client.
+    // This send the data of all player to the new-joined client.
     // TODO: Refactor
-
     let newX;
     let newY;
     do {
@@ -218,40 +218,11 @@ class Server {
 
     this.world.addPlayer(newX, newY, playerEvent.playerId);
 
-    let playerStr = describeAll(this.world.players);
-
-    // this.world.playerstr.forEach((player) => {
-    //   playerstr.push({
-    //     x: player._x,
-    //     y: player._y,
-    //     id: player.id,
-    //   });
-    // });
-    //
-    //
-    // let chests = this.world.getChestPosArray().map((chest) => {
-    //   return {
-    //     x: chest._x,
-    //     y: chest._y,
-    //     playerRequired: chest.playerRequired,
-    //     state: chest.state,
-    //   };
-    // });
-    //
-    // let trees = this.world.getTreePosArray().map((tree) => {
-    //   return {x: tree._x, y: tree._y, durability: tree.durability};
-    // });
-
-    let treeStr = describeAll(this.world.getTreePosArray());
-    let chestStr = describeAll(this.world.getChestPosArray());
-
-    let tileStr = this.world.tilemap.serialize();
-
     socket.emit('initWorld', {
-      players: playerStr,
-      tiles: tileStr,
-      trees: treeStr,
-      chests: chestStr,
+      players: describeAll(this.world.players),
+      tiles: this.world.tilemap.serialize(),
+      trees: describeAll(this.world.getTreePosArray()),
+      chests: describeAll(this.world.getChestPosArray()),
       id: playerEvent.playerId,
       weather: this.world.currentWeather,
     });
