@@ -6,7 +6,7 @@ const World = require('./game/world.js');
 const CommandFactory = require('./game/command');
 
 const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
-const describeWorld = require('./network/world_descriptor.js');
+const describeAll = require('./network/descriptor.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -99,7 +99,7 @@ class Server {
       this.step(dt);
 
       // ------- create world descriptor
-      let str = describeWorld(this.world);
+      let str = describeAll(this.world.players);
 
       this.outgoingBuffer.push({
         t: this.gameTick,
@@ -203,7 +203,7 @@ class Server {
    * @param playerEvent {Object}
    */
   onPlayerJoinWorld(socket, playerEvent) {
-    // This send the data of all players to the new-joined client.
+    // This send the data of all playerstr to the new-joined client.
     // TODO: Refactor
 
     let newX;
@@ -218,40 +218,40 @@ class Server {
 
     this.world.addPlayer(newX, newY, playerEvent.playerId);
 
-    let objects = [];
-    this.world.players.forEach((player) => {
-      objects.push({
-        x: player._x,
-        y: player._y,
-        id: player.id,
-      });
-    });
+    let playerStr = describeAll(this.world.players);
 
-    // TODO: Refactor Subject to Change
-    // TODO: Refactor SUBJECT to change
-    // TODO: Refactor SUBJECT to change
-    // TODO: Refactor SUBJECT to change
-    let chests = this.world.getChestPosArray().map((chest) => {
-      return {
-        x: chest._x,
-        y: chest._y,
-        playerRequired: chest.playerRequired,
-        state: chest.state,
-      };
-    });
+    // this.world.playerstr.forEach((player) => {
+    //   playerstr.push({
+    //     x: player._x,
+    //     y: player._y,
+    //     id: player.id,
+    //   });
+    // });
+    //
+    //
+    // let chests = this.world.getChestPosArray().map((chest) => {
+    //   return {
+    //     x: chest._x,
+    //     y: chest._y,
+    //     playerRequired: chest.playerRequired,
+    //     state: chest.state,
+    //   };
+    // });
+    //
+    // let trees = this.world.getTreePosArray().map((tree) => {
+    //   return {x: tree._x, y: tree._y, durability: tree.durability};
+    // });
 
-    let trees = this.world.getTreePosArray().map((tree) => {
-      return {x: tree._x, y: tree._y, durability: tree.durability};
-    });
+    let treeStr = describeAll(this.world.getTreePosArray());
+    let chestStr = describeAll(this.world.getChestPosArray());
 
-
-    let tileString = this.world.tilemap.serialize();
+    let tileStr = this.world.tilemap.serialize();
 
     socket.emit('initWorld', {
-      players: objects,
-      tiles: tileString,
-      solidObjects: trees,
-      chests: chests,
+      players: playerStr,
+      tiles: tileStr,
+      trees: treeStr,
+      chests: chestStr,
       id: playerEvent.playerId,
       weather: this.world.currentWeather,
     });

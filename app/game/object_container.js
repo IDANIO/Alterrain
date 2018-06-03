@@ -5,6 +5,7 @@ const logger = require('../logger.js');
 
 /**
  * @link https://github.com/elbywan/quadtree-lib
+ * @implements {Serializable}
  */
 class ObjectContainer {
   constructor(world) {
@@ -96,6 +97,21 @@ class ObjectContainer {
 
   debugPrint() {
     logger.debug(this.tree.pretty());
+  }
+
+  serialize() {
+    let treeStr = 't:';
+    let chestStr = 'c:';
+
+    this.tree.each((elt) => {
+      if (elt.object.type !== 'tree') {
+        treeStr += `${elt.object.serialize()}|`;
+      } else {
+        chestStr += `${elt.object.serialize()}|`;
+      }
+    });
+
+    return treeStr + chestStr;
   }
 }
 

@@ -42,16 +42,25 @@ var Client = {};
      * @param data.weather {Number} The current weather of the world
      */
     Client.socket.on('initWorld', function (data) {
-      //console.log(data);
-      var players = data.players;
-      for (var i = 0; i < players.length; i++) {
-        gameplayState.addNewPlayer(players[i].id, players[i].x, players[i].y)
+      // Parse Players
+      let each = data.players.split('|');
+      for (let i = 0; i < each.length - 1; i++) {
+        let e = each[i].split(' ');
+
+        let id = parseInt(e[0]);
+        let x = parseFloat(e[1]);
+        let y = parseFloat(e[2]);
+        let d = parseInt(e[3]);
+
+        gameplayState.addNewPlayer(id, x, y)
       }
+
       if(data.id){
         gameplayState.setPlayerReference(data.id);
       }
 
-      //-Ivan's change -------------------------------------------------------//
+
+      // Parse Tiles
       let tileStrings = data.tiles.split(' ');
 
       let w = parseInt(tileStrings[0]);
@@ -68,15 +77,37 @@ var Client = {};
       }
 
       gameplayState.generateTiles(tiles);
-      data.solidObjects.forEach(function (tree) {
-        gameplayState.placeSolidObject(0, tree.x, tree.y, tree.durability);
-      });
 
-      //-Original-------------------------------------------------------------//
-      // gameplayState.generateSolidObjects(data.solidObjects);
-      //----------------------------------------------------------------------//
 
-      gameplayState.spawnTreasureChests(data.chests);
+      // parse trees
+      let trees = data.trees.split('|');
+      for (let i = 0; i < trees.length - 1; i++) {
+        let e = trees[i].split(' ');
+
+        let x = parseInt(e[0]);
+        let y = parseInt(e[1]);
+        let durability = parseInt(e[2]);
+
+        gameplayState.placeSolidObject(0, x, y, durability);
+      }
+
+      // parse chests
+      let chests = data.chests.split('|');
+      let chestArr = [];
+      for (let i = 0; i < chests.length - 1; i++) {
+        let e = chests[i].split(' ');
+
+        let x = parseInt(e[0]);
+        let y = parseInt(e[1]);
+        let state = parseInt(e[2]);
+        let playerRequired = parseInt(e[3]);
+
+        chestArr.push({x: x, y: y, playerRequired: playerRequired, state:state });
+      }
+
+
+      gameplayState.spawnTreasureChests(chestArr);
+
       gameplayState.startWeatherEffect(data.weather);
     });
 
