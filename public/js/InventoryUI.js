@@ -12,6 +12,10 @@ function InventoryUI(game, x, y, key, frame){
     this.STONE_TILE = 2;
     this.BRIDGE_TILE = 3;
     
+    this.hexRed = 0xffa214;
+    this.hexGray = 0xb4b4b4;
+    this.hexWhite = 0xffffff;
+    
     this.stringMargin = 36;
     this.countOffsetX = 58;
     this.countOffsetY = 24;
@@ -33,6 +37,22 @@ function InventoryUI(game, x, y, key, frame){
     for(let i = 0; i < 9; i++){
         this.numbersText[i] = game.add.bitmapText(x + (i * this.stringMargin) + this.numbersOffsetX, y + this.numbersOffsetY, "m5x7", (i + 1) + "", 21);
     }
+    
+    for(let index = 0; index < this.numbersText.length; index++){
+        let i = index;
+        if(i > 3){
+            i = index - 1;
+        }
+        if(this.itemsText[i].text == "64"){
+            this.itemsText[i].tint = this.hexRed; //red
+        }
+        else if(this.itemsText[i].text == "0"){
+            this.itemsText[i].tint = this.hexGray; //gray
+        }
+        else{
+            this.itemsText[i].tint = this.hexWhite; //white
+        }
+    }
 }
 
 InventoryUI.prototype = Object.create(Phaser.Sprite.prototype);
@@ -40,7 +60,25 @@ InventoryUI.prototype.constructor = InventoryUI;
 
 InventoryUI.prototype.updateHighlight = function(index){
     this.highlightUI.x = this.x + (index * this.stringMargin) + this.highlightOffsetX;
-}
+};
+
+InventoryUI.prototype.updateCountColor = function(){
+    for(let index = 0; index < this.numbersText.length; index++){
+        let i = index;
+        if(i > 3){
+            i = index - 1;
+        }
+        if(this.itemsText[i].text == "64"){
+            this.itemsText[i].tint = this.hexRed; //red
+        }
+        else if(this.itemsText[i].text == "0"){
+            this.itemsText[i].tint = this.hexGray; //gray
+        }
+        else{
+            this.itemsText[i].tint = this.hexWhite; //white
+        }
+    }
+};
 
 InventoryUI.prototype.updateDisplay = function(inventory){
     let tempText = "";
@@ -59,5 +97,6 @@ InventoryUI.prototype.updateDisplay = function(inventory){
             //tempText += inventory[i] + this.stringMargin;
         //}
     }
+    this.updateCountColor();
     //this.itemsText.text = tempText;
 };

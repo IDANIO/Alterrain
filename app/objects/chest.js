@@ -84,6 +84,7 @@ class Chest extends GameObject {
       x: this._x,
       y: this._y,
       state: this.state,
+      playersRequired: this.playerRequired,
     });
   }
 
