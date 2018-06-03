@@ -64,15 +64,23 @@ var Client = {};
       gameplayState.startWeatherEffect(data.weather);
     });
 
+    //----------------------------------------------------------------------//
     Client.socket.on('update', function (arr) {
       arr.forEach(function (data) {
         let each = data.d.split('|');
         for (let i = 0; i < each.length - 1; i++) {
-          let player = each[i].split(' ');
-          console.log(player[0] + ": " + player[1] + ", "+ player[2]);
+          let e = each[i].split(' ');
+
+          let id = e[0];
+          let x = e[1];
+          let y = e[2];
+          let d = parseInt(e[3]);
+
+          gameplayState.updatePlayerPos(id, x, y, d);
         }
       });
     });
+    //----------------------------------------------------------------------//
 
     /**
      * @param data {Object}

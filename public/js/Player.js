@@ -6,19 +6,19 @@ function Player(game, x, y, key, frame){
     this.canMove = true;
     this.moveDuration = 10; //In milliseconds
     this.nextPos = {x: 0, y: 0};
-    
+
     this.moveTimer = game.time.create(false);
     this.moveSpeed = 4; //Must be a power of 2 and less than 32
-    
+
     this.facing = FACING_DOWN;
-    
+
     this.arrowIconOffsetY = -32;
     this.arrowIcon = null;
-    
+
     this.soundIconDuration = 500; //In milliseconds
     this.soundIconTimer = game.time.create(false);
     this.canMakeSound = true;
-    
+
     //Add sound-making icon
     this.soundIconOffsetY = -8;
     this.soundIcon = game.add.sprite(this.x, this.y + this.soundIconOffsetY, "soundIcon");
@@ -73,7 +73,7 @@ Player.prototype.updateIconPositions = function(nx, ny){
         this.arrowIcon.x = nx;
         this.arrowIcon.y = ny + this.arrowIconOffsetY;
     }
-    
+
     //Sound icon
     this.soundIcon.x = nx;
     this.soundIcon.y = ny + this.soundIconOffsetY;
@@ -110,7 +110,7 @@ Player.prototype.stepTo = function(){
 Player.prototype.setDirection = function(d) {
   this.facing = d;
 
-  // TMP
+  // TODO: Here was a bug
   switch (d){
     case FACING_DOWN:
       this.frame = 0;
@@ -124,8 +124,9 @@ Player.prototype.setDirection = function(d) {
     case FACING_UP:
       this.frame = 2;
       break;
+    default:
+        console.log('should not happen');
   }
-
 };
 
 Player.prototype.moveTo = function(nx, ny){
@@ -150,4 +151,14 @@ Player.prototype.moveTo = function(nx, ny){
             this.frame = 2;
         }
     }
+
+
+  // ----------------------------------------------------------------------
+// Player.prototype.setPos = function(x, y){
+//   this.x = x * 32;
+//   this.y = y * 32;
+// }
+
+  // ----------------------------------------------------------------------
+
 };

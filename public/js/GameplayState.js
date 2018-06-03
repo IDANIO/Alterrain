@@ -13,7 +13,7 @@ var GameplayState = function(game){
     for(let i = 0; i < WORLD_HEIGHT; i++){ //TODO use a constant instead of 64 to reference the world size
         this.objectMap[i] = [];
     }
-    
+
     this.weatherEffects = [];
     this.isRainOn = false;
     //this.textStyle = {font: "20px Arial", fill: "#FFF"};
@@ -73,16 +73,16 @@ GameplayState.prototype = {
 
         //Create a group for player icon sprites - drawn above players but below UI
         this.playerIconsGroup = game.add.group();
-        
+
         //Create a group for treasure chest related UI
         this.treasureUIGroup = game.add.group();
 
         //Create a group for UI elements
         this.uiGroup = game.add.group();
         this.uiGroup.fixedToCamera = true;
-        
+
         this.initializeWeatherEffects();
-        
+
         //Create the inventoryUI
         this.playerInventoryUI = new InventoryUI(game, 120, 393, "inventoryUI");
         this.uiGroup.add(this.playerInventoryUI);
@@ -100,7 +100,7 @@ GameplayState.prototype = {
         this.tileText = game.add.bitmapText(320, 450, "m5x7", tileName[this.tileChoice], 48);
         this.tileText.anchor.x = 0.5;
         this.uiGroup.add(this.tileText);
-        
+
         //Loading "screen" while the tilemap is generated
         this.controlsUI = new ControlsUI(game, 0, 0);
         this.loadingText = game.add.bitmapText(GAME_WIDTH / 2, 400, "m5x7", "Loading...", 48);
@@ -131,7 +131,7 @@ GameplayState.prototype = {
             }
         }
     },
-    
+
     initializeWeatherEffects: function(){
         //Screen shader
         this.screenShader = game.add.sprite(0, 0, "screenShader");
@@ -156,7 +156,7 @@ GameplayState.prototype = {
         this.rainEmitter.start(false, 2000, 10);
         this.rainEmitter.on = false;
     },
-    
+
     startWeatherEffect: function(weatherType){
         if(weatherType === 0){ //no weather
             this.stopRainEffect();
@@ -171,7 +171,7 @@ GameplayState.prototype = {
             this.startRainEffect(); //TODO sandstorm
         }
     },
-    
+
     startRainEffect: function(){
         if(!this.lightRainSound.isPlaying){
             this.lightRainSound.play();
@@ -181,7 +181,7 @@ GameplayState.prototype = {
         //this.screenShader.alpha = 0.4;
         this.rainEmitter.on = true;
     },
-    
+
     stopRainEffect: function(){
         if(this.lightRainSound.isPlaying){
             this.lightRainSound.stop();
@@ -200,16 +200,16 @@ GameplayState.prototype = {
         this.chestUnlockSound = game.add.audio("chestUnlockSound");
         this.treeCutSound = game.add.audio("treeCutSound");
         this.treeDestroyedSound = game.add.audio("treeDestroyedSound");
-        
+
         this.grassSound = game.add.audio("grassFootsteps");
         this.sandSound = game.add.audio("sandFootsteps");
         this.stoneSound = game.add.audio("stoneFootsteps");
-        
+
         this.lightRainSound = game.add.audio("lightRain", 1, true);
-        
+
         this.tileSounds = [this.grassSound, this.sandSound, this.stoneSound];
     },
-    
+
     stopAllSounds: function(){
         if(this.lightRainSound.isPlaying){
             this.lightRainSound.stop();
@@ -329,7 +329,7 @@ GameplayState.prototype = {
             Client.playSound();
         }
     },
-    
+
     updatePlayerInventory: function(playerId, inventory){
         let sourcePlayer = this.playerMap[playerId];
         if(sourcePlayer === this.player){
@@ -344,7 +344,7 @@ GameplayState.prototype = {
             sourcePlayer.startSoundTimer();
         }
     },
-    
+
     playErrorSound: function(playerId){
         let sourcePlayer = this.playerMap[playerId];
         if(sourcePlayer === this.player){
@@ -352,12 +352,32 @@ GameplayState.prototype = {
         }
     },
 
+    // ----------------------------------------------------------------------
+
+    updatePlayerPos: function(id, x, y, d){
+       let sprite = this.playerMap[id];
+
+       let screenX = x * TILE_SIZE;
+       let screenY = y * TILE_SIZE;
+
+       sprite.updateIconPositions(this.x, this.y);
+
+       // sprite.canMove = Number.isInteger(x) && Number.isInteger(y);
+
+       sprite.x = screenX;
+       sprite.y = screenY;
+
+       sprite.setDirection(d);
+    },
+
+    // ----------------------------------------------------------------------
+
     //Moves the player to the given position
     movePlayer: function(id, x, y, d){
        //this.playerMap[id].x = x;
        //this.playerMap[id].y = y;
       // console.log(`${x},${y},${d}`)
-      
+
       /*//Play corresponding footstep sound
       if(this.playerMap[id] === this.player){
           let nextTile = this.tileMap.getTile(x, y);
@@ -367,11 +387,11 @@ GameplayState.prototype = {
               }
           }
       }*/
-      
-      this.playerMap[id].setDirection(d);
-        if(this.playerMap[id].ableToMove()){
-            this.playerMap[id].moveTo(x * TILE_SIZE, y * TILE_SIZE);
-        }
+
+      // this.playerMap[id].setDirection(d);
+      //   if(this.playerMap[id].ableToMove()){
+      //       this.playerMap[id].moveTo(x * TILE_SIZE, y * TILE_SIZE);
+      //   }
     },
 
     //Change the given tile to another type
@@ -398,7 +418,7 @@ GameplayState.prototype = {
     //5 == forest
     //6 == snow
     //7 == desert
-    generateTiles: function(tileMap){ 
+    generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
                 this.tileMap.putTile(tileMap[i][j], i, j);
@@ -447,7 +467,7 @@ GameplayState.prototype = {
             game.add.existing(this.objectMap[tileX][tileY]);
         }*/
     },
-    
+
     //Delete an object at a given tile position
     deleteObjectAt: function(tileX, tileY){
         if(this.objectMap[tileX][tileY]){
@@ -490,7 +510,7 @@ GameplayState.prototype = {
             // this.objectMap[tileX][tileY].unlock(state);
         }
     },
-    
+
     //Cut a specific tree, playing a different sound depending on its remaining hitpoints
     cutTree: function(tileX, tileY, hitpoints){
         let tx = tileX * TILE_SIZE;
