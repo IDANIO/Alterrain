@@ -199,10 +199,7 @@ class Server {
     this.onPlayerJoinWorld(socket, playerEvent);
 
     socket.on('disconnect', () => {
-      playerEvent.disconnectTime = this.getSeverTime();
-      socket.broadcast.emit('playerEvent');
-
-      this.onPlayerDisconnected(socket);
+      this.onPlayerDisconnected(socket, playerEvent);
 
       logger.info(`[${playerEvent.id}][playerEvent] disconnect
       playerId        ${playerEvent.playerId}
@@ -262,7 +259,10 @@ class Server {
    * handle player dis-connection
    * @param socket {Socket}
    */
-  onPlayerDisconnected(socket) {
+  onPlayerDisconnected(socket, playerEvent) {
+    playerEvent.disconnectTime = this.getSeverTime();
+    socket.broadcast.emit('playerEvent', playerEvent);
+
     // Remove from Game World
     let player = this.connectedPlayers.get(socket.id);
     if (player) {
