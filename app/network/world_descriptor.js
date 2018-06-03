@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @param world {World}
  * @return {string}

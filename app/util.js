@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2015 Photon Storm Ltd.

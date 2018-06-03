@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * @instance
  * @type {{makeMoveCommand: function((Character|Player), Number=): Function,
