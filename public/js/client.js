@@ -64,6 +64,16 @@ var Client = {};
       gameplayState.startWeatherEffect(data.weather);
     });
 
+    Client.socket.on('update', function (arr) {
+      arr.forEach(function (data) {
+        let each = data.d.split('|');
+        for (let i = 0; i < each.length - 1; i++) {
+          let player = each[i].split(' ');
+          console.log(player[0] + ": " + player[1] + ", "+ player[2]);
+        }
+      });
+    });
+
     /**
      * @param data {Object}
      * @param data.tiles {Array} An array that represents a tile's x,y position and type

@@ -1,9 +1,12 @@
 'use strict';
 
-const World = require('./game/world.js');
 const logger = require('./logger.js');
-const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
+
+const World = require('./game/world.js');
 const CommandFactory = require('./game/command');
+
+const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
+const describeWorld = require('./network/world_descriptor.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -34,6 +37,9 @@ class Server {
      */
     this.world = null;
 
+    this.gameTick = 0;
+    this.outgoingBuffer = [];
+
     this.setupSocketIO(io);
   }
 
@@ -43,7 +49,9 @@ class Server {
    */
   setupSocketIO(io) {
     this.io = io;
-    io.on('connection', this.onPlayerConnected.bind(this));
+    io.on('connection', (socket) => {
+      this.onPlayerConnected(socket);
+    });
   }
 
   /**
@@ -76,19 +84,48 @@ class Server {
   start() {
     const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
 
-    this.serverStartTime = (new Date().getTime());
+    this.outgoingDelta = Math.floor((1000 / this.intervalFrameRate) * 2);
 
+    this.serverStartTime = (new Date().getTime());
     this.lastServerTime = this.serverStartTime;
 
+    // game ticks at 60 fps
+    // world data is sent 30 fps
     this.intervalGameTick = setInterval(() => {
-      let elapsed = (new Date().getTime());
+      let timeNow = (new Date().getTime());
 
-      const dt = elapsed - this.lastServerTime;
+      const dt = timeNow - this.lastServerTime;
 
       this.step(dt);
 
-      this.lastServerTime = elapsed;
+      // ------- create world descriptor
+      let str = describeWorld(this.world);
+
+      this.outgoingBuffer.push({
+        t: this.gameTick,
+        d: str,
+      });
+
+      this.sendOutgoingBuffer();
+
+      // ------
+
+      this.lastServerTime = timeNow;
+      this.gameTick++;
     }, intervalDelta);
+  }
+
+  /**
+   * @return {number}
+   */
+  getSeverTime() {
+    return (new Date().getTime()) - this.serverStartTime;
+  }
+
+  sendOutgoingBuffer() {
+    this.io.emit('update', this.outgoingBuffer);
+
+    this.outgoingBuffer = [];
   }
 
   /**
