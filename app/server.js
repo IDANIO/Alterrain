@@ -7,6 +7,7 @@ const CommandFactory = require('./game/command');
 
 const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
 const describeWorld = require('./network/world_descriptor.js');
+const describeTiles = require('./network/tiles_descriptor.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -244,9 +245,12 @@ class Server {
       return {x: tree._x, y: tree._y, durability: tree.durability};
     });
 
+
+    let tileString = describeTiles(this.world.tilemap);
+
     socket.emit('initWorld', {
       players: objects,
-      tiles: this.world.getTileMap(),
+      tiles: tileString,
       solidObjects: trees,
       chests: chests,
       id: playerEvent.playerId,

@@ -50,8 +50,24 @@ var Client = {};
       if(data.id){
         gameplayState.setPlayerReference(data.id);
       }
-      gameplayState.generateTiles(data.tiles);
+
       //-Ivan's change -------------------------------------------------------//
+      let tileStrings = data.tiles.split(' ');
+
+      let w = parseInt(tileStrings[0]);
+      let h = parseInt(tileStrings[1]);
+
+      let index = 2;
+
+      let tiles = [];
+      for (let i = 0; i < w; i++) {
+        tiles[i] = [];
+        for (let j = 0; j < h; j++) {
+          tiles[i][j] = parseInt(tileStrings[index++]);
+        }
+      }
+
+      gameplayState.generateTiles(tiles);
       data.solidObjects.forEach(function (tree) {
         gameplayState.placeSolidObject(0, tree.x, tree.y, tree.durability);
       });

@@ -11,6 +11,9 @@ class Tilemap {
      */
     this.world = world;
 
+    this.width = this.world.width;
+    this.height = this.world.height;
+
     this.grassTiles = [];
     this.forestTiles = [];
 
