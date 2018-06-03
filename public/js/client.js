@@ -214,6 +214,13 @@ var Client = {};
     Client.socket.on('weatherChange', function (data){
       gameplayState.startWeatherEffect(data);
     });
+
+    /**
+     * @param data {Array}
+     */
+    Client.socket.on('spawnChests', function (data) {
+      gameplayState.spawnTreasureChests(data);
+    });
   };
 
   /**
