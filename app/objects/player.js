@@ -62,6 +62,7 @@ class Player extends Character {
     let newY = Character.roundYWithDirection(this._y, this._direction);
 
     if (this.hasItem(tileId) &&
+        this.world.isValidTile(newX, newY) &&
         this.tileTypeCheck(tileId, newX, newY) &&
         this.world.changeTile(newX, newY, tileId)) {
       this.loseItem(tileId);

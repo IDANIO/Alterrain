@@ -173,15 +173,6 @@ class Character extends GameObject {
       this._y = Character.roundYWithDirection(this._y, d);
     }
 
-    // When moving on ice, player will "slip", move once more
-    const terrainID = this.world.tilemap.getTileAt(this._x, this._y);
-    if (terrainID === Tiles.ICE) {
-      if (this.canPass(this._x, this._y, this._direction)) {
-        this._x = Character.roundXWithDirection(this._x, d);
-        this._y = Character.roundYWithDirection(this._y, d);
-      }
-    }
-
     logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
   }
 
