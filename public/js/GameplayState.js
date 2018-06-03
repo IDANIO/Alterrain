@@ -357,8 +357,8 @@ GameplayState.prototype = {
     updatePlayerPos: function(id, x, y, d){
        let sprite = this.playerMap[id];
 
-       let screenX = x * TILE_SIZE;
-       let screenY = y * TILE_SIZE;
+       let screenX = Math.floor(x * TILE_SIZE);
+       let screenY = Math.floor(y * TILE_SIZE);
 
        sprite.updateIconPositions(screenX, screenY);
 

@@ -202,7 +202,7 @@ var Client = {};
     //   MOVEMENT: 1,
     //   ALTER_TILE: 2,
     //   COMMUNICATION: 3,
-    Client.socket.emit("inputCommand", {
+    Client.socket.emit('inputCommand', {
       type: 1,
       params: dir
     });
