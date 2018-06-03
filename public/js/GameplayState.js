@@ -73,6 +73,9 @@ GameplayState.prototype = {
 
         //Create a group for player icon sprites - drawn above players but below UI
         this.playerIconsGroup = game.add.group();
+        
+        //Create a group for treasure chest related UI
+        this.treasureUIGroup = game.add.group();
 
         //Create a group for UI elements
         this.uiGroup = game.add.group();
@@ -422,6 +425,7 @@ GameplayState.prototype = {
             this.objectMap[arr[i].x][arr[i].y].setSize(arr[i].playerRequired);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y].lootEmitter);
+            this.treasureUIGroup.add(this.objectMap[arr[i].x][arr[i].y].lockCountText);
         }
     },
 
@@ -449,24 +453,28 @@ GameplayState.prototype = {
     },
 
     //Interact with a specific treasure chest
-    interactWithChest: function(tileX, tileY, state){
+    interactWithChest: function(tileX, tileY, state, playersRequired){
         let treasureChest = this.objectMap[tileX][tileY];
         if(treasureChest){
             //New player unlocked 1 lock in this chest
             if(state === 0){
-                this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
-                treasureChest.frame--;
-                
+                //this never runs
             }
             //Old player tried to interact with treasure chest, so nothing happens
             if(state === 1){
-                //TODO locked sound
-                console.log("Old player tried unlocking treasure chest");
+                if(playersRequired == treasureChest.numPlayersRequired){ //old player
+                    //TODO locked sound
+                    console.log("Old player tried unlocking treasure chest");
+                }
+                else{ //new player
+                    this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                    //treasureChest.frame--;
+                    treasureChest.unlockOnce();
+                }
             }
             //Treasure chest's last lock opened
             if(state === 2){
-                treasureChest.frame = 1;
-                treasureChest.lootEmitter.start(false, 500, 250);
+                treasureChest.open();
                 this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
             }
             if(state == 3){
