@@ -45,6 +45,21 @@ exports.TileData = [
 /**
  * @constant
  */
+exports.TileSpeedFactor = [
+  1,
+  1,
+  1,
+  0,
+  1,
+  0.75,
+  1,
+  0.5,
+  1.25,
+];
+
+/**
+ * @constant
+ */
 exports.ServerConfig = {
   MAX_PLAYERS: 50,
   STEP_RATE: 60,
