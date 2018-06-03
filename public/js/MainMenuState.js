@@ -7,6 +7,10 @@ var MainMenuState = function(game){
 
 MainMenuState.prototype = {
     init: function(){
+        //Center the game
+        game.scale.pageAlignHorizontally = true;
+        game.scale.pageAlignVertically = true;  
+        
         //Make sure the game continues running when out of focus
         game.stage.disableVisibilityChange = true;
 
@@ -14,7 +18,7 @@ MainMenuState.prototype = {
         game.stage.smoothed = false
     },
 
-    preload: function(){
+    preload: function(){        
         //Font
         game.load.bitmapFont("m5x7", "assets/font/m5x7.png", "assets/font/m5x7.fnt");
 
@@ -71,6 +75,12 @@ MainMenuState.prototype = {
     },
 
     create: function(){
+        //Hacky way to prevent the "jumping canvas" visual bug, based on:
+        //http://www.html5gamedevs.com/topic/20075-how-to-align-game-to-center-screen-without-jumping/
+        setTimeout( () => {
+            document.getElementsByTagName("canvas")[0].style.opacity = 1;
+        }, 0 );
+        
         this.titleText = game.add.bitmapText(GAME_WIDTH / 2, 180, "m5x7", "Alterrain", 64);
         this.titleText.anchor.setTo(0.5);
 
@@ -88,10 +98,7 @@ MainMenuState.prototype = {
         this.blipHigh.volume = 0.25;
         this.blipLow = game.add.audio("blipLow");
         this.blipLow.volume = 0.25;
-
-        //Center the game
-      game.scale.pageAlignHorizontally = true;
-      game.scale.pageAlignVertically = true;
+ 
     },
 
     update: function(){

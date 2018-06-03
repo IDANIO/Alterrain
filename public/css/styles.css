@@ -2,8 +2,7 @@ body {
 	font-family: Helvetica;
 }
 
-#container {
-	margin: auto;
-	width: 50%;
-	height: 100%;
+canvas {
+	opacity: 0;
+	border: 4px solid #657392;
 }
