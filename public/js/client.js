@@ -71,9 +71,9 @@ var Client = {};
         for (let i = 0; i < each.length - 1; i++) {
           let e = each[i].split(' ');
 
-          let id = e[0];
-          let x = e[1];
-          let y = e[2];
+          let id = parseInt(e[0]);
+          let x = parseFloat(e[1]);
+          let y = parseFloat(e[2]);
           let d = parseInt(e[3]);
 
           gameplayState.updatePlayerPos(id, x, y, d);

@@ -360,7 +360,7 @@ GameplayState.prototype = {
        let screenX = x * TILE_SIZE;
        let screenY = y * TILE_SIZE;
 
-       sprite.updateIconPositions(this.x, this.y);
+       sprite.updateIconPositions(screenX, screenY);
 
        // sprite.canMove = Number.isInteger(x) && Number.isInteger(y);
 
