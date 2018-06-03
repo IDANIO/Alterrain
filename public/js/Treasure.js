@@ -6,6 +6,17 @@ function Treasure(game, x, y, key, frame){
     //Default - require 1 player only to open
     this.numPlayersRequired = 1;
     this.frame = 1;
+    
+    this.lockCountText = game.add.bitmapText(x, y - 12, "m5x7", "1x", 24);
+    this.lockIcon = game.add.sprite(x + 20, y - 12, "lockIcon");
+    
+    this.lootEmitter = game.add.emitter(x + 16, y + 14);
+    this.lootEmitter.makeParticles("tileSpritesheet", [0, 1, 2, 5, 6, 7, 8], 16);
+    this.lootEmitter.gravity = 128;
+    //this.lootEmitter.setRotation(0, 0);
+    this.lootEmitter.setXSpeed(-48, 48);
+    this.lootEmitter.setYSpeed(-64, -32);
+    this.lootEmitter.setScale(0.25, 0.25, 0.25, 0.25);
 }
 
 Treasure.prototype = Object.create(Phaser.Sprite.prototype);
@@ -14,16 +25,20 @@ Treasure.prototype.constructor = Tree;
 Treasure.prototype.setSize = function(size){
     if(size > 0){
         this.numPlayersRequired = size;
-        this.frame = size + 1;
+        //this.frame = size + 1;
+        this.frame = 2;
+        this.lockCountText.text = size + "x";
     }
 };
 
 Treasure.prototype.setState = function(state){
     if(state === 3){
         this.frame = 0;
+        this.lootEmitter.on = false;
     }
     else if(state === 2){
         this.frame = 1;
+        this.lootEmitter.start(false, 500, 250);
     }
     else if(state === 1 || state === 0){
         this.frame = 2;
@@ -41,10 +56,19 @@ Treasure.prototype.setHidden = function(flag){
     }
 };
 
+Treasure.prototype.open = function(){
+    this.frame = 1;
+    this.lootEmitter.start(false, 500, 250);
+    this.lockCountText.destroy();
+    this.lockIcon.destroy();
+};
+
 Treasure.prototype.digUp = function(){
     this.setHidden(false);
 };
 
-Treasure.prototype.unlock = function(state){
-    
+Treasure.prototype.unlockOnce = function(){
+    //this.frame--;
+    this.numPlayersRequired--;
+    this.lockCountText.text = this.numPlayersRequired + "x Lock";
 };

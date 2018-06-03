@@ -72,18 +72,21 @@ class World {
      * @type {World.WEATHER|number}
      */
     this.currentWeather = World.WEATHER.DRY;
-
-    /**
-     * @type {number}
-     */
     this.weatherCount = 0;
-
     this.weatherDuration = WorldConfig.WEATHER_DURATION;
+
+    this.outgoingBuffer = [];
+
+    this.treeGenChance = WorldConfig.TREE_GEN_SPEED;
 
     this.initWorldData(filename);
 
     this.on('objectRemoval', (obj) => {
       this.removeObject(obj);
+    });
+
+    this.on('playerSpawn', ()=>{
+      this.onPlayerSpawn();
     });
   }
 
@@ -96,8 +99,8 @@ class World {
     logger.info('Creating new Tilemap...');
 
     this.tilemap = new Tilemap(this);
-    this.spawnTrees();
-    this.spawnChests();
+    this.initializeTrees();
+    this.initializeChests();
   }
 
   /**
@@ -122,61 +125,22 @@ class World {
     this.emit = emitter.emit;
   }
 
-  /**
-   * Save a world snapshot to the local disk.
-   */
-  saveWorldDataToDisk() {
-    let d = new Date();
-    let filename = `world-${d.getDay()}-${d.getHours()}-${d.getSeconds()}.json`;
-    let resolvedPath = path.join(__dirname, '../../data', filename);
-    let data = JSON.stringify(this.tileMap);
+  onPlayerSpawn() {
+    let chest = this.spawnChest();
 
-    fs.writeFile(resolvedPath, data, (err) => {
-      if (err) {
-        return logger.error(`Unable to Save world data: ${resolvedPath}`);
-      }
-      logger.info(`World snapshot saved: ${resolvedPath}`);
-    });
-  }
-
-  /**
-   * @param filename {String}
-   * @return {Array.<Array.<Number>>}
-   */
-  loadFromDiskData(filename) {
-    let resolvedPath = path.join(__dirname, '../../data', filename);
-
-    let mapData = null;
-
-    try {
-      mapData = JSON.parse(fs.readFileSync(resolvedPath));
-    } catch (err) {
-      logger.error(`Unable to Read world data: ${resolvedPath}`);
-      logger.error(err);
-    }
-
-    return mapData;
+    logger.data(`a chest spawned at (${chest._x},${chest._y}).`);
   }
 
   /**
    * @private
    */
-  spawnChests() {
+  initializeChests() {
     this.chestObjects = [];
-    let newX;
-    let newY;
 
-    // TODO: Very bad implementation
-    for (let i = 0; i < 50; ++i) {
-      do {
-        newX = Math.floor(Math.random() * this.width);
-        newY = Math.floor(Math.random() * this.height);
-      } while (!this.isPassable(newX, newY, 2));
+    for (let i = 0; i < 5; ++i) {
+      let chest = this.spawnChest();
 
-      let chest = new Chest(this, newX, newY);
-      this.chestObjects.push(chest);
-      this.objectContainer.add(chest);
-      logger.debug(`chest spawned at (${newX},${newY}).`);
+      logger.debug(`a chest spawned at (${chest._x},${chest._y}).`);
     }
 
     this.objectContainer.debugPrint();
@@ -186,7 +150,8 @@ class World {
    * Spawns trees around the world based on a given tilemap.
    * Will spawn trees on grass tiles only.
    */
-  spawnTrees() {
+  initializeTrees() {
+    let count = 0;
     // TODO use a better algorithm to spawn trees
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
@@ -195,16 +160,54 @@ class World {
           if (Math.random() < 0.8) {
             // Set the object type as a tree
             let tree = new Tree(this, x, y);
+            count++;
             this.objectContainer.add(tree);
           }
         } else if (tileType === Tiles.GRASS) {
-          if (Math.random() < 0.05) {
+          if (Math.random() < 0.025) {
             let tree = new Tree(this, x, y);
+            count++;
             this.objectContainer.add(tree);
           }
         }
       }
     }
+
+    this.maxTreeNumber = count;
+  }
+
+  /**
+   * @return {Chest}
+   */
+  spawnChest() {
+    let newX;
+    let newY;
+
+    do {
+      newX = Math.floor(Math.random() * this.width);
+      newY = Math.floor(Math.random() * this.height);
+    } while (!this.isPassable(newX, newY, 2));
+
+    let chest = new Chest(this, newX, newY);
+    this.chestObjects.push(chest);
+    this.objectContainer.add(chest);
+
+    return chest;
+  }
+
+  /**
+   *
+   */
+  spawnTree(x, y) {
+    let tree = new Tree(this, x, y);
+
+    this.objectContainer.add(tree);
+
+    this.outgoingBuffer.push({
+      x: x,
+      y: y,
+      durability: tree.durability,
+    });
   }
 
   /**
@@ -282,6 +285,10 @@ class World {
   removeObject(object) {
     this.objectContainer.remove(object);
 
+    logger.info(`object removed, now has ${
+      this.objectContainer.tree.size
+    } objects. `);
+
     this.server.io.emit('objectRemoval', {
       x: object._x,
       y: object._y,
@@ -328,6 +335,7 @@ class World {
     if (this.weatherCount >= this.weatherDuration) {
       this.weatherCount = 0;
 
+      this.lastWeather = this.currentWeather;
       this.currentWeather = util.pick([
         World.WEATHER.DRY,
         World.WEATHER.RAIN,
@@ -339,8 +347,61 @@ class World {
 
       // TODO: Refactor
       this.server.io.emit('weatherChange', this.currentWeather);
+      this.onWeatherChange();
 
-      logger.data(`World Weather has changed to ${this.currentWeather}.`);
+      logger.data(`World Weather has changed from ${
+        this.lastWeather
+        } to ${
+        this.currentWeather
+      }.`);
+    }
+
+    // emit buffer
+    if (this.outgoingBuffer.length !== 0) {
+      this.server.io.emit('objectUpdate', this.outgoingBuffer);
+      this.outgoingBuffer.length = 0;
+    }
+  }
+
+  /**
+   * O(n^2 * log n) algorithm.
+   * TODO: Make it efficient.
+   */
+  spawnRandomTree() {
+    let count = 0;
+    const grassChance = this.treeGenChance / 1000;
+    const forestChance = this.treeGenChance / 333;
+
+    this.tilemap.foreach((x, y, type)=> {
+      const rnd = Math.random();
+      if (type === Tiles.GRASS) {
+        if (!this.objectContainer.colliding(x, y) && rnd <= grassChance) {
+          this.spawnTree(x, y);
+          count++;
+        }
+      } else if (type === Tiles.FOREST) {
+        if (!this.objectContainer.colliding(x, y) && rnd <= forestChance) {
+          this.spawnTree(x, y);
+          count++;
+        }
+      }
+    });
+
+    logger.data(`New Trees has spawned ${count}, there is a total of ${
+      this.objectContainer.tree.size
+      } trees on the world. The chance was ${
+      grassChance
+      } and ${forestChance}.`);
+  }
+
+  onWeatherChange() {
+    if (this.lastWeather === World.WEATHER.RAIN &&
+        this.currentWeather !== World.WEATHER.RAIN) {
+      // 50 is the number of chests of, object container count them as well.
+      // TODO: Fix this, forgive my messy code.
+      if (this.objectContainer.tree.size < this.maxTreeNumber + 50) {
+        this.spawnRandomTree();
+      }
     }
   }
 

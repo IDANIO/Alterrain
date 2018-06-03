@@ -15,9 +15,23 @@ class Chest extends GameObject {
     this.loots = [
       Tiles.GRASS, Tiles.STONE, Tiles.SAND,
       Tiles.FOREST, Tiles.SNOW, Tiles.DESERT,
+      Tiles.ICE,
     ];
+
     this.playerRequired = 1;
     this.playerHistory = [];
+
+    this.count = 10 * 1000;
+  }
+
+  onUpdate(dt) {
+    if (this.state === Chest.STATE_LOOTED) {
+      this.count -= dt;
+
+      if (this.count <= 0) {
+        this.world.emit('objectRemoval', this);
+      }
+    }
   }
 
   /**
@@ -70,6 +84,7 @@ class Chest extends GameObject {
       x: this._x,
       y: this._y,
       state: this.state,
+      playersRequired: this.playerRequired,
     });
   }
 

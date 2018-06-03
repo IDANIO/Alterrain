@@ -22,7 +22,7 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 32;
 
-var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert"];
+var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert", "Ice"];
 
 // We are using num-pad representation (Ivan)
 //
@@ -73,6 +73,9 @@ GameplayState.prototype = {
 
         //Create a group for player icon sprites - drawn above players but below UI
         this.playerIconsGroup = game.add.group();
+        
+        //Create a group for treasure chest related UI
+        this.treasureUIGroup = game.add.group();
 
         //Create a group for UI elements
         this.uiGroup = game.add.group();
@@ -97,6 +100,11 @@ GameplayState.prototype = {
         this.tileText = game.add.bitmapText(320, 450, "m5x7", tileName[this.tileChoice], 48);
         this.tileText.anchor.x = 0.5;
         this.uiGroup.add(this.tileText);
+        
+        //Loading "screen" while the tilemap is generated
+        this.controlsUI = new ControlsUI(game, 0, 0);
+        this.loadingText = game.add.bitmapText(GAME_WIDTH / 2, 400, "m5x7", "Loading...", 48);
+        this.loadingText.anchor.setTo(0.5);
     },
 
     shutdown: function(){
@@ -169,7 +177,8 @@ GameplayState.prototype = {
             this.lightRainSound.play();
         }
         this.screenShader.tint = 0x999999;
-        this.screenShader.alpha = 0.4;
+        game.add.tween(this.screenShader).to( { alpha: 0.4 }, 1500, "Linear", true);
+        //this.screenShader.alpha = 0.4;
         this.rainEmitter.on = true;
     },
     
@@ -177,7 +186,8 @@ GameplayState.prototype = {
         if(this.lightRainSound.isPlaying){
             this.lightRainSound.stop();
         }
-        this.screenShader.alpha = 0;
+        game.add.tween(this.screenShader).to( { alpha: 0 }, 1500, "Linear", true);
+        //this.screenShader.alpha = 0;
         this.rainEmitter.on = false;;
     },
 
@@ -298,9 +308,14 @@ GameplayState.prototype = {
             gameplayState.tileText.text = tileName[gameplayState.tileChoice];
             gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
         }
+        if(e.keyCode === Phaser.Keyboard.EIGHT){
+            gameplayState.tileChoice = 8; //ice
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
 
-        //Change the tile the player is standing on
-        if(e.keyCode === Phaser.Keyboard.SPACEBAR){
+        //Change the tile in front of the player
+        if(e.keyCode === Phaser.Keyboard.X){
             Client.changeTile(gameplayState.tileChoice, gameplayState.player.facing);
         }
 
@@ -383,12 +398,14 @@ GameplayState.prototype = {
     //5 == forest
     //6 == snow
     //7 == desert
-    generateTiles: function(tileMap){
+    generateTiles: function(tileMap){ 
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
                 this.tileMap.putTile(tileMap[i][j], i, j);
             }
         }
+        this.controlsUI.destroy();
+        this.loadingText.destroy();
     },
 
     //Generates solid objects based on a given 2D object map
@@ -407,6 +424,9 @@ GameplayState.prototype = {
             this.objectMap[arr[i].x][arr[i].y].setState(arr[i].state);
             this.objectMap[arr[i].x][arr[i].y].setSize(arr[i].playerRequired);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
+            this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y].lootEmitter);
+            this.treasureUIGroup.add(this.objectMap[arr[i].x][arr[i].y].lockCountText);
+            this.treasureUIGroup.add(this.objectMap[arr[i].x][arr[i].y].lockIcon);
         }
     },
 
@@ -434,28 +454,34 @@ GameplayState.prototype = {
     },
 
     //Interact with a specific treasure chest
-    interactWithChest: function(tileX, tileY, state){
+    interactWithChest: function(tileX, tileY, state, playersRequired){
         let treasureChest = this.objectMap[tileX][tileY];
         if(treasureChest){
             //New player unlocked 1 lock in this chest
             if(state === 0){
-                this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
-                treasureChest.frame--;
-                
+                //this never runs
             }
-            //Old player tried to interact with treasure chest, nothing happens
+            //Old player tried to interact with treasure chest, so nothing happens
             if(state === 1){
-                //TODO locked sound
-                console.log("Old player tried unlocking treasure chest");
+                if(playersRequired == treasureChest.numPlayersRequired){ //old player
+                    //TODO locked sound
+                    console.log("Old player tried unlocking treasure chest");
+                }
+                else{ //new player
+                    this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                    //treasureChest.frame--;
+                    treasureChest.unlockOnce();
+                }
             }
             //Treasure chest's last lock opened
             if(state === 2){
-                treasureChest.frame = 1;
+                treasureChest.open();
                 this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
             }
             if(state == 3){
                 if(treasureChest.frame !== 0){
                     treasureChest.frame = 0;
+                    treasureChest.lootEmitter.on = false;
                     this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
                 }
             }

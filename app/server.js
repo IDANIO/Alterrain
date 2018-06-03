@@ -99,8 +99,6 @@ class Server {
   step(dt) {
     let step = ++this.world.stepCount;
 
-    // this.emit('preStep', {step, dt});
-
     // process input commands together.
     this.playerInputQueues.forEach((commands, playerId) => {
       commands.forEach((cmd)=>{
@@ -111,8 +109,6 @@ class Server {
 
     // Main Game Update Goes Here
     this.world.step(dt);
-
-    // this.emit('postStep', {step});
   }
 
   /**
@@ -226,6 +222,8 @@ class Server {
     socket.on('inputCommand', (cmd) => {
       this.onReceivedInput(cmd, socket, playerEvent.playerId);
     });
+
+    this.world.emit('playerSpawn');
   }
 
   /**
