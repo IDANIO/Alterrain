@@ -29,6 +29,7 @@ class Server {
 
     this.intervalFrameRate = ServerConfig.STEP_RATE || 60;
     this.maximumPlayer = ServerConfig.MAX_PLAYERS || 50;
+    this.timeoutInterval = ServerConfig.TIMEOUT_INTERVAL || 40;
 
     this.lastPlayerID = 0;
 
@@ -130,6 +131,18 @@ class Server {
     this.outgoingBuffer = [];
   }
 
+  resetIdleTimeout(socket) {
+    if (socket.idleTimeout) {
+      clearTimeout(socket.idleTimeout);
+    }
+
+    if (this.timeoutInterval > 0) {
+      socket.idleTimeout = setTimeout(() => {
+        this.onPlayerTimeout(socket);
+      }, this.timeoutInterval * 1000);
+    }
+  }
+
   /**
    * Single game step.
    *
@@ -204,6 +217,7 @@ class Server {
    * @param playerEvent {Object}
    */
   onPlayerJoinWorld(socket, playerEvent) {
+    this.resetIdleTimeout(socket);
     // This send the data of all player to the new-joined client.
     // TODO: Refactor
     let newX;
@@ -237,6 +251,13 @@ class Server {
     this.world.emit('playerSpawn');
   }
 
+  onPlayerTimeout(socket) {
+    logger.info(`A Client timed out after ${
+      this.timeoutInterval} seconds`);
+
+    socket.disconnect();
+  }
+
   /**
    * handle player dis-connection
    * @param socket {Socket}
@@ -267,8 +288,9 @@ class Server {
   onReceivedInput(cmd, socket, playerId) {
     const player = this.world.players.get(playerId);
 
-    let command;
+    this.resetIdleTimeout(socket);
 
+    let command;
     switch (cmd.type) {
       case Commands.MOVEMENT:
         command = CommandFactory.makeMoveCommand(player, cmd.params);

@@ -7,6 +7,12 @@ var Client = {};
   Client.connectToServer = function() {
     Client.socket = io.connect();
 
+    Client.socket.on('disconnect', function () {
+      game.state.start("MainMenuState");
+      // alert("TODO: Timeout");
+    });
+
+
     /**
      * @param data {Object}
      * @param data.id {Number} Player Id
@@ -297,6 +303,8 @@ var Client = {};
       type: 3,
     });
   }
+
+
 
 })();
 
