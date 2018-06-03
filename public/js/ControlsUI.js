@@ -7,7 +7,7 @@ function ControlsUI(game, x, y){
     this.screenShader = game.add.sprite(0, 0, "screenShader");
     this.screenShader.scale.x = game.world.width;
     this.screenShader.scale.y = game.world.height;
-    this.screenShader.tint = 0x555555;
+    this.screenShader.tint = 0x5d2c28;
     
     this.titleText = game.add.bitmapText(x + GAME_WIDTH / 2, y + 100, "m5x7", "CONTROLS", 48);
     this.titleText.anchor.setTo(0.5);

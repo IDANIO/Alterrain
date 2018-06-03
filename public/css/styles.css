@@ -4,5 +4,6 @@ body {
 
 canvas {
 	opacity: 0;
-	border: 4px solid #657392;
+	border: 30px solid #bf6f4a;
+	border-image: url("../assets/img/treasureMapBorder.png") 30 round;
 }
