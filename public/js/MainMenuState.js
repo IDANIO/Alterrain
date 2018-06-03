@@ -37,6 +37,7 @@ MainMenuState.prototype = {
         game.load.image("arrowIcon", "./assets/img/arrow.png", 32, 32);
         game.load.image("soundIcon", "./assets/img/sound.png", 64, 32);
         game.load.image("lockIcon", "./assets/img/lock.png");
+        game.load.image("lockBackground", "./assets/img/chest_icon_box.png");
         game.load.image("inventoryUI", "./assets/img/inventory_ui.png", 48, 128);
         game.load.image("highlightUI", "./assets/img/highlight_ui.png", 37, 34);
         game.load.image("menuHighlight", "./assets/img/menu_highlight.png");
@@ -119,7 +120,8 @@ MainMenuState.prototype = {
         }
 
         //Select a menu option
-        if(game.input.keyboard.justPressed(Phaser.Keyboard.Z)){
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.Z) ||
+           game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR)){
             if(this.menuChoice === 0){
                 this.blipHigh.play();
                 game.state.start("GameplayState");

@@ -10,7 +10,7 @@ ControlsState.prototype = {
     create: function(){        
         this.controlsUI = new ControlsUI(game, 0, 0);
         
-        this.returnText = game.add.bitmapText(GAME_WIDTH / 2, 400, "m5x7", "Press X to go back", 48);
+        this.returnText = game.add.bitmapText(GAME_WIDTH / 2, 400, "m5x7", "Press Esc to go back", 48);
         this.returnText.anchor.setTo(0.5);
         
         this.blipHigh = game.add.audio("blipHigh");
@@ -18,7 +18,7 @@ ControlsState.prototype = {
     },
 
     update: function(){
-        if(game.input.keyboard.justPressed(Phaser.Keyboard.X)){
+        if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
             this.blipHigh.play();
             game.state.start("MainMenuState");
         }

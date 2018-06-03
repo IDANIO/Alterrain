@@ -315,7 +315,7 @@ GameplayState.prototype = {
         }
 
         //Change the tile in front of the player
-        if(e.keyCode === Phaser.Keyboard.X){
+        if(e.keyCode === Phaser.Keyboard.SPACEBAR){
             Client.changeTile(gameplayState.tileChoice, gameplayState.player.facing);
         }
 
@@ -425,6 +425,8 @@ GameplayState.prototype = {
             this.objectMap[arr[i].x][arr[i].y].setSize(arr[i].playerRequired);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y]);
             this.solidObjectsGroup.add(this.objectMap[arr[i].x][arr[i].y].lootEmitter);
+
+            this.treasureUIGroup.add(this.objectMap[arr[i].x][arr[i].y].lockBackground);
             this.treasureUIGroup.add(this.objectMap[arr[i].x][arr[i].y].lockCountText);
             this.treasureUIGroup.add(this.objectMap[arr[i].x][arr[i].y].lockIcon);
         }
