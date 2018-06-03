@@ -1,9 +1,12 @@
 'use strict';
 
-const World = require('./game/world.js');
 const logger = require('./logger.js');
-const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
+
+const World = require('./game/world.js');
 const CommandFactory = require('./game/command');
+
+const {ServerConfig, WorldConfig, Commands} = require('../shared/constant.js');
+const describeAll = require('./network/descriptor.js');
 
 /**
  * Server is the main server-side singleton code.
@@ -26,6 +29,7 @@ class Server {
 
     this.intervalFrameRate = ServerConfig.STEP_RATE || 60;
     this.maximumPlayer = ServerConfig.MAX_PLAYERS || 50;
+    this.timeoutInterval = ServerConfig.TIMEOUT_INTERVAL || 40;
 
     this.lastPlayerID = 0;
 
@@ -34,16 +38,20 @@ class Server {
      */
     this.world = null;
 
+    this.gameTick = 0;
+    this.outgoingBuffer = [];
+
     this.setupSocketIO(io);
   }
-
 
   /**
    * @param io {Socket}
    */
   setupSocketIO(io) {
     this.io = io;
-    io.on('connection', this.onPlayerConnected.bind(this));
+    io.on('connection', (socket) => {
+      this.onPlayerConnected(socket);
+    });
   }
 
   /**
@@ -76,19 +84,63 @@ class Server {
   start() {
     const intervalDelta = Math.floor(1000 / this.intervalFrameRate);
 
-    this.serverStartTime = (new Date().getTime());
+    this.outgoingDelta = Math.floor((1000 / this.intervalFrameRate) * 2);
 
+    this.serverStartTime = (new Date().getTime());
     this.lastServerTime = this.serverStartTime;
 
+    // game ticks at 60 fps
+    // world data is sent 30 fps
     this.intervalGameTick = setInterval(() => {
-      let elapsed = (new Date().getTime());
+      let timeNow = (new Date().getTime());
 
-      const dt = elapsed - this.lastServerTime;
+      const dt = timeNow - this.lastServerTime;
 
       this.step(dt);
 
-      this.lastServerTime = elapsed;
+      // ------- create world descriptor, ignore if there is no players
+
+      if (this.connectedPlayers.size !== 0) {
+        let str = describeAll(this.world.players);
+
+        this.outgoingBuffer.push({
+          t: this.gameTick,
+          d: str,
+        });
+
+        this.sendOutgoingBuffer();
+      }
+
+      // ------
+
+      this.lastServerTime = timeNow;
+      this.gameTick++;
     }, intervalDelta);
+  }
+
+  /**
+   * @return {number}
+   */
+  getSeverTime() {
+    return (new Date().getTime()) - this.serverStartTime;
+  }
+
+  sendOutgoingBuffer() {
+    this.io.emit('update', this.outgoingBuffer);
+
+    this.outgoingBuffer = [];
+  }
+
+  resetIdleTimeout(socket) {
+    if (socket.idleTimeout) {
+      clearTimeout(socket.idleTimeout);
+    }
+
+    if (this.timeoutInterval > 0) {
+      socket.idleTimeout = setTimeout(() => {
+        this.onPlayerTimeout(socket);
+      }, this.timeoutInterval * 1000);
+    }
   }
 
   /**
@@ -135,25 +187,21 @@ class Server {
     let playerEvent = {
       id: socket.id,
       playerId: playerId,
-      joinTime: (new Date()).getTime(),
+      joinTime: this.getSeverTime(),
       disconnectTime: 0,
     };
 
-    logger.data(`[${playerEvent.id}] Has joined the world
+    logger.info(`[${playerEvent.id}] Has joined the world
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
 
-
     this.onPlayerJoinWorld(socket, playerEvent);
 
     socket.on('disconnect', () => {
-      playerEvent.disconnectTime = (new Date()).getTime();
-      socket.broadcast.emit('playerEvent', ``);
+      this.onPlayerDisconnected(socket, playerEvent);
 
-      this.onPlayerDisconnected(socket);
-
-      logger.data(`[${playerEvent.id}][playerEvent] disconnect
+      logger.info(`[${playerEvent.id}][playerEvent] disconnect
       playerId        ${playerEvent.playerId}
       joinTime        ${playerEvent.joinTime}
       disconnectTime  ${playerEvent.disconnectTime}`);
@@ -166,9 +214,9 @@ class Server {
    * @param playerEvent {Object}
    */
   onPlayerJoinWorld(socket, playerEvent) {
-    // This send the data of all players to the new-joined client.
+    this.resetIdleTimeout(socket);
+    // This send the data of all player to the new-joined client.
     // TODO: Refactor
-
     let newX;
     let newY;
     do {
@@ -181,37 +229,11 @@ class Server {
 
     this.world.addPlayer(newX, newY, playerEvent.playerId);
 
-    let objects = [];
-    this.world.players.forEach((player) => {
-      objects.push({
-        x: player._x,
-        y: player._y,
-        id: player.id,
-      });
-    });
-
-    // TODO: Refactor Subject to Change
-    // TODO: Refactor SUBJECT to change
-    // TODO: Refactor SUBJECT to change
-    // TODO: Refactor SUBJECT to change
-    let chests = this.world.getChestPosArray().map((chest) => {
-      return {
-        x: chest._x,
-        y: chest._y,
-        playerRequired: chest.playerRequired,
-        state: chest.state,
-      };
-    });
-
-    let trees = this.world.getTreePosArray().map((tree) => {
-      return {x: tree._x, y: tree._y, durability: tree.durability};
-    });
-
     socket.emit('initWorld', {
-      players: objects,
-      tiles: this.world.getTileMap(),
-      solidObjects: trees,
-      chests: chests,
+      players: describeAll(this.world.players),
+      tiles: this.world.tilemap.serialize(),
+      trees: describeAll(this.world.getTreePosArray()),
+      chests: describeAll(this.world.getChestPosArray()),
       id: playerEvent.playerId,
       weather: this.world.currentWeather,
     });
@@ -226,11 +248,21 @@ class Server {
     this.world.emit('playerSpawn');
   }
 
+  onPlayerTimeout(socket) {
+    logger.info(`A Client timed out after ${
+      this.timeoutInterval} seconds`);
+
+    socket.disconnect();
+  }
+
   /**
    * handle player dis-connection
    * @param socket {Socket}
    */
-  onPlayerDisconnected(socket) {
+  onPlayerDisconnected(socket, playerEvent) {
+    playerEvent.disconnectTime = this.getSeverTime();
+    socket.broadcast.emit('playerEvent', playerEvent);
+
     // Remove from Game World
     let player = this.connectedPlayers.get(socket.id);
     if (player) {
@@ -256,8 +288,9 @@ class Server {
   onReceivedInput(cmd, socket, playerId) {
     const player = this.world.players.get(playerId);
 
-    let command;
+    this.resetIdleTimeout(socket);
 
+    let command;
     switch (cmd.type) {
       case Commands.MOVEMENT:
         command = CommandFactory.makeMoveCommand(player, cmd.params);

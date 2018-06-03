@@ -1,3 +1,21 @@
+'use strict';
+
+/**
+ * @author       Ivan Xu <yxu83@ucsc.edu>
+ */
+
+/**
+ * @abstract
+ * @interface
+ */
+class Serializable {
+  /**
+   * @abstract
+   * @return {String}
+   */
+  serialize() {}
+}
+
 /**
  * @author       Richard Davey <rich@photonstorm.com>
  * @copyright    2015 Photon Storm Ltd.

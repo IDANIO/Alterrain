@@ -128,6 +128,15 @@ class World {
   onPlayerSpawn() {
     let chest = this.spawnChest();
 
+    this.server.io.emit('spawnChests', [
+      {
+        x: chest._x,
+        y: chest._y,
+        state: chest.state,
+        playerRequired: chest.playerRequired,
+      },
+    ]);
+
     logger.data(`a chest spawned at (${chest._x},${chest._y}).`);
   }
 
@@ -285,7 +294,7 @@ class World {
   removeObject(object) {
     this.objectContainer.remove(object);
 
-    logger.info(`object removed, now has ${
+    logger.data(`object removed, now has ${
       this.objectContainer.tree.size
     } objects. `);
 

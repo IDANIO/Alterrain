@@ -4,12 +4,18 @@ const noise = require('../libs/perlin.js');
 
 const {TileData} = require('../../shared/constant.js');
 
+/**
+ * @implements {Serializable}
+ */
 class Tilemap {
   constructor(world) {
     /**
      * @type {World} Reference to the World instance.
      */
     this.world = world;
+
+    this.width = this.world.width;
+    this.height = this.world.height;
 
     this.grassTiles = [];
     this.forestTiles = [];
@@ -293,6 +299,18 @@ class Tilemap {
         tilemap[i][j] = tileType;
       }
     }
+  }
+
+  serialize() {
+    let str = `${this.width} ${this.height} `;
+
+    for (let i = 0; i < this.width; i++) {
+      for (let j = 0; j < this.height; j++) {
+        str += `${this.data[i][j]} `;
+      }
+    }
+
+    return str;
   }
 }
 

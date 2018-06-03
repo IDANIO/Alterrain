@@ -3,7 +3,7 @@
 const logger = require('../logger.js');
 const GameObject = require('./game_object');
 
-const {TileSpeedFactor, Tiles} = require('../../shared/constant.js');
+const {TileSpeed, Tiles} = require('../../shared/constant.js');
 
 class Character extends GameObject {
   constructor(world, x = 0, y = 0) {
@@ -54,7 +54,7 @@ class Character extends GameObject {
   update() {
     if (this.isMoving()) {
       const terrainID = this.world.tilemap.getTileAt(this._x, this._y);
-      this._speedFactor = TileSpeedFactor[terrainID];
+      this._moveSpeed = TileSpeed[terrainID];
 
       this.updateMove();
     }
@@ -134,7 +134,8 @@ class Character extends GameObject {
    * @return {number}
    */
   realMoveSpeed() {
-    return this._moveSpeed * this._speedFactor;
+    return this._moveSpeed;
+    // return this._moveSpeed * this._speedFactor;
   }
 
   /**
@@ -182,6 +183,10 @@ class Character extends GameObject {
     }
 
     logger.debug(`Player moved to (${this._x}, ${this._y}) facing ${d}`);
+  }
+
+  serialize() {
+    return `${this._realX} ${this._realY} ${this._direction}`;
   }
 }
 

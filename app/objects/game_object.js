@@ -1,5 +1,8 @@
 'use strict';
 
+/**
+ * @implements {Serializable}
+ */
 class GameObject {
   constructor(world, x, y) {
     /**
@@ -67,6 +70,13 @@ class GameObject {
    * @param player {Player}
    */
   onInteraction(player) { }
+
+  /**
+   * @return {string}
+   */
+  serialize() {
+    return `${this._x} ${this._y}`;
+  }
 }
 
 module.exports = GameObject;
