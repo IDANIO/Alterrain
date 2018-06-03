@@ -4,7 +4,7 @@
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/RaiderSoap/cmpm120-project.png?columns=all)](https://waffle.io/RaiderSoap/cmpm120-project?utm_source=badge)
 [![Build Status](https://travis-ci.org/RaiderSoap/cmpm120-project.svg?branch=master)](https://travis-ci.org/RaiderSoap/cmpm120-project)
 
-![idanio](./idanio.png)
+![idanio](./idanio.gif)
 
 UCSC CMPM 120 Phaser Multiplayer Game
 
