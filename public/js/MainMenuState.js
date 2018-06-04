@@ -100,8 +100,9 @@ MainMenuState.prototype = {
         
         this.zIcon = game.add.sprite(this.menuHighlight.x - this.menuHighlight.width / 2 - 36, 
                                      this.menuHighlight.y - this.menuHighlight.height / 2 + 2, "zIcon");
-        this.spaceIcon = game.add.sprite(this.menuHighlight.x + this.menuHighlight.width / 2 + 4, 
+        /*this.spaceIcon = game.add.sprite(this.menuHighlight.x + this.menuHighlight.width / 2 + 4, 
                                          this.menuHighlight.y - this.menuHighlight.height / 2 + 2, "spaceIcon");
+                                         */
 
         this.blipHigh = game.add.audio("blipHigh");
         this.blipHigh.volume = 0.25;
@@ -116,7 +117,7 @@ MainMenuState.prototype = {
                 this.menuChoice = 0;
                 this.menuHighlight.y = this.joinTextY - 8;
                 this.zIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
-                this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
+                //this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
                 this.blipLow.play();
             }
         }
@@ -125,7 +126,7 @@ MainMenuState.prototype = {
                 this.menuChoice = 1;
                 this.menuHighlight.y = this.controlsTextY - 8;
                 this.zIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
-                this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
+                //this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
                 this.blipLow.play();
             }
         }
