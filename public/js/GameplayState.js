@@ -82,6 +82,12 @@ GameplayState.prototype = {
         this.uiGroup.fixedToCamera = true;
 
         this.initializeWeatherEffects();
+        
+        //Create the pause/quit UI
+        this.pauseUI = new PauseUI(game, 0, 0);
+        this.uiGroup.add(this.pauseUI.promptText);
+        this.uiGroup.add(this.pauseUI.choiceText);
+        this.pauseUI.hide();
 
         //Create the inventoryUI
         this.playerInventoryUI = new InventoryUI(game, 120, 393, "inventoryUI");
@@ -168,19 +174,18 @@ GameplayState.prototype = {
     update: function(){
         this.updateInput();
 
-        if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
-            this.stopAllSounds();
-            game.state.start("MainMenuState");
-        }
-        //DEBUG - remove later
-        if(game.input.keyboard.justPressed(Phaser.Keyboard.R)){
-            if(this.isRainOn){
-                this.stopRainEffect();
-                this.isRainOn = false;
+        if(this.pauseUI.paused){
+            if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
+                this.pauseUI.hide();
             }
-            else{
-                this.startRainEffect();
-                this.isRainOn = true;
+            if(game.input.keyboard.justPressed(Phaser.Keyboard.Y)){
+                this.stopAllSounds();
+                game.state.start("MainMenuState");
+            }
+        }
+        else{
+            if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
+                this.pauseUI.show();
             }
         }
     },
