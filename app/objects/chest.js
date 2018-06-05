@@ -46,7 +46,7 @@ class Chest extends GameObject {
    */
   awardPlayer(player) {
     let item = util.pick(this.loots);
-    player.gainItem(item, util.integerInRange(4, 12));
+    player.gainItem(item, util.integerInRange(20, 48));
   }
 
   /**

@@ -63,7 +63,7 @@ exports.TileSpeed = [
 exports.ServerConfig = {
   MAX_PLAYERS: 50,
   STEP_RATE: 60,
-  TIMEOUT_INTERVAL: 40,
+  TIMEOUT_INTERVAL: 60 * 30, // 30 minutes
 };
 
 /**
