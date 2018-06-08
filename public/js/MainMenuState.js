@@ -42,7 +42,9 @@ MainMenuState.prototype = {
         game.load.image("highlightUI", "./assets/img/highlight_ui.png", 37, 34);
         game.load.image("menuHighlight", "./assets/img/menu_highlight.png");
         game.load.image("zIcon", "./assets/img/Z_key_icon.png");
+        game.load.image("eIcon", "./assets/img/E_key_icon.png");
         game.load.image("spaceIcon", "./assets/img/Space_key_icon.png");
+        game.load.image("arrowKeysIcon", "./assets/img/Arrow_keys_icon.png");
 
         //Weather-related images
         game.load.image("raindrop", "assets/img/raindrop.png");
