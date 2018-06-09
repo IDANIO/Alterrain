@@ -23,6 +23,9 @@ MainMenuState.prototype = {
         //game.stage.backgroundColor = 0xf6ca9f;
         //Font
         game.load.bitmapFont("m5x7", "assets/font/m5x7.png", "assets/font/m5x7.fnt");
+        
+        //Main menu background
+        game.load.spritesheet("mainMenuBackground", "./assets/img/main_menu_art.png");
 
         //Spritesheets
         game.load.spritesheet("player", "./assets/img/person_spritesheet_large.png", 32, 32);
@@ -88,7 +91,9 @@ MainMenuState.prototype = {
             document.getElementsByTagName("canvas")[0].style.opacity = 1;
         }, 0 );
         
-        this.titleText = game.add.bitmapText(GAME_WIDTH / 2, 180, "m5x7", "Alterrain", 64);
+        this.mainMenuBackground = game.add.sprite(0, 0, "mainMenuBackground");
+        
+        this.titleText = game.add.bitmapText(GAME_WIDTH / 2, 170, "m5x7", "Alterrain", 64);
         this.titleText.anchor.setTo(0.5);
 
         this.joinText = game.add.bitmapText(GAME_WIDTH / 2, this.joinTextY, "m5x7", "Join Game", 48);
