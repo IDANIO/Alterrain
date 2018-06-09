@@ -3,6 +3,7 @@ var MainMenuState = function(game){
     //this.textStyle = {font: "32px Arial", fill: "#FFF"};
     this.joinTextY = 300;
     this.controlsTextY = 360;
+    this.textColor = 0xbf6f4a;
 };
 
 MainMenuState.prototype = {
@@ -18,7 +19,8 @@ MainMenuState.prototype = {
         game.stage.smoothed = false
     },
 
-    preload: function(){        
+    preload: function(){
+        //game.stage.backgroundColor = 0xf6ca9f;
         //Font
         game.load.bitmapFont("m5x7", "assets/font/m5x7.png", "assets/font/m5x7.fnt");
 
@@ -95,6 +97,10 @@ MainMenuState.prototype = {
         this.controlsText = game.add.bitmapText(GAME_WIDTH / 2, this.controlsTextY, "m5x7", "Controls", 48);
         this.controlsText.anchor.setTo(0.5);
         
+        //Tint the text a different color
+        //this.titleText.tint = this.textColor;
+        //this.joinText.tint = this.textColor;
+        //this.controlsText.tint = this.textColor;        
 
         this.menuHighlight = game.add.sprite(GAME_WIDTH / 2, this.joinTextY - 8, "menuHighlight");
         this.menuHighlight.anchor.setTo(0.5);

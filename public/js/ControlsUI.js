@@ -7,7 +7,9 @@ function ControlsUI(game, x, y){
     this.screenShader = game.add.sprite(0, 0, "screenShader");
     this.screenShader.scale.x = game.world.width;
     this.screenShader.scale.y = game.world.height;
-    this.screenShader.tint = 0x5d2c28;
+    this.screenShader.tint = 0xf6ca9f; //0x5d2c28;
+    
+    this.textColor = 0xbf6f4a;
     
     this.offsetY = 110;
     this.marginY = 60;
@@ -35,6 +37,13 @@ function ControlsUI(game, x, y){
                                      this.movementText.y - this.movementText.height - 32, "arrowKeysIcon");
     this.eIcon = game.add.sprite(this.makeSoundText.x - this.makeSoundText.width / 2 - 52, 
                                      this.makeSoundText.y - this.makeSoundText.height, "eIcon");
+                                     
+    //Tint the text a different color
+    this.titleText.tint = this.textColor;
+    this.movementText.tint = this.textColor;
+    this.interactText.tint = this.textColor;
+    this.placeText.tint = this.textColor;
+    this.makeSoundText.tint = this.textColor;
 }
 
 ControlsUI.prototype.destroy = function(){
