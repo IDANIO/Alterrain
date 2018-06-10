@@ -194,10 +194,14 @@ class World {
     let newX;
     let newY;
 
+    let success;
     do {
       newX = Math.floor(Math.random() * this.width);
       newY = Math.floor(Math.random() * this.height);
-    } while (!this.isPassable(newX, newY, 2));
+
+      success = this.isPassable(newX, newY, 2) &&
+        this.getPlayersAt(newX, newY).length === 0;
+    } while (!success);
 
     let chest;
     if (normal) {

@@ -78,9 +78,9 @@ class Chest extends GameObject {
    * @param player {Player} the player who interacts with this object.
    */
   onInteraction(player) {
-    //logger.debug(`Player ${player.id} is interacting Box \
+    // logger.debug(`Player ${player.id} is interacting Box \
     //  (state ${this.state})`);
-      
+
     switch (this.state) {
       case Chest.STATE_LOCKED:
         this.onClosed(player);

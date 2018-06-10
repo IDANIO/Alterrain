@@ -11,32 +11,31 @@ class DualChest extends Chest {
   }
 
   onOpened(player) {
-    let success = 0; //0 = new player looted
+    let success = 0; // 0 = new player looted
     // if this player is recorded in the history.
     let index = this.playerHistory.indexOf(player.id);
     if (index !== -1) {
       this.awardPlayer(player);
       this.success = true;
       this.playerHistory.splice(index, 1);
-    }
-    else{
-        success = 1; //1 = old player failed to loot
+    } else {
+        success = 1; // 1 = old player failed to loot
     }
 
     if (this.playerHistory <= 0) {
       this.state = Chest.STATE_LOOTED;
-      success = 2; //2 = last player looted
+      success = 2; // 2 = last player looted
     }
     return success;
   }
-  
+
   /**
    * @param player {Player} the player who interacts with this object.
    */
   onInteraction(player) {
-    //Very ugly way of fixing sound bug
+    // Very ugly way of fixing sound bug
     let success = 2;
-      
+
     switch (this.state) {
       case Chest.STATE_LOCKED:
         this.onClosed(player);
@@ -51,24 +50,22 @@ class DualChest extends Chest {
         this.onLooted(player);
         break;
     }
-    
-    if(success === 0){
+
+    if (success === 0) {
       this.world.server.io.emit('chestUpdate', {
         x: this._x,
         y: this._y,
         state: 4,
         playersRequired: this.playerRequired,
       });
-    }
-    else if(success === 1){
+    } else if (success === 1) {
       this.world.server.io.emit('chestUpdate', {
         x: this._x,
         y: this._y,
         state: 5,
         playersRequired: this.playerRequired,
       });
-    }
-    else if(success === 2){
+    } else if (success === 2) {
       // TODO: Refactor
       this.world.server.io.emit('chestUpdate', {
         x: this._x,
