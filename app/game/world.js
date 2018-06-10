@@ -12,6 +12,7 @@ const ObjectContainer = require('./object_container.js');
 
 const Player = require('../objects/player.js');
 const Chest = require('../objects/chest.js');
+const DualChest = require('../objects/dual_chest.js');
 const Tree = require('../objects/tree.js');
 
 const {Tiles, WorldConfig} = require('../../shared/constant.js');
@@ -126,7 +127,7 @@ class World {
   }
 
   onPlayerSpawn() {
-    let chest = this.spawnChest();
+    let chest = this.spawnChest(false);
 
     this.server.io.emit('spawnChests', [
       {
@@ -185,9 +186,10 @@ class World {
   }
 
   /**
+   * @param normal {boolean}
    * @return {Chest}
    */
-  spawnChest() {
+  spawnChest(normal = true) {
     let newX;
     let newY;
 
@@ -196,7 +198,13 @@ class World {
       newY = Math.floor(Math.random() * this.height);
     } while (!this.isPassable(newX, newY, 2));
 
-    let chest = new Chest(this, newX, newY);
+    let chest;
+    if (normal) {
+      chest = new Chest(this, newX, newY);
+    } else {
+      chest = new DualChest(this, newX, newY);
+    }
+
     this.chestObjects.push(chest);
     this.objectContainer.add(chest);
 
@@ -225,9 +233,13 @@ class World {
    * @return {Array.<Player>}
    */
   getPlayersAt(x, y) {
-    return this.players.filter((player) => {
-      return player.pos(x, y);
+    let arr = [];
+    this.players.forEach((player) => {
+      if (player.pos(x, y)) {
+        arr.push(player);
+      }
     });
+    return arr;
   }
 
   /**
