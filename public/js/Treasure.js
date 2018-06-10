@@ -38,10 +38,16 @@ Treasure.prototype.setState = function(state){
     if(state === 3){
         this.frame = 0;
         this.lootEmitter.on = false;
+        this.lockCountText.destroy();
+        this.lockIcon.destroy();
+        this.lockBackground.destroy();
     }
     else if(state === 2){
         this.frame = 1;
         this.lootEmitter.start(false, 500, 250);
+        this.lockCountText.destroy();
+        this.lockIcon.destroy();
+        this.lockBackground.destroy();
     }
     else if(state === 1 || state === 0){
         this.frame = 2;
