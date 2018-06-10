@@ -59,7 +59,7 @@ MainMenuState.prototype = {
         game.load.audio("errorSound", ["assets/audio/wrong.ogg", "assets/audio/wrong.mp3"]);
 
         //Abstract sound
-        game.load.audio("abstractChirpSound", ["assets/audio/abstract_chirp01.ogg", "assets/audio/abstract_chirp01.mp3"]);
+        game.load.audio("abstractSound", ["assets/audio/snap01.ogg", "assets/audio/snap01.mp3"]);
 
         //Treasure chest sounds
         game.load.audio("pickupLootSound", ["assets/audio/pickup_loot01.ogg", "assets/audio/pickup_loot01.mp3"]);

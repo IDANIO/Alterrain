@@ -281,7 +281,7 @@ GameplayState.prototype = {
         this.placeTileSound = game.add.audio("placeTileSound");
         this.errorSound = game.add.audio("errorSound");
         this.errorSound.volume = 0.2;
-        this.abstractChirpSound = game.add.audio("abstractChirpSound");
+        this.abstractSound = game.add.audio("abstractSound");
         this.pickupLootSound = game.add.audio("pickupLootSound");
         this.chestOpenSound = game.add.audio("chestOpenSound");
         this.chestUnlockSound = game.add.audio("chestUnlockSound");
@@ -431,7 +431,7 @@ GameplayState.prototype = {
     playAbstractSoundFrom: function(playerId){
         let sourcePlayer = this.playerMap[playerId];
         if(sourcePlayer.canMakeSound){
-            this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x, sourcePlayer.y, 0.2);
+            this.playSoundFrom(this.abstractSound, sourcePlayer.x, sourcePlayer.y, 1);
             sourcePlayer.startSoundTimer();
         }
     },
