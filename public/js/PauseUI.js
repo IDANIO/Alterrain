@@ -5,6 +5,7 @@ function PauseUI(game, x, y){
     this.y = y || 0;
     this.paused = true;
     
+    //Instructions text for the UI
     this.promptText = game.add.bitmapText(x + GAME_WIDTH / 2, y + 170, "m5x7", "Are you sure you want to quit?", 32);
     this.promptText.anchor.setTo(0.5);
     

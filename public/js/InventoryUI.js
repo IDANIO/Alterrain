@@ -3,19 +3,14 @@ function InventoryUI(game, x, y, key, frame){
     //Call to Phaser.Sprite(game, x, y, key, frame)
     Phaser.Sprite.call(this, game, x, y, key, frame);
     
-    //this.textStyle = {font: "16px Arial", fill: "#FFF"};
     this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert", "Ice"];
     
-    //Specific index of each tile in the inventory
-    this.GRASS_TILE = 0;
-    this.SAND_TILE = 1;
-    this.STONE_TILE = 2;
-    this.BRIDGE_TILE = 3;
-    
+    //Text colors for the inventory count in each slot
     this.hexRed = 0xffa214;
     this.hexGray = 0xb4b4b4;
     this.hexWhite = 0xffffff;
     
+    //Position-related variables for the UI
     this.stringMargin = 36;
     this.countOffsetX = 58;
     this.countOffsetY = 39;
@@ -26,20 +21,21 @@ function InventoryUI(game, x, y, key, frame){
     
     this.highlightUI = game.add.sprite(x + this.highlightOffsetX, y + this.highlightOffsetY, "highlightUI");
     
-    //this.itemsText = game.add.text(x + 4, y + 4, "", this.textStyle);
-    //this.itemsText = game.add.bitmapText(x + 50, y + 14, "m5x7", "", 32);
     this.itemsText = [];
     for(let i = 0; i < 9; i++){
         this.itemsText[i] = game.add.bitmapText(x + (i * this.stringMargin) + this.countOffsetX, y + this.countOffsetY, "m5x7", "0", 21);
     }
+    
     //Hacky display update, players start with 50 bridge tiles
     this.itemsText[3].text = "50";
     
+    //Set up the counters below each tile
     this.numbersText = [];
     for(let i = 0; i < 9; i++){
         this.numbersText[i] = game.add.bitmapText(x + (i * this.stringMargin) + this.numbersOffsetX, y + this.numbersOffsetY, "m5x7", (i + 1) + "", 21);
     }
     
+    //Set up the count text colors
     for(let index = 0; index < this.numbersText.length; index++){
         let i = index;
         if(i > 3){
@@ -64,6 +60,7 @@ InventoryUI.prototype.updateHighlight = function(index){
     this.highlightUI.x = this.x + (index * this.stringMargin) + this.highlightOffsetX;
 };
 
+//Update the color of the count text
 InventoryUI.prototype.updateCountColor = function(){
     for(let index = 0; index < this.numbersText.length; index++){
         let i = index;
@@ -82,23 +79,18 @@ InventoryUI.prototype.updateCountColor = function(){
     }
 };
 
+//Updates the inventory display after receiving new inventory data from the server
 InventoryUI.prototype.updateDisplay = function(inventory){
     let tempText = "";
     for(let i = 0; i < inventory.length; i++){
         let tileIndex = -1;
-        //Hacky solution
+        //Hacky solution since water is 3 but not a placable tile
         if(i <= 3){
             this.itemsText[i].text = inventory[i];
         }
         else{
             this.itemsText[i-1].text = inventory[i];
         }
-        //if(inventory[i] > 0){
-            //this.items.push([this.tileName[i] + ": x" + inventory[i]]);
-            //tempText += this.tileName[i] + " x" + inventory[i] + "\n";
-            //tempText += inventory[i] + this.stringMargin;
-        //}
     }
     this.updateCountColor();
-    //this.itemsText.text = tempText;
 };

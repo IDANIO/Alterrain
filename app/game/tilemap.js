@@ -152,14 +152,14 @@ class Tilemap {
     }
   }
 
-  /** USE THIS FUNCTION WHEN WE HAVE MORE BIOMES
+  /** 
    * Returns the type of terrain that corresponds to the
    * given parameters
    * @param e The 2D array that represents the elevation
    * @param m The 2D array that represents the moisture
    * @returns {number} an integer that corresponds to a specific tile type
    */
-   getBiomeTypeBetter(e, m) { // 0 = grass, 1 = sand, 2 = stone, 3 = water
+   getBiomeTypeBetter(e, m) {
     if (e < this.waterMax) {
       if (m < this.iceRatio) {
         return 8; // ice
@@ -264,9 +264,7 @@ class Tilemap {
    * @param height The height of the 2D array
    */
   generateNoise(arr, width, height) {
-    // let noise = new Noise();
     noise.seed(Math.random());
-    // let freq = 1.2; //Frequency, should be a constant
     let freq = 2.2;
 
     for (let i = 0; i < width; i++) {
@@ -289,8 +287,6 @@ class Tilemap {
    * @param moisture
    */
   generateTileMap(tilemap, heightmap, moisture) {
-    // TODO properly generate the tilemap based on the heightmap
-    // layer and other layers
     for (let i = 0; i < tilemap.length; i++) {
       for (let j = 0; j < tilemap.length; j++) {
         let e = heightmap[i][j];

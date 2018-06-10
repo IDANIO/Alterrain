@@ -161,7 +161,6 @@ class World {
    */
   initializeTrees() {
     let count = 0;
-    // TODO use a better algorithm to spawn trees
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         let tileType = this.tilemap.getTileAt(x, y);

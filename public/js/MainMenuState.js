@@ -1,6 +1,5 @@
 //The main menu state
 var MainMenuState = function(game){
-    //this.textStyle = {font: "32px Arial", fill: "#FFF"};
     this.joinTextY = 300;
     this.controlsTextY = 360;
     this.textColor = 0xbf6f4a;
@@ -20,7 +19,6 @@ MainMenuState.prototype = {
     },
 
     preload: function(){
-        //game.stage.backgroundColor = 0xf6ca9f;
         //Font
         game.load.bitmapFont("m5x7", "assets/font/m5x7.png", "assets/font/m5x7.fnt");
         
@@ -101,11 +99,6 @@ MainMenuState.prototype = {
 
         this.controlsText = game.add.bitmapText(GAME_WIDTH / 2, this.controlsTextY, "m5x7", "Controls", 48);
         this.controlsText.anchor.setTo(0.5);
-        
-        //Tint the text a different color
-        //this.titleText.tint = this.textColor;
-        //this.joinText.tint = this.textColor;
-        //this.controlsText.tint = this.textColor;        
 
         this.menuHighlight = game.add.sprite(GAME_WIDTH / 2, this.joinTextY - 8, "menuHighlight");
         this.menuHighlight.anchor.setTo(0.5);
@@ -113,9 +106,6 @@ MainMenuState.prototype = {
         
         this.zIcon = game.add.sprite(this.menuHighlight.x - this.menuHighlight.width / 2 - 36, 
                                      this.menuHighlight.y - this.menuHighlight.height / 2 + 2, "zIcon");
-        /*this.spaceIcon = game.add.sprite(this.menuHighlight.x + this.menuHighlight.width / 2 + 4, 
-                                         this.menuHighlight.y - this.menuHighlight.height / 2 + 2, "spaceIcon");
-                                         */
 
         this.blipHigh = game.add.audio("blipHigh");
         this.blipHigh.volume = 0.25;
@@ -130,7 +120,6 @@ MainMenuState.prototype = {
                 this.menuChoice = 0;
                 this.menuHighlight.y = this.joinTextY - 8;
                 this.zIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
-                //this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
                 this.blipLow.play();
             }
         }
@@ -139,7 +128,6 @@ MainMenuState.prototype = {
                 this.menuChoice = 1;
                 this.menuHighlight.y = this.controlsTextY - 8;
                 this.zIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
-                //this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
                 this.blipLow.play();
             }
         }

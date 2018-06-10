@@ -4,6 +4,7 @@ function ControlsUI(game, x, y){
     this.x = x || 0;
     this.y = y || 0;
     
+    //Background
     this.screenShader = game.add.sprite(0, 0, "screenShader");
     this.screenShader.scale.x = game.world.width;
     this.screenShader.scale.y = game.world.height;
@@ -14,6 +15,7 @@ function ControlsUI(game, x, y){
     this.offsetY = 110;
     this.marginY = 60;
     
+    //Text for the controls
     this.titleText = game.add.bitmapText(x + GAME_WIDTH / 2, y + this.offsetY / 3 * 2, "m5x7", "============CONTROLS============", 48);
     this.titleText.anchor.setTo(0.5);
     
@@ -29,6 +31,7 @@ function ControlsUI(game, x, y){
     this.makeSoundText = game.add.bitmapText(x + GAME_WIDTH / 2 + 18, y + this.offsetY + (4 * this.marginY), "m5x7", "- make a sound", 48);
     this.makeSoundText.anchor.setTo(0.5);
     
+    //Icons for the controls
     this.zIcon = game.add.sprite(this.interactText.x - this.interactText.width / 2 - 52, 
                                      this.interactText.y - this.interactText.height + 4, "zIcon");
     this.spaceIcon = game.add.sprite(this.placeText.x - this.placeText.width / 2 - 112, 
