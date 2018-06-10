@@ -557,7 +557,6 @@ GameplayState.prototype = {
     //Interact with a specific treasure chest
     interactWithChest: function(tileX, tileY, state, playersRequired){
         let treasureChest = this.objectMap[tileX][tileY];
-        console.log("State: " + state + ", playersRequired: " + playersRequired);
         if(treasureChest){
             //New player unlocked 1 lock in this chest
             if(state === 0){
@@ -625,7 +624,6 @@ GameplayState.prototype = {
         else{
             sfx.volume = (1 - factor) * initialVolume;
         }
-        console.log(sfx.volume);
         if(sfx.volume > 0){
             sfx.play();
         }
