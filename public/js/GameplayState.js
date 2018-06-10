@@ -1,3 +1,4 @@
+//The world size in tiles
 var WORLD_WIDTH = 88;
 var WORLD_HEIGHT = 88;
 
@@ -5,18 +6,18 @@ var WORLD_HEIGHT = 88;
 var GameplayState = function(game){
     //Create a playerMap property
     this.playerMap = {};
+
     //Make a reference to the local player
     this.player = null;
 
     //Create a 2D array for solid objects
     this.objectMap = [];
-    for(let i = 0; i < WORLD_HEIGHT; i++){ //TODO use a constant instead of 64 to reference the world size
+    for(let i = 0; i < WORLD_HEIGHT; i++){
         this.objectMap[i] = [];
     }
 
     this.weatherEffects = [];
     this.isRainOn = false;
-    //this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
 //Tile-based movement
@@ -50,7 +51,6 @@ GameplayState.prototype = {
         this.createSoundObjects();
 
         //Set up and create the world tilemap
-        //TODO use constants instead of hard-coded numbers
         game.world.setBounds(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE);
         this.tileGroup = game.add.group();
         this.tileMap = game.add.tilemap();
@@ -59,7 +59,7 @@ GameplayState.prototype = {
         //new Tilemap(layerName, widthInTiles, heightInTiles, tileWidth, tileHeight)
         this.mainLayer = this.tileMap.create("mainLayer", WORLD_WIDTH, WORLD_HEIGHT, TILE_SIZE, TILE_SIZE);
 
-        //TODO need to optimize later
+        //The currently selected tile
         this.tileChoice = 0;
 
         //Handle input
@@ -82,7 +82,7 @@ GameplayState.prototype = {
         this.uiGroup.fixedToCamera = true;
 
         this.initializeWeatherEffects();
-        
+
         //Create the pause/quit UI
         this.pauseUI = new PauseUI(game, 0, 0);
         this.uiGroup.add(this.pauseUI.promptText);
@@ -99,17 +99,15 @@ GameplayState.prototype = {
         for(let i = 0; i < this.playerInventoryUI.itemsText.length; i++){
             this.uiGroup.add(this.playerInventoryUI.numbersText[i]);
         }
-        //this.uiGroup.add(this.playerInventoryUI.itemsText);
 
         //Display tile choice
-        //TODO should be a proper UI instead
         this.tileText = game.add.bitmapText(320, 450, "m5x7", tileName[this.tileChoice], 48);
         this.tileText.anchor.x = 0.5;
         this.uiGroup.add(this.tileText);
 
         //Loading "screen" while the tilemap is generated
         this.controlsUI = new ControlsUI(game, 0, 0);
-        this.loadingText = game.add.bitmapText(GAME_WIDTH / 2, 400, "m5x7", "Loading...", 48);
+        this.loadingText = game.add.bitmapText(GAME_WIDTH / 2, 430, "m5x7", "Loading...", 48);
         this.loadingText.anchor.setTo(0.5);
 
 
@@ -174,6 +172,7 @@ GameplayState.prototype = {
     update: function(){
         this.updateInput();
 
+        //Pausing controls
         if(this.pauseUI.paused){
             if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
                 this.pauseUI.hide();
@@ -198,8 +197,9 @@ GameplayState.prototype = {
         this.screenShader.tint = 0x777777;
         this.screenShader.alpha = 0;
         this.weatherEffects[0] = this.screenShader;
+
         //Rain
-        this.rainEmitter = game.add.emitter(game.world.centerX, 256);
+        this.rainEmitter = game.add.emitter(game.world.centerX, 0, 256);
         this.rainEmitter.fixedToCamera = true;
         this.rainEmitter.makeParticles(["raindrop"], 0, 256);
         this.rainEmitter.gravity = 0;
@@ -213,20 +213,39 @@ GameplayState.prototype = {
         this.weatherEffects[1] = this.rainEmitter;
         this.rainEmitter.start(false, 2000, 10);
         this.rainEmitter.on = false;
+
+        //Snow/blizzard
+        this.snowEmitter = game.add.emitter(game.world.centerX, 0, 512);
+        this.snowEmitter.fixedToCamera = true;
+        this.snowEmitter.makeParticles("snowflakes", [0, 1, 2], 400);
+        this.snowEmitter.gravity = 0;
+        this.snowEmitter.setXSpeed(-20, -20);
+        this.snowEmitter.setYSpeed(96, 96);
+        this.snowEmitter.minParticleScale = 0.5;
+        this.snowEmitter.maxParticleScale = 1.5;
+        this.snowEmitter.setAlpha(0.5, 0.9);
+        this.snowEmitter.area = area;
+        this.weatherEffects[2] = this.snowEmitter;
+        this.snowEmitter.start(false, 10000, 64);
+        this.snowEmitter.on = false;
     },
 
     startWeatherEffect: function(weatherType){
         if(weatherType === 0){ //no weather
             this.stopRainEffect();
+            this.stopSnowEffect();
         }
         else if(weatherType === 1){ //rain
+            this.stopSnowEffect();
             this.startRainEffect();
         }
-        else if(weatherType === 2){
-            this.startRainEffect(); //TODO blizzard
+        else if(weatherType === 2){ //snow
+            this.stopRainEffect();
+            this.startSnowEffect();
         }
         else if(weatherType === 3){
-            this.startRainEffect(); //TODO sandstorm
+            this.startRainEffect(); //rain + snow
+            this.startSnowEffect();
         }
     },
 
@@ -236,7 +255,6 @@ GameplayState.prototype = {
         }
         this.screenShader.tint = 0x999999;
         game.add.tween(this.screenShader).to( { alpha: 0.4 }, 1500, "Linear", true);
-        //this.screenShader.alpha = 0.4;
         this.rainEmitter.on = true;
     },
 
@@ -245,14 +263,25 @@ GameplayState.prototype = {
             this.lightRainSound.stop();
         }
         game.add.tween(this.screenShader).to( { alpha: 0 }, 1500, "Linear", true);
-        //this.screenShader.alpha = 0;
         this.rainEmitter.on = false;;
+    },
+
+    startSnowEffect: function(){
+        this.screenShader.tint = 0xFFFFFF;
+        game.add.tween(this.screenShader).to( { alpha: 0.3 }, 1500, "Linear", true);
+        this.snowEmitter.on = true;
+    },
+
+    stopSnowEffect: function(){
+        game.add.tween(this.screenShader).to( { alpha: 0 }, 1500, "Linear", true);
+        this.snowEmitter.on = false;
     },
 
     createSoundObjects: function(){
         this.placeTileSound = game.add.audio("placeTileSound");
         this.errorSound = game.add.audio("errorSound");
-        this.abstractChirpSound = game.add.audio("abstractChirpSound");
+        this.errorSound.volume = 0.2;
+        this.abstractSound = game.add.audio("abstractSound");
         this.pickupLootSound = game.add.audio("pickupLootSound");
         this.chestOpenSound = game.add.audio("chestOpenSound");
         this.chestUnlockSound = game.add.audio("chestUnlockSound");
@@ -402,7 +431,7 @@ GameplayState.prototype = {
     playAbstractSoundFrom: function(playerId){
         let sourcePlayer = this.playerMap[playerId];
         if(sourcePlayer.canMakeSound){
-            this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x, sourcePlayer.y);
+            this.playSoundFrom(this.abstractSound, sourcePlayer.x, sourcePlayer.y, 1);
             sourcePlayer.startSoundTimer();
         }
     },
@@ -438,17 +467,6 @@ GameplayState.prototype = {
     movePlayer: function(id, x, y, d){
        //this.playerMap[id].x = x;
        //this.playerMap[id].y = y;
-      // console.log(`${x},${y},${d}`)
-
-      /*//Play corresponding footstep sound
-      if(this.playerMap[id] === this.player){
-          let nextTile = this.tileMap.getTile(x, y);
-          if(this.footstepSounds[nextTile.index]){
-              if(!this.footstepSounds[nextTile.index].isPlaying){
-                this.footstepSounds[nextTile.index].play();
-              }
-          }
-      }*/
 
       // this.playerMap[id].setDirection(d);
       //   if(this.playerMap[id].ableToMove()){
@@ -464,7 +482,7 @@ GameplayState.prototype = {
         }
         let sourceX = tileX * TILE_SIZE;
         let sourceY = tileY * TILE_SIZE;
-        this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
+        this.playSoundFrom(this.placeTileSound, sourceX, sourceY, 0.15);
         this.tileMap.putTile(tileType, tileX, tileY);
         //if(this.tileSounds[tileType]){
             //this.playSoundFrom(this.tileSounds[tileType], sourceX, sourceY);
@@ -480,6 +498,7 @@ GameplayState.prototype = {
     //5 == forest
     //6 == snow
     //7 == desert
+    //8 = ice
     generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
@@ -515,8 +534,6 @@ GameplayState.prototype = {
     },
 
     //Helper function for placing individual solid objects
-    //0 === trees
-    //1 === rocks
     placeSolidObject: function(objectType, tileX, tileY, objectState){
         if(objectType === 0){
             this.objectMap[tileX][tileY] = new Tree(game, tileX * TILE_SIZE, tileY * TILE_SIZE, "willowTree");
@@ -538,7 +555,7 @@ GameplayState.prototype = {
     },
 
     //Interact with a specific treasure chest
-    interactWithChest: function(tileX, tileY, state, playersRequired){
+    interactWithChest: function(tileX, tileY, state, playersRequired, success){
         let treasureChest = this.objectMap[tileX][tileY];
         if(treasureChest){
             //New player unlocked 1 lock in this chest
@@ -559,17 +576,24 @@ GameplayState.prototype = {
             }
             //Treasure chest's last lock opened
             if(state === 2){
-                treasureChest.open();
-                this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                if(treasureChest.frame !== 1){
+                    treasureChest.open();
+                    this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                }
             }
-            if(state == 3){
+            if(state === 3){
                 if(treasureChest.frame !== 0){
                     treasureChest.frame = 0;
                     treasureChest.lootEmitter.on = false;
-                    this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                    this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE, 0.3);
                 }
             }
-            // this.objectMap[tileX][tileY].unlock(state);
+            if(state === 4){
+                this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE, 0.3);
+            }
+            if(state === 5){
+                //this.errorSound.play();
+            }
         }
     },
 
@@ -578,24 +602,28 @@ GameplayState.prototype = {
         let tx = tileX * TILE_SIZE;
         let ty = tileY * TILE_SIZE;
         if(hitpoints > 0){
-            this.playSoundFrom(this.treeCutSound, tx, ty);
+            this.playSoundFrom(this.treeCutSound, tx, ty, 0.25);
         }
         else if(hitpoints === 0){
-            this.playSoundFrom(this.treeDestroyedSound, tx, ty);
+            this.playSoundFrom(this.treeDestroyedSound, tx, ty, 0.25);
             let treeObj = this.objectMap[tileX][tileY];
             treeObj.cutDown();
         }
     },
 
     //Plays a given sound with volume inversely scaled to the distance from the source
-    //TODO make the minimum hearing distance a variable instead
-    playSoundFrom: function(sfx, x, y){
+    playSoundFrom: function(sfx, x, y, initialVolume = 1){
         let dist = this.getDistance(x, y, this.player.x, this.player.y);
         let factor = dist / MIN_HEARING_DISTANCE;
         if(factor > 1){
             factor = 1;
         }
-        sfx.volume = 1 - factor;
+        if(initialVolume === 1){
+            sfx.volume = 1 - factor;
+        }
+        else{
+            sfx.volume = (1 - factor) * initialVolume;
+        }
         if(sfx.volume > 0){
             sfx.play();
         }

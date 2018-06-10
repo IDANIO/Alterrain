@@ -83,6 +83,7 @@ Player.prototype.ableToMove = function(){
     return this.canMove;
 };
 
+//Old method for player movement
 Player.prototype.stepTo = function(){
     //Movement is in progress
     if(this.x < this.nextPos.x){

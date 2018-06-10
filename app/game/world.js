@@ -12,6 +12,7 @@ const ObjectContainer = require('./object_container.js');
 
 const Player = require('../objects/player.js');
 const Chest = require('../objects/chest.js');
+const DualChest = require('../objects/dual_chest.js');
 const Tree = require('../objects/tree.js');
 
 const {Tiles, WorldConfig} = require('../../shared/constant.js');
@@ -126,7 +127,7 @@ class World {
   }
 
   onPlayerSpawn() {
-    let chest = this.spawnChest();
+    let chest = this.spawnChest(false, false);
 
     this.server.io.emit('spawnChests', [
       {
@@ -147,7 +148,7 @@ class World {
     this.chestObjects = [];
 
     for (let i = 0; i < 5; ++i) {
-      let chest = this.spawnChest();
+      let chest = this.spawnChest(true, true);
 
       logger.debug(`a chest spawned at (${chest._x},${chest._y}).`);
     }
@@ -161,7 +162,6 @@ class World {
    */
   initializeTrees() {
     let count = 0;
-    // TODO use a better algorithm to spawn trees
     for (let x = 0; x < this.width; x++) {
       for (let y = 0; y < this.height; y++) {
         let tileType = this.tilemap.getTileAt(x, y);
@@ -186,18 +186,30 @@ class World {
   }
 
   /**
+   * @param normal {boolean}
+   * @param canSpawn {boolean}
    * @return {Chest}
    */
-  spawnChest() {
+  spawnChest(normal = true, canSpawn = false) {
     let newX;
     let newY;
 
+    let success;
     do {
       newX = Math.floor(Math.random() * this.width);
       newY = Math.floor(Math.random() * this.height);
-    } while (!this.isPassable(newX, newY, 2));
 
-    let chest = new Chest(this, newX, newY);
+      success = this.isPassable(newX, newY, 2) &&
+        this.getPlayersAt(newX, newY).length === 0;
+    } while (!success);
+
+    let chest;
+    if (normal) {
+      chest = new Chest(this, newX, newY, canSpawn);
+    } else {
+      chest = new DualChest(this, newX, newY, canSpawn);
+    }
+
     this.chestObjects.push(chest);
     this.objectContainer.add(chest);
 
@@ -205,7 +217,8 @@ class World {
   }
 
   /**
-   *
+   * @param x {Number}
+   * @param y {Number}
    */
   spawnTree(x, y) {
     let tree = new Tree(this, x, y);
@@ -217,6 +230,21 @@ class World {
       y: y,
       durability: tree.durability,
     });
+  }
+
+  /**
+   * @param x
+   * @param y
+   * @return {Array.<Player>}
+   */
+  getPlayersAt(x, y) {
+    let arr = [];
+    this.players.forEach((player) => {
+      if (player.pos(x, y)) {
+        arr.push(player);
+      }
+    });
+    return arr;
   }
 
   /**
@@ -373,7 +401,7 @@ class World {
   }
 
   /**
-   * O(n^2 * log n) algorithm.
+   * O(n^2 * 2 log n) algorithm.
    * TODO: Make it efficient.
    */
   spawnRandomTree() {
@@ -384,12 +412,14 @@ class World {
     this.tilemap.foreach((x, y, type)=> {
       const rnd = Math.random();
       if (type === Tiles.GRASS) {
-        if (!this.objectContainer.colliding(x, y) && rnd <= grassChance) {
-          this.spawnTree(x, y);
-          count++;
+        if (rnd <= grassChance && !this.objectContainer.colliding(x, y) &&
+          this.getPlayersAt(x, y).length === 0) {
+            this.spawnTree(x, y);
+            count++;
         }
       } else if (type === Tiles.FOREST) {
-        if (!this.objectContainer.colliding(x, y) && rnd <= forestChance) {
+        if (rnd <= forestChance && !this.objectContainer.colliding(x, y) &&
+          this.getPlayersAt(x, y).length === 0) {
           this.spawnTree(x, y);
           count++;
         }

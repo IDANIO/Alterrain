@@ -6,7 +6,7 @@ const GameObject = require('../objects/game_object');
 const {Tiles} = require('../../shared/constant.js');
 
 class Chest extends GameObject {
-  constructor(world, x, y) {
+  constructor(world, x, y, canRespawn = false) {
     super(world, x, y);
     this.type = 'chest';
 
@@ -20,6 +20,8 @@ class Chest extends GameObject {
 
     this.playerRequired = 1;
     this.playerHistory = [];
+    this.canRespawn = canRespawn;
+    this.success = null;
 
     this.count = 10 * 1000;
   }
@@ -30,6 +32,21 @@ class Chest extends GameObject {
 
       if (this.count <= 0) {
         this.world.emit('objectRemoval', this);
+
+        if (this.canRespawn) {
+          let chest = this.world.spawnChest();
+
+          this.world.server.io.emit('spawnChests', [
+            {
+              x: chest._x,
+              y: chest._y,
+              state: chest.state,
+              playerRequired: chest.playerRequired,
+            },
+          ]);
+
+          logger.data(`a chest spawned at (${chest._x},${chest._y}).`);
+        }
       }
     }
   }
@@ -61,8 +78,8 @@ class Chest extends GameObject {
    * @param player {Player} the player who interacts with this object.
    */
   onInteraction(player) {
-    logger.debug(`Player ${player.id} is interacting Box \
-      (state ${this.state})`);
+    // logger.debug(`Player ${player.id} is interacting Box \
+    //  (state ${this.state})`);
 
     switch (this.state) {
       case Chest.STATE_LOCKED:

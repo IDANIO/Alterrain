@@ -1,8 +1,8 @@
 //The main menu state
 var MainMenuState = function(game){
-    //this.textStyle = {font: "32px Arial", fill: "#FFF"};
     this.joinTextY = 300;
     this.controlsTextY = 360;
+    this.textColor = 0xbf6f4a;
 };
 
 MainMenuState.prototype = {
@@ -18,9 +18,12 @@ MainMenuState.prototype = {
         game.stage.smoothed = false
     },
 
-    preload: function(){        
+    preload: function(){
         //Font
         game.load.bitmapFont("m5x7", "assets/font/m5x7.png", "assets/font/m5x7.fnt");
+        
+        //Main menu background
+        game.load.spritesheet("mainMenuBackground", "./assets/img/main_menu_art.png");
 
         //Spritesheets
         game.load.spritesheet("player", "./assets/img/person_spritesheet_large.png", 32, 32);
@@ -42,10 +45,13 @@ MainMenuState.prototype = {
         game.load.image("highlightUI", "./assets/img/highlight_ui.png", 37, 34);
         game.load.image("menuHighlight", "./assets/img/menu_highlight.png");
         game.load.image("zIcon", "./assets/img/Z_key_icon.png");
+        game.load.image("eIcon", "./assets/img/E_key_icon.png");
         game.load.image("spaceIcon", "./assets/img/Space_key_icon.png");
+        game.load.image("arrowKeysIcon", "./assets/img/Arrow_keys_icon.png");
 
         //Weather-related images
         game.load.image("raindrop", "assets/img/raindrop.png");
+        game.load.spritesheet("snowflakes", "assets/img/snowflakes.png", 16, 16);
         game.load.image("screenShader", "assets/img/screen_shader.png");
 
         //Tile placing sounds
@@ -53,7 +59,7 @@ MainMenuState.prototype = {
         game.load.audio("errorSound", ["assets/audio/wrong.ogg", "assets/audio/wrong.mp3"]);
 
         //Abstract sound
-        game.load.audio("abstractChirpSound", ["assets/audio/abstract_chirp01.ogg", "assets/audio/abstract_chirp01.mp3"]);
+        game.load.audio("abstractSound", ["assets/audio/snap01.ogg", "assets/audio/snap01.mp3"]);
 
         //Treasure chest sounds
         game.load.audio("pickupLootSound", ["assets/audio/pickup_loot01.ogg", "assets/audio/pickup_loot01.mp3"]);
@@ -84,7 +90,9 @@ MainMenuState.prototype = {
             document.getElementsByTagName("canvas")[0].style.opacity = 1;
         }, 0 );
         
-        this.titleText = game.add.bitmapText(GAME_WIDTH / 2, 180, "m5x7", "Alterrain", 64);
+        this.mainMenuBackground = game.add.sprite(0, 0, "mainMenuBackground");
+        
+        this.titleText = game.add.bitmapText(GAME_WIDTH / 2, 170, "m5x7", "Alterrain", 64);
         this.titleText.anchor.setTo(0.5);
 
         this.joinText = game.add.bitmapText(GAME_WIDTH / 2, this.joinTextY, "m5x7", "Join Game", 48);
@@ -92,7 +100,6 @@ MainMenuState.prototype = {
 
         this.controlsText = game.add.bitmapText(GAME_WIDTH / 2, this.controlsTextY, "m5x7", "Controls", 48);
         this.controlsText.anchor.setTo(0.5);
-        
 
         this.menuHighlight = game.add.sprite(GAME_WIDTH / 2, this.joinTextY - 8, "menuHighlight");
         this.menuHighlight.anchor.setTo(0.5);
@@ -100,9 +107,6 @@ MainMenuState.prototype = {
         
         this.zIcon = game.add.sprite(this.menuHighlight.x - this.menuHighlight.width / 2 - 36, 
                                      this.menuHighlight.y - this.menuHighlight.height / 2 + 2, "zIcon");
-        /*this.spaceIcon = game.add.sprite(this.menuHighlight.x + this.menuHighlight.width / 2 + 4, 
-                                         this.menuHighlight.y - this.menuHighlight.height / 2 + 2, "spaceIcon");
-                                         */
 
         this.blipHigh = game.add.audio("blipHigh");
         this.blipHigh.volume = 0.25;
@@ -117,7 +121,6 @@ MainMenuState.prototype = {
                 this.menuChoice = 0;
                 this.menuHighlight.y = this.joinTextY - 8;
                 this.zIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
-                //this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
                 this.blipLow.play();
             }
         }
@@ -126,7 +129,6 @@ MainMenuState.prototype = {
                 this.menuChoice = 1;
                 this.menuHighlight.y = this.controlsTextY - 8;
                 this.zIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
-                //this.spaceIcon.y = this.menuHighlight.y - this.menuHighlight.height / 2 + 2;
                 this.blipLow.play();
             }
         }

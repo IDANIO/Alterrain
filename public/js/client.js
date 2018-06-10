@@ -9,7 +9,6 @@ var Client = {};
 
     Client.socket.on('disconnect', function () {
       game.state.start("MainMenuState");
-      // alert("TODO: Timeout");
     });
 
 
@@ -33,7 +32,7 @@ var Client = {};
     Client.socket.on('playerEvent', function (event) {
       // if Some player left the game
       if (event.disconnectTime) {
-        console.log('removing player ' + event.playerId);
+        //console.log('removing player ' + event.playerId);
         gameplayState.removePlayer(event.playerId);
       } else {
         gameplayState.addNewPlayer(event.playerId, event.x, event.y);
@@ -149,7 +148,6 @@ var Client = {};
         var y = tile[1];
         var type = tile[2];
         gameplayState.changeTileAt(x, y, type);
-        //gameplayState.playAbstractSoundAt(x, y);
       }
     });
 
@@ -164,7 +162,7 @@ var Client = {};
      * @param data {Object} An object with the x and y index of the chest and its state
      */
     Client.socket.on('chestUpdate', function (data){
-      gameplayState.interactWithChest(data.x, data.y, data.state, data.playersRequired);
+      gameplayState.interactWithChest(data.x, data.y, data.state, data.playersRequired, data.success);
     });
 
     /**
@@ -223,9 +221,6 @@ var Client = {};
     });
   };
 
-  /**
-   *
-   */
   Client.disconnectFromServer = function(){
     Client.socket.disconnect();
   };
@@ -243,33 +238,13 @@ var Client = {};
       return;
     }
 
-    console.log('send');
+    //console.log('send');
 
     Client.socket.emit('inputCommand', {
       type: 1, // MOVEMENT
       params: dir
     });
   };
-
-  // /**
-  //  * @param dir
-  //  */
-  // Client.sendMove = function (dir) {
-  //   // TODO: Julio, make it only sent the direction for player to move
-  //   // 2 = Down, 4 = Left, 6 = Right, 8 = Up
-  //
-  //   // check '/shared/constant.js'
-  //   //
-  //   //   MOVEMENT: 1,
-  //   //   ALTER_TILE: 2,
-  //   //   COMMUNICATION: 3,
-  //   Client.socket.emit('inputCommand', {
-  //     type: 1,
-  //     params: dir
-  //   });
-  //
-  //   // Client.socket.emit("moveplayer", {dx: dx, dy: dy});
-  // };
 
   Client.changeTile = function (tileChoice, dir) {
     // check '/shared/constant.js'
@@ -311,8 +286,6 @@ var Client = {};
       type: 3,
     });
   }
-
-
 
 })();
 

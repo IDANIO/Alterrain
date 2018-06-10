@@ -9,6 +9,7 @@ var controlsState;
 window.onload = function(){
     game = new Phaser.Game(GAME_WIDTH, GAME_HEIGHT, Phaser.AUTO);
 
+    //Create the state objects
     mainMenuState = new MainMenuState(game);
     gameplayState = new GameplayState(game);
     controlsState = new ControlsState(game);
