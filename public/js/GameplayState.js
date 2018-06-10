@@ -236,12 +236,12 @@ GameplayState.prototype = {
             this.stopSnowEffect();
         }
         else if(weatherType === 1){ //rain
-            this.startRainEffect();
             this.stopSnowEffect();
+            this.startRainEffect();
         }
         else if(weatherType === 2){ //snow
-            this.startSnowEffect();
             this.stopRainEffect();
+            this.startSnowEffect();
         }
         else if(weatherType === 3){
             this.startRainEffect(); //rain + snow
