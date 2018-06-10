@@ -152,7 +152,7 @@ class Tilemap {
     }
   }
 
-  /** 
+  /**
    * Returns the type of terrain that corresponds to the
    * given parameters
    * @param e The 2D array that represents the elevation

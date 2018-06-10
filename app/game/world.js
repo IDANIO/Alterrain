@@ -204,7 +204,8 @@ class World {
   }
 
   /**
-   *
+   * @param x {Number}
+   * @param y {Number}
    */
   spawnTree(x, y) {
     let tree = new Tree(this, x, y);
@@ -215,6 +216,17 @@ class World {
       x: x,
       y: y,
       durability: tree.durability,
+    });
+  }
+
+  /**
+   * @param x
+   * @param y
+   * @return {Array.<Player>}
+   */
+  getPlayersAt(x, y) {
+    return this.players.filter((player) => {
+      return player.pos(x, y);
     });
   }
 
@@ -372,7 +384,7 @@ class World {
   }
 
   /**
-   * O(n^2 * log n) algorithm.
+   * O(n^2 * 2 log n) algorithm.
    * TODO: Make it efficient.
    */
   spawnRandomTree() {
@@ -383,12 +395,14 @@ class World {
     this.tilemap.foreach((x, y, type)=> {
       const rnd = Math.random();
       if (type === Tiles.GRASS) {
-        if (!this.objectContainer.colliding(x, y) && rnd <= grassChance) {
-          this.spawnTree(x, y);
-          count++;
+        if (rnd <= grassChance && !this.objectContainer.colliding(x, y) &&
+          this.getPlayersAt(x, y).length === 0) {
+            this.spawnTree(x, y);
+            count++;
         }
       } else if (type === Tiles.FOREST) {
-        if (!this.objectContainer.colliding(x, y) && rnd <= forestChance) {
+        if (rnd <= forestChance && !this.objectContainer.colliding(x, y) &&
+          this.getPlayersAt(x, y).length === 0) {
           this.spawnTree(x, y);
           count++;
         }

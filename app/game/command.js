@@ -18,12 +18,6 @@ const CommandFactory = {
     return () => {
       if (!player.isMoving()) {
         player.moveStraight(dir);
-        // player.world.server.io.emit('playerUpdate', {
-        //   id: player.id,
-        //   x: player._x,
-        //   y: player._y,
-        //   d: player._direction,
-        // });
       }
     };
   },
