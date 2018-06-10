@@ -237,12 +237,15 @@ GameplayState.prototype = {
         }
         else if(weatherType === 1){ //rain
             this.startRainEffect();
+            this.stopSnowEffect();
         }
         else if(weatherType === 2){ //snow
             this.startSnowEffect();
+            this.stopRainEffect();
         }
         else if(weatherType === 3){
-            this.startRainEffect(); //TODO sandstorm
+            this.startRainEffect(); //rain + snow
+            this.startSnowEffect();
         }
     },
 

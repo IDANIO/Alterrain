@@ -17,8 +17,8 @@ class Player extends Character {
      */
     this.inventory = Array(...Array(9)).map(Number.prototype.valueOf, 0);
     
-    //Players start with 50 bridge tiles
-    this.gainItem(Tiles.BRIDGE, 50);
+    //Players start with 20 bridge tiles
+    this.gainItem(Tiles.BRIDGE, 20);
   }
 
   /**

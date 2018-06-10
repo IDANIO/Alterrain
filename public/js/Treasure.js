@@ -77,5 +77,5 @@ Treasure.prototype.digUp = function(){
 Treasure.prototype.unlockOnce = function(){
     //this.frame--;
     this.numPlayersRequired--;
-    this.lockCountText.text = this.numPlayersRequired + "x Lock";
+    this.lockCountText.text = this.numPlayersRequired + "x";
 };

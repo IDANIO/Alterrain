@@ -26,8 +26,8 @@ function InventoryUI(game, x, y, key, frame){
         this.itemsText[i] = game.add.bitmapText(x + (i * this.stringMargin) + this.countOffsetX, y + this.countOffsetY, "m5x7", "0", 21);
     }
     
-    //Hacky display update, players start with 50 bridge tiles
-    this.itemsText[3].text = "50";
+    //Hacky display update, players start with some bridge tiles
+    this.itemsText[3].text = "20";
     
     //Set up the counters below each tile
     this.numbersText = [];
