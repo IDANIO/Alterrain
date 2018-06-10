@@ -29,6 +29,55 @@ class DualChest extends Chest {
     }
     return success;
   }
+  
+  /**
+   * @param player {Player} the player who interacts with this object.
+   */
+  onInteraction(player) {
+    //Very ugly way of fixing sound bug
+    let success = 2;
+      
+    switch (this.state) {
+      case Chest.STATE_LOCKED:
+        this.onClosed(player);
+        break;
+      case Chest.STATE_UNLOCK:
+        this.onUnlock(player);
+        break;
+      case Chest.STATE_OPENED:
+        success = this.onOpened(player);
+        break;
+      case Chest.STATE_LOOTED:
+        this.onLooted(player);
+        break;
+    }
+    
+    if(success === 0){
+      this.world.server.io.emit('chestUpdate', {
+        x: this._x,
+        y: this._y,
+        state: 4,
+        playersRequired: this.playerRequired,
+      });
+    }
+    else if(success === 1){
+      this.world.server.io.emit('chestUpdate', {
+        x: this._x,
+        y: this._y,
+        state: 5,
+        playersRequired: this.playerRequired,
+      });
+    }
+    else if(success === 2){
+      // TODO: Refactor
+      this.world.server.io.emit('chestUpdate', {
+        x: this._x,
+        y: this._y,
+        state: this.state,
+        playersRequired: this.playerRequired,
+      });
+    }
+  }
 }
 
 module.exports = DualChest;
