@@ -21,6 +21,7 @@ class Chest extends GameObject {
     this.playerRequired = 1;
     this.playerHistory = [];
     this.canRespawn = canRespawn;
+    this.success = null;
 
     this.count = 10 * 1000;
   }
