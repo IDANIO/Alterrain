@@ -80,6 +80,9 @@ class Chest extends GameObject {
     logger.debug(`Player ${player.id} is interacting Box \
       (state ${this.state})`);
 
+    //Very ugly way of fixing sound bug
+    let success = 2;
+      
     switch (this.state) {
       case Chest.STATE_LOCKED:
         this.onClosed(player);
@@ -88,20 +91,46 @@ class Chest extends GameObject {
         this.onUnlock(player);
         break;
       case Chest.STATE_OPENED:
-        this.onOpened(player);
+        success = this.onOpened(player);
         break;
       case Chest.STATE_LOOTED:
         this.onLooted(player);
         break;
     }
+    
+    if(success === 0){
+      this.world.server.io.emit('chestUpdate', {
+        x: this._x,
+        y: this._y,
+        state: 4,
+        playersRequired: this.playerRequired,
+      });
+    }
+    else if(success === 1){
+      this.world.server.io.emit('chestUpdate', {
+        x: this._x,
+        y: this._y,
+        state: 5,
+        playersRequired: this.playerRequired,
+      });
+    }
+    else if(success === 2){
+      // TODO: Refactor
+      this.world.server.io.emit('chestUpdate', {
+        x: this._x,
+        y: this._y,
+        state: this.state,
+        playersRequired: this.playerRequired,
+      });
+    }
 
     // TODO: Refactor
-    this.world.server.io.emit('chestUpdate', {
+    /*this.world.server.io.emit('chestUpdate', {
       x: this._x,
       y: this._y,
       state: this.state,
       playersRequired: this.playerRequired,
-    });
+    });*/
   }
 
   /**

@@ -557,6 +557,7 @@ GameplayState.prototype = {
     //Interact with a specific treasure chest
     interactWithChest: function(tileX, tileY, state, playersRequired){
         let treasureChest = this.objectMap[tileX][tileY];
+        console.log("State: " + state + ", playersRequired: " + playersRequired);
         if(treasureChest){
             //New player unlocked 1 lock in this chest
             if(state === 0){
@@ -576,15 +577,23 @@ GameplayState.prototype = {
             }
             //Treasure chest's last lock opened
             if(state === 2){
-                treasureChest.open();
-                this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                if(treasureChest.frame !== 1){
+                    treasureChest.open();
+                    this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                }
             }
-            if(state == 3){
+            if(state === 3){
                 if(treasureChest.frame !== 0){
                     treasureChest.frame = 0;
                     treasureChest.lootEmitter.on = false;
                     this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE, 0.3);
                 }
+            }
+            if(state === 4){
+                this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE, 0.3);
+            }
+            if(state === 5){
+                //this.errorSound.play();
             }
         }
     },

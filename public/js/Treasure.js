@@ -34,6 +34,13 @@ Treasure.prototype.setSize = function(size){
     }
 };
 
+Treasure.prototype.update = function(){
+    //Hacky way to keep the correct display counter
+    if(this.lockCountText.text != this.numPlayersRequired + "x"){
+        this.lockCountText.text = this.numPlayersRequired + "x";
+    }
+};
+
 Treasure.prototype.setState = function(state){
     if(state === 3){
         this.frame = 0;
