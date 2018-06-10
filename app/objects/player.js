@@ -16,8 +16,8 @@ class Player extends Character {
      * @type {Array.<Number>} Key: Tiles Enum. Value: item count.
      */
     this.inventory = Array(...Array(9)).map(Number.prototype.valueOf, 0);
-    
-    //Players start with 20 bridge tiles
+
+    // Players start with 20 bridge tiles
     this.gainItem(Tiles.BRIDGE, 20);
   }
 
@@ -82,7 +82,8 @@ class Player extends Character {
     let targetTile = this.world.tilemap.getTileAt(x, y);
     let isValid = true;
 
-    if (tileId !== Tiles.BRIDGE && tileId !== Tiles.ICE && targetTile === Tiles.WATER ) {
+    if (tileId !== Tiles.BRIDGE && tileId !== Tiles.ICE &&
+      targetTile === Tiles.WATER ) {
       isValid = false;
     }
 

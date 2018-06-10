@@ -127,7 +127,7 @@ class World {
   }
 
   onPlayerSpawn() {
-    let chest = this.spawnChest(false);
+    let chest = this.spawnChest(false, false);
 
     this.server.io.emit('spawnChests', [
       {
@@ -148,7 +148,7 @@ class World {
     this.chestObjects = [];
 
     for (let i = 0; i < 5; ++i) {
-      let chest = this.spawnChest();
+      let chest = this.spawnChest(true, true);
 
       logger.debug(`a chest spawned at (${chest._x},${chest._y}).`);
     }
@@ -187,9 +187,10 @@ class World {
 
   /**
    * @param normal {boolean}
+   * @param canSpawn {boolean}
    * @return {Chest}
    */
-  spawnChest(normal = true) {
+  spawnChest(normal = true, canSpawn = false) {
     let newX;
     let newY;
 
@@ -200,9 +201,9 @@ class World {
 
     let chest;
     if (normal) {
-      chest = new Chest(this, newX, newY);
+      chest = new Chest(this, newX, newY, canSpawn);
     } else {
-      chest = new DualChest(this, newX, newY);
+      chest = new DualChest(this, newX, newY, canSpawn);
     }
 
     this.chestObjects.push(chest);
