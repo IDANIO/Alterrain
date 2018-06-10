@@ -15,7 +15,7 @@ class DualChest extends Chest {
     let index = this.playerHistory.indexOf(player.id);
     if (index !== -1) {
       this.awardPlayer(player);
-
+      this.success = true;
       this.playerHistory.splice(index, 1);
     }
 

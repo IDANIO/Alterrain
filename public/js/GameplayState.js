@@ -6,7 +6,7 @@ var WORLD_HEIGHT = 88;
 var GameplayState = function(game){
     //Create a playerMap property
     this.playerMap = {};
-    
+
     //Make a reference to the local player
     this.player = null;
 
@@ -82,7 +82,7 @@ GameplayState.prototype = {
         this.uiGroup.fixedToCamera = true;
 
         this.initializeWeatherEffects();
-        
+
         //Create the pause/quit UI
         this.pauseUI = new PauseUI(game, 0, 0);
         this.uiGroup.add(this.pauseUI.promptText);
@@ -197,7 +197,7 @@ GameplayState.prototype = {
         this.screenShader.tint = 0x777777;
         this.screenShader.alpha = 0;
         this.weatherEffects[0] = this.screenShader;
-        
+
         //Rain
         this.rainEmitter = game.add.emitter(game.world.centerX, 0, 256);
         this.rainEmitter.fixedToCamera = true;
@@ -213,7 +213,7 @@ GameplayState.prototype = {
         this.weatherEffects[1] = this.rainEmitter;
         this.rainEmitter.start(false, 2000, 10);
         this.rainEmitter.on = false;
-        
+
         //Snow/blizzard
         this.snowEmitter = game.add.emitter(game.world.centerX, 0, 512);
         this.snowEmitter.fixedToCamera = true;
@@ -265,7 +265,7 @@ GameplayState.prototype = {
         game.add.tween(this.screenShader).to( { alpha: 0 }, 1500, "Linear", true);
         this.rainEmitter.on = false;;
     },
-    
+
     startSnowEffect: function(){
         this.screenShader.tint = 0xFFFFFF;
         game.add.tween(this.screenShader).to( { alpha: 0.3 }, 1500, "Linear", true);
@@ -555,7 +555,7 @@ GameplayState.prototype = {
     },
 
     //Interact with a specific treasure chest
-    interactWithChest: function(tileX, tileY, state, playersRequired){
+    interactWithChest: function(tileX, tileY, state, playersRequired, success){
         let treasureChest = this.objectMap[tileX][tileY];
         if(treasureChest){
             //New player unlocked 1 lock in this chest
@@ -577,7 +577,12 @@ GameplayState.prototype = {
             //Treasure chest's last lock opened
             if(state === 2){
                 treasureChest.open();
-                this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+
+                if (success) {
+                  this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE, 0.3);
+                } else {
+                  this.playSoundFrom(this.chestOpenSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                }
             }
             if(state == 3){
                 if(treasureChest.frame !== 0){
