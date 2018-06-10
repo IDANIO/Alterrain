@@ -57,6 +57,7 @@ ControlsUI.prototype.destroy = function(){
     this.placeText.destroy();
     this.makeSoundText.destroy();
     this.zIcon.destroy();
+    this.eIcon.destroy();
     this.spaceIcon.destroy();
     this.arrowKeysIcon.destroy();
 }

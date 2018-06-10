@@ -1,3 +1,4 @@
+//The world size in tiles
 var WORLD_WIDTH = 88;
 var WORLD_HEIGHT = 88;
 
@@ -5,18 +6,18 @@ var WORLD_HEIGHT = 88;
 var GameplayState = function(game){
     //Create a playerMap property
     this.playerMap = {};
+    
     //Make a reference to the local player
     this.player = null;
 
     //Create a 2D array for solid objects
     this.objectMap = [];
-    for(let i = 0; i < WORLD_HEIGHT; i++){ //TODO use a constant instead of 64 to reference the world size
+    for(let i = 0; i < WORLD_HEIGHT; i++){
         this.objectMap[i] = [];
     }
 
     this.weatherEffects = [];
     this.isRainOn = false;
-    //this.textStyle = {font: "20px Arial", fill: "#FFF"};
 };
 
 //Tile-based movement
@@ -50,7 +51,6 @@ GameplayState.prototype = {
         this.createSoundObjects();
 
         //Set up and create the world tilemap
-        //TODO use constants instead of hard-coded numbers
         game.world.setBounds(0, 0, WORLD_WIDTH * TILE_SIZE, WORLD_HEIGHT * TILE_SIZE);
         this.tileGroup = game.add.group();
         this.tileMap = game.add.tilemap();
@@ -59,7 +59,7 @@ GameplayState.prototype = {
         //new Tilemap(layerName, widthInTiles, heightInTiles, tileWidth, tileHeight)
         this.mainLayer = this.tileMap.create("mainLayer", WORLD_WIDTH, WORLD_HEIGHT, TILE_SIZE, TILE_SIZE);
 
-        //TODO need to optimize later
+        //The currently selected tile
         this.tileChoice = 0;
 
         //Handle input
@@ -99,10 +99,8 @@ GameplayState.prototype = {
         for(let i = 0; i < this.playerInventoryUI.itemsText.length; i++){
             this.uiGroup.add(this.playerInventoryUI.numbersText[i]);
         }
-        //this.uiGroup.add(this.playerInventoryUI.itemsText);
 
         //Display tile choice
-        //TODO should be a proper UI instead
         this.tileText = game.add.bitmapText(320, 450, "m5x7", tileName[this.tileChoice], 48);
         this.tileText.anchor.x = 0.5;
         this.uiGroup.add(this.tileText);
@@ -174,6 +172,7 @@ GameplayState.prototype = {
     update: function(){
         this.updateInput();
 
+        //Pausing controls
         if(this.pauseUI.paused){
             if(game.input.keyboard.justPressed(Phaser.Keyboard.ESC)){
                 this.pauseUI.hide();
@@ -198,6 +197,7 @@ GameplayState.prototype = {
         this.screenShader.tint = 0x777777;
         this.screenShader.alpha = 0;
         this.weatherEffects[0] = this.screenShader;
+        
         //Rain
         this.rainEmitter = game.add.emitter(game.world.centerX, 256);
         this.rainEmitter.fixedToCamera = true;
@@ -236,7 +236,6 @@ GameplayState.prototype = {
         }
         this.screenShader.tint = 0x999999;
         game.add.tween(this.screenShader).to( { alpha: 0.4 }, 1500, "Linear", true);
-        //this.screenShader.alpha = 0.4;
         this.rainEmitter.on = true;
     },
 
@@ -245,13 +244,13 @@ GameplayState.prototype = {
             this.lightRainSound.stop();
         }
         game.add.tween(this.screenShader).to( { alpha: 0 }, 1500, "Linear", true);
-        //this.screenShader.alpha = 0;
         this.rainEmitter.on = false;;
     },
 
     createSoundObjects: function(){
         this.placeTileSound = game.add.audio("placeTileSound");
         this.errorSound = game.add.audio("errorSound");
+        this.errorSound.volume = 0.2;
         this.abstractChirpSound = game.add.audio("abstractChirpSound");
         this.pickupLootSound = game.add.audio("pickupLootSound");
         this.chestOpenSound = game.add.audio("chestOpenSound");
@@ -402,7 +401,7 @@ GameplayState.prototype = {
     playAbstractSoundFrom: function(playerId){
         let sourcePlayer = this.playerMap[playerId];
         if(sourcePlayer.canMakeSound){
-            this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x, sourcePlayer.y);
+            this.playSoundFrom(this.abstractChirpSound, sourcePlayer.x, sourcePlayer.y, 0.2);
             sourcePlayer.startSoundTimer();
         }
     },
@@ -438,17 +437,6 @@ GameplayState.prototype = {
     movePlayer: function(id, x, y, d){
        //this.playerMap[id].x = x;
        //this.playerMap[id].y = y;
-      // console.log(`${x},${y},${d}`)
-
-      /*//Play corresponding footstep sound
-      if(this.playerMap[id] === this.player){
-          let nextTile = this.tileMap.getTile(x, y);
-          if(this.footstepSounds[nextTile.index]){
-              if(!this.footstepSounds[nextTile.index].isPlaying){
-                this.footstepSounds[nextTile.index].play();
-              }
-          }
-      }*/
 
       // this.playerMap[id].setDirection(d);
       //   if(this.playerMap[id].ableToMove()){
@@ -464,7 +452,7 @@ GameplayState.prototype = {
         }
         let sourceX = tileX * TILE_SIZE;
         let sourceY = tileY * TILE_SIZE;
-        this.playSoundFrom(this.placeTileSound, sourceX, sourceY);
+        this.playSoundFrom(this.placeTileSound, sourceX, sourceY, 0.15);
         this.tileMap.putTile(tileType, tileX, tileY);
         //if(this.tileSounds[tileType]){
             //this.playSoundFrom(this.tileSounds[tileType], sourceX, sourceY);
@@ -480,6 +468,7 @@ GameplayState.prototype = {
     //5 == forest
     //6 == snow
     //7 == desert
+    //8 = ice
     generateTiles: function(tileMap){
         for(let i = 0; i < tileMap.length; i++){
             for(let j = 0; j < tileMap[i].length; j++){
@@ -515,8 +504,6 @@ GameplayState.prototype = {
     },
 
     //Helper function for placing individual solid objects
-    //0 === trees
-    //1 === rocks
     placeSolidObject: function(objectType, tileX, tileY, objectState){
         if(objectType === 0){
             this.objectMap[tileX][tileY] = new Tree(game, tileX * TILE_SIZE, tileY * TILE_SIZE, "willowTree");
@@ -566,10 +553,9 @@ GameplayState.prototype = {
                 if(treasureChest.frame !== 0){
                     treasureChest.frame = 0;
                     treasureChest.lootEmitter.on = false;
-                    this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
+                    this.playSoundFrom(this.pickupLootSound, tileX * TILE_SIZE, tileY * TILE_SIZE, 0.3);
                 }
             }
-            // this.objectMap[tileX][tileY].unlock(state);
         }
     },
 
@@ -578,24 +564,29 @@ GameplayState.prototype = {
         let tx = tileX * TILE_SIZE;
         let ty = tileY * TILE_SIZE;
         if(hitpoints > 0){
-            this.playSoundFrom(this.treeCutSound, tx, ty);
+            this.playSoundFrom(this.treeCutSound, tx, ty, 0.25);
         }
         else if(hitpoints === 0){
-            this.playSoundFrom(this.treeDestroyedSound, tx, ty);
+            this.playSoundFrom(this.treeDestroyedSound, tx, ty, 0.25);
             let treeObj = this.objectMap[tileX][tileY];
             treeObj.cutDown();
         }
     },
 
     //Plays a given sound with volume inversely scaled to the distance from the source
-    //TODO make the minimum hearing distance a variable instead
-    playSoundFrom: function(sfx, x, y){
+    playSoundFrom: function(sfx, x, y, initialVolume = 1){
         let dist = this.getDistance(x, y, this.player.x, this.player.y);
         let factor = dist / MIN_HEARING_DISTANCE;
         if(factor > 1){
             factor = 1;
         }
-        sfx.volume = 1 - factor;
+        if(initialVolume === 1){
+            sfx.volume = 1 - factor;
+        }
+        else{
+            sfx.volume = (1 - factor) * initialVolume;
+        }
+        console.log(sfx.volume);
         if(sfx.volume > 0){
             sfx.play();
         }

@@ -32,7 +32,7 @@ var Client = {};
     Client.socket.on('playerEvent', function (event) {
       // if Some player left the game
       if (event.disconnectTime) {
-        console.log('removing player ' + event.playerId);
+        //console.log('removing player ' + event.playerId);
         gameplayState.removePlayer(event.playerId);
       } else {
         gameplayState.addNewPlayer(event.playerId, event.x, event.y);
@@ -238,7 +238,7 @@ var Client = {};
       return;
     }
 
-    console.log('send');
+    //console.log('send');
 
     Client.socket.emit('inputCommand', {
       type: 1, // MOVEMENT
