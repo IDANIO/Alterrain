@@ -22,7 +22,7 @@ function ControlsUI(game, x, y){
     this.movementText = game.add.bitmapText(x + GAME_WIDTH / 2 + 56, y + this.offsetY + this.marginY - 12, "m5x7", "- move", 48);
     this.movementText.anchor.setTo(0.5);
     
-    this.interactText = game.add.bitmapText(x + GAME_WIDTH / 2 + 28, y + this.offsetY + (2 * this.marginY), "m5x7", "- interact with objects", 48);
+    this.interactText = game.add.bitmapText(x + GAME_WIDTH / 2 + 18, y + this.offsetY + (2 * this.marginY), "m5x7", "- open chests/cut down trees", 48);
     this.interactText.anchor.setTo(0.5);
     
     this.placeText = game.add.bitmapText(x + GAME_WIDTH / 2 + 36, y + this.offsetY + (3 * this.marginY), "m5x7", "- place tiles", 48);
@@ -32,7 +32,7 @@ function ControlsUI(game, x, y){
     this.makeSoundText.anchor.setTo(0.5);
     
     //Icons for the controls
-    this.zIcon = game.add.sprite(this.interactText.x - this.interactText.width / 2 - 52, 
+    this.zIcon = game.add.sprite(this.interactText.x - this.interactText.width / 2 - 51, 
                                      this.interactText.y - this.interactText.height + 4, "zIcon");
     this.spaceIcon = game.add.sprite(this.placeText.x - this.placeText.width / 2 - 112, 
                                      this.placeText.y - this.placeText.height + 4, "spaceIcon");
