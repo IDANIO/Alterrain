@@ -51,6 +51,7 @@ MainMenuState.prototype = {
 
         //Weather-related images
         game.load.image("raindrop", "assets/img/raindrop.png");
+        game.load.spritesheet("snowflakes", "assets/img/snowflakes.png", 16, 16);
         game.load.image("screenShader", "assets/img/screen_shader.png");
 
         //Tile placing sounds

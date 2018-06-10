@@ -199,7 +199,7 @@ GameplayState.prototype = {
         this.weatherEffects[0] = this.screenShader;
         
         //Rain
-        this.rainEmitter = game.add.emitter(game.world.centerX, 256);
+        this.rainEmitter = game.add.emitter(game.world.centerX, 0, 256);
         this.rainEmitter.fixedToCamera = true;
         this.rainEmitter.makeParticles(["raindrop"], 0, 256);
         this.rainEmitter.gravity = 0;
@@ -213,17 +213,33 @@ GameplayState.prototype = {
         this.weatherEffects[1] = this.rainEmitter;
         this.rainEmitter.start(false, 2000, 10);
         this.rainEmitter.on = false;
+        
+        //Snow/blizzard
+        this.snowEmitter = game.add.emitter(game.world.centerX, 0, 512);
+        this.snowEmitter.fixedToCamera = true;
+        this.snowEmitter.makeParticles("snowflakes", [0, 1, 2], 400);
+        this.snowEmitter.gravity = 0;
+        this.snowEmitter.setXSpeed(-20, -20);
+        this.snowEmitter.setYSpeed(96, 96);
+        this.snowEmitter.minParticleScale = 0.5;
+        this.snowEmitter.maxParticleScale = 1.5;
+        this.snowEmitter.setAlpha(0.5, 0.9);
+        this.snowEmitter.area = area;
+        this.weatherEffects[2] = this.snowEmitter;
+        this.snowEmitter.start(false, 10000, 64);
+        this.snowEmitter.on = false;
     },
 
     startWeatherEffect: function(weatherType){
         if(weatherType === 0){ //no weather
             this.stopRainEffect();
+            this.stopSnowEffect();
         }
         else if(weatherType === 1){ //rain
             this.startRainEffect();
         }
-        else if(weatherType === 2){
-            this.startRainEffect(); //TODO blizzard
+        else if(weatherType === 2){ //snow
+            this.startSnowEffect();
         }
         else if(weatherType === 3){
             this.startRainEffect(); //TODO sandstorm
@@ -245,6 +261,17 @@ GameplayState.prototype = {
         }
         game.add.tween(this.screenShader).to( { alpha: 0 }, 1500, "Linear", true);
         this.rainEmitter.on = false;;
+    },
+    
+    startSnowEffect: function(){
+        this.screenShader.tint = 0xFFFFFF;
+        game.add.tween(this.screenShader).to( { alpha: 0.3 }, 1500, "Linear", true);
+        this.snowEmitter.on = true;
+    },
+
+    stopSnowEffect: function(){
+        game.add.tween(this.screenShader).to( { alpha: 0 }, 1500, "Linear", true);
+        this.snowEmitter.on = false;
     },
 
     createSoundObjects: function(){

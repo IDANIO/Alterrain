@@ -72,7 +72,7 @@ exports.ServerConfig = {
 exports.WorldConfig = {
   WIDTH: 88,
   HEIGHT: 88,
-  WEATHER_DURATION: (45 * 1000), // 1 min in millisecond
+  WEATHER_DURATION: (45 * 1000), // in millisecond
   // MAX_TREES: 400,
   // we don't need this any more, the max number of trees is the number of
   // trees in the start of the game.
