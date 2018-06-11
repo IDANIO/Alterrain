@@ -109,7 +109,7 @@ GameplayState.prototype = {
         this.controlsUI = new ControlsUI(game, 0, 0);
         this.loadingText = game.add.bitmapText(GAME_WIDTH / 2, 430, "m5x7", "Loading...", 48);
         this.loadingText.anchor.setTo(0.5);
-
+        this.loadingText.tint = 0xbf6f4a;
 
         // -------------------------------------- Ivan's change
         this.cursors = game.input.keyboard.createCursorKeys();
