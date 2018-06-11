@@ -285,6 +285,7 @@ GameplayState.prototype = {
         this.pickupLootSound = game.add.audio("pickupLootSound");
         this.chestOpenSound = game.add.audio("chestOpenSound");
         this.chestUnlockSound = game.add.audio("chestUnlockSound");
+        this.chestLockedSound = game.add.audio("chestLockedSound");
         this.treeCutSound = game.add.audio("treeCutSound");
         this.treeDestroyedSound = game.add.audio("treeDestroyedSound");
 
@@ -570,8 +571,7 @@ GameplayState.prototype = {
             //Old player tried to interact with treasure chest, so nothing happens
             if(state === 1){
                 if(playersRequired == treasureChest.numPlayersRequired){ //old player
-                    //TODO locked sound
-                    console.log("Old player tried unlocking treasure chest");
+                    this.playSoundFrom(this.chestLockedSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
                 }
                 else{ //new player
                     this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);

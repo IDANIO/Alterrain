@@ -65,6 +65,7 @@ MainMenuState.prototype = {
         game.load.audio("pickupLootSound", ["assets/audio/pickup_loot01.ogg", "assets/audio/pickup_loot01.mp3"]);
         game.load.audio("chestOpenSound", ["assets/audio/creak.ogg", "assets/audio/creak.mp3"]);
         game.load.audio("chestUnlockSound", ["assets/audio/unlock.ogg", "assets/audio/unlock.mp3"]);
+        game.load.audio("chestLockedSound", ["assets/audio/closed_lock.ogg", "assets/audio/closed_lock.mp3"]);
 
         //Tree sounds
         game.load.audio("treeCutSound", ["assets/audio/chop01.ogg", "assets/audio/chop01.mp3"]);
