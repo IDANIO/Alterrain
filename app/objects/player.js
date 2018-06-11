@@ -15,7 +15,7 @@ class Player extends Character {
      * Initialized to zero.
      * @type {Array.<Number>} Key: Tiles Enum. Value: item count.
      */
-    this.inventory = Array(...Array(9)).map(Number.prototype.valueOf, 0);
+    this.inventory = Array(...Array(10)).map(Number.prototype.valueOf, 0);
 
     // Players start with 20 bridge tiles
     this.gainItem(Tiles.BRIDGE, 20);

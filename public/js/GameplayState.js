@@ -23,7 +23,7 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 32;
 
-var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert", "Ice"];
+var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert", "Ice", "Cobblestone"];
 
 // We are using num-pad representation (Ivan)
 //
@@ -401,6 +401,11 @@ GameplayState.prototype = {
         }
         if(e.keyCode === Phaser.Keyboard.EIGHT){
             gameplayState.tileChoice = 8; //ice
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
+        if(e.keyCode === Phaser.Keyboard.NINE){
+            gameplayState.tileChoice = 9; //cobblestone
             gameplayState.tileText.text = tileName[gameplayState.tileChoice];
             gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
         }
