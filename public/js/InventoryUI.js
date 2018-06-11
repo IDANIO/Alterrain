@@ -3,7 +3,7 @@ function InventoryUI(game, x, y, key, frame){
     //Call to Phaser.Sprite(game, x, y, key, frame)
     Phaser.Sprite.call(this, game, x, y, key, frame);
     
-    this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert", "Ice"];
+    this.tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert", "Ice", "Cobblestone"];
     
     //Text colors for the inventory count in each slot
     this.hexRed = 0xffa214;

@@ -43,9 +43,11 @@ MainMenuState.prototype = {
         game.load.image("lockBackground", "./assets/img/chest_icon_box.png");
         game.load.image("inventoryUI", "./assets/img/inventory_ui.png", 48, 128);
         game.load.image("highlightUI", "./assets/img/highlight_ui.png", 37, 34);
+        game.load.image("pauseBackground", "./assets/img/pause_background.png");
         game.load.image("menuHighlight", "./assets/img/menu_highlight.png");
         game.load.image("zIcon", "./assets/img/Z_key_icon.png");
         game.load.image("eIcon", "./assets/img/E_key_icon.png");
+        game.load.image("escIcon", "./assets/img/Esc_key_icon.png");
         game.load.image("spaceIcon", "./assets/img/Space_key_icon.png");
         game.load.image("arrowKeysIcon", "./assets/img/Arrow_keys_icon.png");
 
@@ -65,6 +67,7 @@ MainMenuState.prototype = {
         game.load.audio("pickupLootSound", ["assets/audio/pickup_loot01.ogg", "assets/audio/pickup_loot01.mp3"]);
         game.load.audio("chestOpenSound", ["assets/audio/creak.ogg", "assets/audio/creak.mp3"]);
         game.load.audio("chestUnlockSound", ["assets/audio/unlock.ogg", "assets/audio/unlock.mp3"]);
+        game.load.audio("chestLockedSound", ["assets/audio/closed_lock.ogg", "assets/audio/closed_lock.mp3"]);
 
         //Tree sounds
         game.load.audio("treeCutSound", ["assets/audio/chop01.ogg", "assets/audio/chop01.mp3"]);

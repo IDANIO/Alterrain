@@ -23,7 +23,7 @@ var GameplayState = function(game){
 //Tile-based movement
 var playerSpeed = 32;
 
-var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert", "Ice"];
+var tileName = ["Grass", "Sand", "Stone", "Water", "Bridge", "Forest", "Snow", "Desert", "Ice", "Cobblestone"];
 
 // We are using num-pad representation (Ivan)
 //
@@ -85,9 +85,12 @@ GameplayState.prototype = {
 
         //Create the pause/quit UI
         this.pauseUI = new PauseUI(game, 0, 0);
+        this.uiGroup.add(this.pauseUI.pauseBackground);
         this.uiGroup.add(this.pauseUI.promptText);
         this.uiGroup.add(this.pauseUI.choiceText);
         this.pauseUI.hide();
+        this.escIcon = game.add.sprite(4, 4, "escIcon");
+        this.uiGroup.add(this.escIcon);
 
         //Create the inventoryUI
         this.playerInventoryUI = new InventoryUI(game, 120, 393, "inventoryUI");
@@ -109,7 +112,7 @@ GameplayState.prototype = {
         this.controlsUI = new ControlsUI(game, 0, 0);
         this.loadingText = game.add.bitmapText(GAME_WIDTH / 2, 430, "m5x7", "Loading...", 48);
         this.loadingText.anchor.setTo(0.5);
-
+        this.loadingText.tint = 0xbf6f4a;
 
         // -------------------------------------- Ivan's change
         this.cursors = game.input.keyboard.createCursorKeys();
@@ -285,6 +288,7 @@ GameplayState.prototype = {
         this.pickupLootSound = game.add.audio("pickupLootSound");
         this.chestOpenSound = game.add.audio("chestOpenSound");
         this.chestUnlockSound = game.add.audio("chestUnlockSound");
+        this.chestLockedSound = game.add.audio("chestLockedSound");
         this.treeCutSound = game.add.audio("treeCutSound");
         this.treeDestroyedSound = game.add.audio("treeDestroyedSound");
 
@@ -401,6 +405,11 @@ GameplayState.prototype = {
         }
         if(e.keyCode === Phaser.Keyboard.EIGHT){
             gameplayState.tileChoice = 8; //ice
+            gameplayState.tileText.text = tileName[gameplayState.tileChoice];
+            gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
+        }
+        if(e.keyCode === Phaser.Keyboard.NINE){
+            gameplayState.tileChoice = 9; //cobblestone
             gameplayState.tileText.text = tileName[gameplayState.tileChoice];
             gameplayState.playerInventoryUI.updateHighlight(gameplayState.tileChoice - 1);
         }
@@ -555,7 +564,7 @@ GameplayState.prototype = {
     },
 
     //Interact with a specific treasure chest
-    interactWithChest: function(tileX, tileY, state, playersRequired, success){
+    interactWithChest: function(tileX, tileY, state, playerRequired, success){
         let treasureChest = this.objectMap[tileX][tileY];
         if(treasureChest){
             //New player unlocked 1 lock in this chest
@@ -564,8 +573,8 @@ GameplayState.prototype = {
             }
             //Old player tried to interact with treasure chest, so nothing happens
             if(state === 1){
-                if(playersRequired == treasureChest.numPlayersRequired){ //old player
-                    console.log("Old player tried unlocking treasure chest");
+                if(playerRequired == treasureChest.numPlayersRequired){ //old player
+                    this.playSoundFrom(this.chestLockedSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
                 }
                 else{ //new player
                     this.playSoundFrom(this.chestUnlockSound, tileX * TILE_SIZE, tileY * TILE_SIZE);

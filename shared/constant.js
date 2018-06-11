@@ -25,6 +25,7 @@ exports.Tiles = {
   SNOW: 6,
   DESERT: 7,
   ICE: 8,
+  COBBLESTONE: 9,
 };
 
 /**
@@ -35,6 +36,7 @@ exports.TileData = [
   0,
   0,
   1,
+  0,
   0,
   0,
   0,
@@ -54,6 +56,7 @@ exports.TileSpeed = [
   4.5,
   4.5,
   4,
+  4.5,
   4.5,
 ];
 

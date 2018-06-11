@@ -56,21 +56,21 @@ class DualChest extends Chest {
         x: this._x,
         y: this._y,
         state: 4,
-        playersRequired: this.playerRequired,
+        playerRequired: this.playerRequired,
       });
     } else if (success === 1) {
       this.world.server.io.emit('chestUpdate', {
         x: this._x,
         y: this._y,
         state: 5,
-        playersRequired: this.playerRequired,
+        playerRequired: this.playerRequired,
       });
     } else if (success === 2) {
       this.world.server.io.emit('chestUpdate', {
         x: this._x,
         y: this._y,
         state: this.state,
-        playersRequired: this.playerRequired,
+        playerRequired: this.playerRequired,
       });
     }
   }

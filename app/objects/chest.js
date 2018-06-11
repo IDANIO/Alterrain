@@ -15,7 +15,7 @@ class Chest extends GameObject {
     this.loots = [
       Tiles.GRASS, Tiles.STONE, Tiles.SAND,
       Tiles.FOREST, Tiles.SNOW, Tiles.DESERT,
-      Tiles.ICE,
+      Tiles.ICE, Tiles.COBBLESTONE
     ];
 
     this.playerRequired = 1;
@@ -34,7 +34,7 @@ class Chest extends GameObject {
         this.world.emit('objectRemoval', this);
 
         if (this.canRespawn) {
-          let chest = this.world.spawnChest();
+          let chest = this.world.spawnChest(true, true);
 
           this.world.server.io.emit('spawnChests', [
             {
@@ -96,11 +96,13 @@ class Chest extends GameObject {
         break;
     }
 
+    // TODO: Refactor
+    console.log(this.world);
     this.world.server.io.emit('chestUpdate', {
       x: this._x,
       y: this._y,
       state: this.state,
-      playersRequired: this.playerRequired,
+      playerRequired: this.playerRequired,
     });
   }
 
@@ -143,7 +145,7 @@ class Chest extends GameObject {
   }
 
   serialize() {
-    return `${super.serialize()} ${this.state} ${this.playersRequired}`;
+    return `${super.serialize()} ${this.state} ${this.playerRequired}`;
   }
 }
 
