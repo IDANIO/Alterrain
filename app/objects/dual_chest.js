@@ -6,23 +6,23 @@ class DualChest extends Chest {
   constructor(world, x = 0, y = 0) {
     super(world, x, y);
 
+    this.lootedPlayerHistory = [];
+
     let half = Math.floor(this.world.players.size / 2);
     this.playerRequired = Math.min(5, Math.max(2, half));
   }
 
   onOpened(player) {
     let success = 0; // 0 = new player looted
-    // if this player is recorded in the history.
-    let index = this.playerHistory.indexOf(player.id);
-    if (index !== -1) {
+    if (this.lootedPlayerHistory.indexOf(player.id) === -1) {
       this.awardPlayer(player);
       this.success = true;
-      this.playerHistory.splice(index, 1);
+      this.lootedPlayerHistory.push(player.id);
     } else {
         success = 1; // 1 = old player failed to loot
     }
 
-    if (this.playerHistory <= 0) {
+    if (this.playerHistory.length === this.lootedPlayerHistory.length) {
       this.state = Chest.STATE_LOOTED;
       success = 2; // 2 = last player looted
     }
