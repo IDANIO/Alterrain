@@ -46,6 +46,7 @@ MainMenuState.prototype = {
         game.load.image("menuHighlight", "./assets/img/menu_highlight.png");
         game.load.image("zIcon", "./assets/img/Z_key_icon.png");
         game.load.image("eIcon", "./assets/img/E_key_icon.png");
+        game.load.image("escIcon", "./assets/img/Esc_key_icon.png");
         game.load.image("spaceIcon", "./assets/img/Space_key_icon.png");
         game.load.image("arrowKeysIcon", "./assets/img/Arrow_keys_icon.png");
 

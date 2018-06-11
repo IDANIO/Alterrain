@@ -88,6 +88,8 @@ GameplayState.prototype = {
         this.uiGroup.add(this.pauseUI.promptText);
         this.uiGroup.add(this.pauseUI.choiceText);
         this.pauseUI.hide();
+        this.escIcon = game.add.sprite(4, 4, "escIcon");
+        this.uiGroup.add(this.escIcon);
 
         //Create the inventoryUI
         this.playerInventoryUI = new InventoryUI(game, 120, 393, "inventoryUI");
