@@ -561,7 +561,7 @@ GameplayState.prototype = {
     },
 
     //Interact with a specific treasure chest
-    interactWithChest: function(tileX, tileY, state, playersRequired, success){
+    interactWithChest: function(tileX, tileY, state, playerRequired, success){
         let treasureChest = this.objectMap[tileX][tileY];
         if(treasureChest){
             //New player unlocked 1 lock in this chest
@@ -570,7 +570,7 @@ GameplayState.prototype = {
             }
             //Old player tried to interact with treasure chest, so nothing happens
             if(state === 1){
-                if(playersRequired == treasureChest.numPlayersRequired){ //old player
+                if(playerRequired == treasureChest.numPlayersRequired){ //old player
                     this.playSoundFrom(this.chestLockedSound, tileX * TILE_SIZE, tileY * TILE_SIZE);
                 }
                 else{ //new player
