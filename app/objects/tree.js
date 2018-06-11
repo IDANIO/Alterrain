@@ -15,7 +15,7 @@ class Tree extends GameObject {
 
     this.durability = util.integerInRange(3, 8);
 
-    this.tresureChestChance = 3; // 3% chance
+    this.tresureChestChance = 6; // 6% chance
     this.removeCount = 1 * 60; // 30 * 60;
 
     this.loot = Tiles.BRIDGE;
