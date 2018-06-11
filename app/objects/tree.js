@@ -1,7 +1,11 @@
 'use strict';
 
 const util = require('../util.js');
+const logger = require('../logger.js');
+
 const GameObject = require('../objects/game_object.js');
+const Chest = require('./chest.js');
+
 const {Tiles} = require('../../shared/constant.js');
 
 class Tree extends GameObject {
@@ -11,6 +15,7 @@ class Tree extends GameObject {
 
     this.durability = util.integerInRange(3, 8);
 
+    this.tresureChestChance = 3; // 3% chance
     this.removeCount = 1 * 60; // 30 * 60;
 
     this.loot = Tiles.BRIDGE;
@@ -22,6 +27,10 @@ class Tree extends GameObject {
     }
     if (this.removeCount <= 0) {
       this.world.emit('objectRemoval', this);
+
+      if (util.integerInRange(0, 100) <= this.tresureChestChance) {
+        this.revealHiddenChest();
+      }
     }
   }
 
@@ -37,6 +46,26 @@ class Tree extends GameObject {
       y: this._y,
       durability: this.durability,
     });
+  }
+
+  /**
+   * @private
+   */
+  revealHiddenChest() {
+      let chest = new Chest(this.world, this._x, this._y);
+      this.world.chestObjects.push(chest);
+      this.world.objectContainer.add(chest);
+
+      this.world.server.io.emit('spawnChests', [
+        {
+          x: chest._x,
+          y: chest._y,
+          state: chest.state,
+          playerRequired: chest.playerRequired,
+        },
+      ]);
+
+      logger.data(`a chest spawned at (${chest._x},${chest._y}).`);
   }
 
   serialize() {
