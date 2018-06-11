@@ -162,7 +162,7 @@ var Client = {};
      * @param data {Object} An object with the x and y index of the chest and its state
      */
     Client.socket.on('chestUpdate', function (data){
-      gameplayState.interactWithChest(data.x, data.y, data.state, data.playersRequired, data.success);
+      gameplayState.interactWithChest(data.x, data.y, data.state, data.playerRequired, data.success);
     });
 
     /**
