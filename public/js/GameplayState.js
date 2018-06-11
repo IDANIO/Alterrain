@@ -85,6 +85,7 @@ GameplayState.prototype = {
 
         //Create the pause/quit UI
         this.pauseUI = new PauseUI(game, 0, 0);
+        this.uiGroup.add(this.pauseUI.pauseBackground);
         this.uiGroup.add(this.pauseUI.promptText);
         this.uiGroup.add(this.pauseUI.choiceText);
         this.pauseUI.hide();

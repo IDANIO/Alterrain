@@ -43,6 +43,7 @@ MainMenuState.prototype = {
         game.load.image("lockBackground", "./assets/img/chest_icon_box.png");
         game.load.image("inventoryUI", "./assets/img/inventory_ui.png", 48, 128);
         game.load.image("highlightUI", "./assets/img/highlight_ui.png", 37, 34);
+        game.load.image("pauseBackground", "./assets/img/pause_background.png");
         game.load.image("menuHighlight", "./assets/img/menu_highlight.png");
         game.load.image("zIcon", "./assets/img/Z_key_icon.png");
         game.load.image("eIcon", "./assets/img/E_key_icon.png");
