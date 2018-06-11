@@ -15,7 +15,7 @@ class Chest extends GameObject {
     this.loots = [
       Tiles.GRASS, Tiles.STONE, Tiles.SAND,
       Tiles.FOREST, Tiles.SNOW, Tiles.DESERT,
-      Tiles.ICE,
+      Tiles.ICE, Tiles.COBBLESTONE,
     ];
 
     this.playerRequired = 1;
@@ -96,7 +96,6 @@ class Chest extends GameObject {
         break;
     }
 
-    // TODO: Refactor
     this.world.server.io.emit('chestUpdate', {
       x: this._x,
       y: this._y,
