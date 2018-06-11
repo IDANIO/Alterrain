@@ -97,6 +97,7 @@ class Chest extends GameObject {
     }
 
     // TODO: Refactor
+    console.log(this.world);
     this.world.server.io.emit('chestUpdate', {
       x: this._x,
       y: this._y,
