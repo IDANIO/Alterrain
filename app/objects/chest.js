@@ -34,7 +34,7 @@ class Chest extends GameObject {
         this.world.emit('objectRemoval', this);
 
         if (this.canRespawn) {
-          let chest = this.world.spawnChest();
+          let chest = this.world.spawnChest(true, true);
 
           this.world.server.io.emit('spawnChests', [
             {
