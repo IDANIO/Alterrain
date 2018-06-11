@@ -382,7 +382,6 @@ class World {
 
       this.emit('weatherChange', this.currentWeather);
 
-      // TODO: Refactor
       this.server.io.emit('weatherChange', this.currentWeather);
       this.onWeatherChange();
 
@@ -402,7 +401,6 @@ class World {
 
   /**
    * O(n^2 * 2 log n) algorithm.
-   * TODO: Make it efficient.
    */
   spawnRandomTree() {
     let count = 0;
@@ -437,7 +435,6 @@ class World {
     if (this.lastWeather === World.WEATHER.RAIN &&
         this.currentWeather !== World.WEATHER.RAIN) {
       // 50 is the number of chests of, object container count them as well.
-      // TODO: Fix this, forgive my messy code.
       if (this.objectContainer.tree.size < this.maxTreeNumber + 50) {
         this.spawnRandomTree();
       }

@@ -66,7 +66,6 @@ class DualChest extends Chest {
         playersRequired: this.playerRequired,
       });
     } else if (success === 2) {
-      // TODO: Refactor
       this.world.server.io.emit('chestUpdate', {
         x: this._x,
         y: this._y,

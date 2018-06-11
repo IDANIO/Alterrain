@@ -96,7 +96,6 @@ class Chest extends GameObject {
         break;
     }
 
-    // TODO: Refactor
     this.world.server.io.emit('chestUpdate', {
       x: this._x,
       y: this._y,

@@ -565,7 +565,6 @@ GameplayState.prototype = {
             //Old player tried to interact with treasure chest, so nothing happens
             if(state === 1){
                 if(playersRequired == treasureChest.numPlayersRequired){ //old player
-                    //TODO locked sound
                     console.log("Old player tried unlocking treasure chest");
                 }
                 else{ //new player

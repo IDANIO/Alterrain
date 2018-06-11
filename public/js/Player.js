@@ -111,7 +111,6 @@ Player.prototype.stepTo = function(){
 Player.prototype.setDirection = function(d) {
   this.facing = d;
 
-  // TODO: Here was a bug
   switch (d){
     case FACING_DOWN:
       this.frame = 0;

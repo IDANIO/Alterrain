@@ -216,7 +216,6 @@ class Server {
   onPlayerJoinWorld(socket, playerEvent) {
     this.resetIdleTimeout(socket);
     // This send the data of all player to the new-joined client.
-    // TODO: Refactor
     let newX;
     let newY;
     do {
