@@ -10,7 +10,7 @@ UCSC CMPM 120 Phaser Multiplayer Game
 
 ## Team
 
-* **Yanwen Xu** ([RaiderSoap](https://github.com/RaiderSoap) ) - :floppy_disk: Back-End developer
+* **Yanwen Xu** ([xuyanwen2012](https://github.com/xuyanwen2012) ) - :floppy_disk: Back-End developer
 * **Julio Choy** ([svntax](https://github.com/svntax)) - :computer: Front-End developer, :art: Games Artist
 * **David Kirkpatrick** ([DavidKirkpatrick95](https://github.com/DavidKirkpatrick95)) - :art: Games Artist, :sound: Games Audio
 
